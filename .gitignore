@@ -1,0 +1,34 @@
+# NeuroMove
+
+# Web application
+website/node_modules/
+website/dist/
+website/coverage/
+website/playwright-report/
+website/test-results/
+
+# Python and firmware build files
+**/__pycache__/
+*.py[cod]
+**/.pio/
+
+# Local-only folders, intentionally excluded from the team repository
+/.claude/
+/atlas/
+/video/
+
+# Obsolete files from the old layout
+/план-до-27-октября.md
+/hardware/models/enclosure/render.mjs
+
+# Generated review output and temporary files
+tmp/
+*.log
+*.tmp
+*.bak
+
+# Operating system files
+.DS_Store
+Thumbs.db
+website/e2e-report/
+website/e2e-results/

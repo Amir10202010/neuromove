@@ -1,0 +1,9 @@
+# imu-csv v1
+# device=NM-01 fw=0.1 rate_hz=100 acc_g=4 gyro_dps=1000 sensors=trunk,upper_r,fore_r
+# board=esp32s3 i2c_hz=100000 arm=right
+# id_trunk=5A4C6311 id_upper_r=5A4C6322 id_fore_r=none
+# внимание: fore_r отвечает WHO_AM_I 0x72, а не 0x68 — копия чипа; регистры те же
+seq,trunk_ax,trunk_ay,trunk_az,trunk_gx,trunk_gy,trunk_gz,upper_r_ax,upper_r_ay,upper_r_az,upper_r_gx,upper_r_gy,upper_r_gz,fore_r_ax,fore_r_ay,fore_r_az,fore_r_gx,fore_r_gy,fore_r_gz
+0,-8192,0,50,-3,0,0,-8192,100,47,-3,0,1000,-8192,200,44,-3,0,2000
+1,-8191,-1,50,-2,-1,0,-8191,99,47,-2,-1,1000,-8191,199,44,-2,-1,2000
+2,-8190,-2,50,-1,-2,0,-8190,98,47,-1,-2,1000,-8190,198,44,-1,-2,2000

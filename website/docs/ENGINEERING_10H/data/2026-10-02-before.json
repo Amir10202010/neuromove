@@ -1,0 +1,4667 @@
+{
+ "started": "2026-10-02T02:49:21.758Z",
+ "finished": "2026-10-02T02:50:14.169Z",
+ "full": true,
+ "node": "v24.14.1",
+ "results": [
+  {
+   "id": "C1-shoulder_flexion-ideal",
+   "criterion": "C1 (алгоритм): MAE ≤ 1,0°, максимум ≤ 2,0°",
+   "setup": "shoulder_flexion, right, датчик «ideal»; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.01,
+     "mae": 0.03,
+     "rmse": 0.04,
+     "p95": 0.1,
+     "max": 0.16
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.02,
+     "mae": 0.03,
+     "rmse": 0.04,
+     "p95": 0.09,
+     "max": 0.18
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0,
+     "mae": 0.02,
+     "rmse": 0.03,
+     "p95": 0.06,
+     "max": 0.16
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.01,
+     "mae": 0.03,
+     "rmse": 0.04,
+     "p95": 0.08,
+     "max": 0.15
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.01,
+     "mae": 0.02,
+     "rmse": 0.03,
+     "p95": 0.06,
+     "max": 0.13
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.01,
+     "mae": 0.02,
+     "rmse": 0.03,
+     "p95": 0.08,
+     "max": 0.12
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.01,
+     "mae": 0.02,
+     "rmse": 0.03,
+     "p95": 0.06,
+     "max": 0.12
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.02,
+     "mae": 0.03,
+     "rmse": 0.04,
+     "p95": 0.09,
+     "max": 0.17
+    }
+   ],
+   "summary": {
+    "worstMae": 0.03,
+    "worstMax": 0.18,
+    "meanMae": 0.03
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C1-shoulder_flexion",
+   "criterion": "C1: MAE ≤ 1,0°, максимум ≤ 2,0°",
+   "setup": "shoulder_flexion, right, датчик «typical» + калибровка в 6 положениях; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -1.13,
+     "mae": 1.13,
+     "rmse": 1.24,
+     "p95": 1.83,
+     "max": 1.87
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.5,
+     "mae": 0.5,
+     "rmse": 0.56,
+     "p95": 0.84,
+     "max": 0.85
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.07,
+     "mae": 0.07,
+     "rmse": 0.08,
+     "p95": 0.15,
+     "max": 0.18
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.35,
+     "mae": 0.35,
+     "rmse": 0.39,
+     "p95": 0.61,
+     "max": 0.62
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.56,
+     "mae": 0.56,
+     "rmse": 0.61,
+     "p95": 0.88,
+     "max": 0.89
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -1.2,
+     "mae": 1.2,
+     "rmse": 1.34,
+     "p95": 2,
+     "max": 2.02
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.75,
+     "mae": 0.75,
+     "rmse": 0.85,
+     "p95": 1.29,
+     "max": 1.31
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.4,
+     "mae": 0.4,
+     "rmse": 0.44,
+     "p95": 0.64,
+     "max": 0.66
+    }
+   ],
+   "summary": {
+    "worstMae": 1.2,
+    "worstMax": 2.02,
+    "meanMae": 0.62
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": false
+  },
+  {
+   "id": "C1-shoulder_abduction-ideal",
+   "criterion": "C1 (алгоритм): MAE ≤ 1,0°, максимум ≤ 2,0°",
+   "setup": "shoulder_abduction, right, датчик «ideal»; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.02,
+     "mae": 0.03,
+     "rmse": 0.04,
+     "p95": 0.08,
+     "max": 0.16
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.02,
+     "mae": 0.03,
+     "rmse": 0.04,
+     "p95": 0.07,
+     "max": 0.14
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0,
+     "mae": 0.02,
+     "rmse": 0.03,
+     "p95": 0.07,
+     "max": 0.16
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.01,
+     "mae": 0.02,
+     "rmse": 0.03,
+     "p95": 0.07,
+     "max": 0.1
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.01,
+     "mae": 0.02,
+     "rmse": 0.03,
+     "p95": 0.05,
+     "max": 0.11
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0,
+     "mae": 0.03,
+     "rmse": 0.04,
+     "p95": 0.09,
+     "max": 0.16
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.01,
+     "mae": 0.03,
+     "rmse": 0.03,
+     "p95": 0.06,
+     "max": 0.11
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.01,
+     "mae": 0.03,
+     "rmse": 0.04,
+     "p95": 0.07,
+     "max": 0.12
+    }
+   ],
+   "summary": {
+    "worstMae": 0.03,
+    "worstMax": 0.16,
+    "meanMae": 0.03
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C1-shoulder_abduction",
+   "criterion": "C1: MAE ≤ 1,0°, максимум ≤ 2,0°",
+   "setup": "shoulder_abduction, right, датчик «typical» + калибровка в 6 положениях; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.88,
+     "mae": 0.88,
+     "rmse": 1,
+     "p95": 1.51,
+     "max": 1.52
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.28,
+     "mae": 0.28,
+     "rmse": 0.32,
+     "p95": 0.49,
+     "max": 0.5
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.11,
+     "mae": 0.11,
+     "rmse": 0.12,
+     "p95": 0.19,
+     "max": 0.23
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.53,
+     "mae": 0.53,
+     "rmse": 0.61,
+     "p95": 0.93,
+     "max": 0.96
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.49,
+     "mae": 0.49,
+     "rmse": 0.54,
+     "p95": 0.8,
+     "max": 0.83
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.81,
+     "mae": 0.81,
+     "rmse": 0.9,
+     "p95": 1.34,
+     "max": 1.35
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.11,
+     "mae": 0.11,
+     "rmse": 0.14,
+     "p95": 0.23,
+     "max": 0.27
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.07,
+     "mae": 0.08,
+     "rmse": 0.1,
+     "p95": 0.16,
+     "max": 0.23
+    }
+   ],
+   "summary": {
+    "worstMae": 0.88,
+    "worstMax": 1.52,
+    "meanMae": 0.41
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C1-elbow_flexion-ideal",
+   "criterion": "C1 (алгоритм): MAE ≤ 1,0°, максимум ≤ 2,0°",
+   "setup": "elbow_flexion, right, датчик «ideal»; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.04,
+     "mae": 0.05,
+     "rmse": 0.06,
+     "p95": 0.11,
+     "max": 0.22
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.07,
+     "mae": 0.07,
+     "rmse": 0.08,
+     "p95": 0.15,
+     "max": 0.25
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.01,
+     "mae": 0.03,
+     "rmse": 0.05,
+     "p95": 0.11,
+     "max": 0.2
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.02,
+     "mae": 0.03,
+     "rmse": 0.04,
+     "p95": 0.08,
+     "max": 0.19
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.05,
+     "mae": 0.05,
+     "rmse": 0.06,
+     "p95": 0.14,
+     "max": 0.24
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.05,
+     "mae": 0.05,
+     "rmse": 0.07,
+     "p95": 0.14,
+     "max": 0.29
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.04,
+     "mae": 0.04,
+     "rmse": 0.05,
+     "p95": 0.11,
+     "max": 0.21
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.03,
+     "mae": 0.04,
+     "rmse": 0.05,
+     "p95": 0.11,
+     "max": 0.25
+    }
+   ],
+   "summary": {
+    "worstMae": 0.07,
+    "worstMax": 0.29,
+    "meanMae": 0.05
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C1-elbow_flexion",
+   "criterion": "C1: MAE ≤ 1,0°, максимум ≤ 2,0°",
+   "setup": "elbow_flexion, right, датчик «typical» + калибровка в 6 положениях; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.28,
+     "mae": 0.28,
+     "rmse": 0.31,
+     "p95": 0.49,
+     "max": 0.58
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.83,
+     "mae": 0.83,
+     "rmse": 0.89,
+     "p95": 1.3,
+     "max": 1.33
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.99,
+     "mae": 0.99,
+     "rmse": 1.08,
+     "p95": 1.56,
+     "max": 1.58
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.4,
+     "mae": 0.4,
+     "rmse": 0.42,
+     "p95": 0.61,
+     "max": 0.69
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.62,
+     "mae": 0.62,
+     "rmse": 0.67,
+     "p95": 0.94,
+     "max": 0.98
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.01,
+     "mae": 0.04,
+     "rmse": 0.05,
+     "p95": 0.09,
+     "max": 0.2
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.36,
+     "mae": 0.36,
+     "rmse": 0.38,
+     "p95": 0.56,
+     "max": 0.62
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.01,
+     "mae": 0.05,
+     "rmse": 0.07,
+     "p95": 0.13,
+     "max": 0.28
+    }
+   ],
+   "summary": {
+    "worstMae": 0.99,
+    "worstMax": 1.58,
+    "meanMae": 0.45
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C1-forearm_rotation-ideal",
+   "criterion": "C1 (алгоритм): MAE ≤ 1,0°, максимум ≤ 2,0°",
+   "setup": "forearm_rotation, right, датчик «ideal»; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.03,
+     "mae": 0.03,
+     "rmse": 0.03,
+     "p95": 0.06,
+     "max": 0.08
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.01,
+     "mae": 0.02,
+     "rmse": 0.03,
+     "p95": 0.05,
+     "max": 0.06
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.02,
+     "mae": 0.02,
+     "rmse": 0.03,
+     "p95": 0.05,
+     "max": 0.06
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.02,
+     "mae": 0.02,
+     "rmse": 0.03,
+     "p95": 0.05,
+     "max": 0.1
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0,
+     "mae": 0.01,
+     "rmse": 0.02,
+     "p95": 0.05,
+     "max": 0.08
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.03,
+     "mae": 0.03,
+     "rmse": 0.04,
+     "p95": 0.06,
+     "max": 0.09
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0,
+     "mae": 0.01,
+     "rmse": 0.02,
+     "p95": 0.04,
+     "max": 0.05
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.01,
+     "mae": 0.02,
+     "rmse": 0.02,
+     "p95": 0.04,
+     "max": 0.08
+    }
+   ],
+   "summary": {
+    "worstMae": 0.03,
+    "worstMax": 0.1,
+    "meanMae": 0.02
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C1-forearm_rotation",
+   "criterion": "C1: MAE ≤ 1,0°, максимум ≤ 2,0°",
+   "setup": "forearm_rotation, right, датчик «typical» + калибровка в 6 положениях; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.26,
+     "mae": 0.35,
+     "rmse": 0.42,
+     "p95": 0.64,
+     "max": 0.69
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.07,
+     "mae": 0.13,
+     "rmse": 0.16,
+     "p95": 0.33,
+     "max": 0.42
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.49,
+     "mae": 0.49,
+     "rmse": 0.49,
+     "p95": 0.6,
+     "max": 0.66
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.4,
+     "mae": 0.4,
+     "rmse": 0.44,
+     "p95": 0.67,
+     "max": 0.72
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.83,
+     "mae": 0.86,
+     "rmse": 1.03,
+     "p95": 1.59,
+     "max": 1.61
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.31,
+     "mae": 0.59,
+     "rmse": 0.75,
+     "p95": 1.12,
+     "max": 1.14
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.18,
+     "mae": 0.18,
+     "rmse": 0.18,
+     "p95": 0.23,
+     "max": 0.25
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.17,
+     "mae": 0.2,
+     "rmse": 0.25,
+     "p95": 0.45,
+     "max": 0.5
+    }
+   ],
+   "summary": {
+    "worstMae": 0.86,
+    "worstMax": 1.61,
+    "meanMae": 0.4
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C2-slow",
+   "criterion": "C2: RMSE ≤ 2°, ошибка ROM повтора ≤ 2°",
+   "setup": "подъём вперёд 0 → 150° за 3 с, 3 повтора; датчик «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 2550,
+     "coverage": 100,
+     "bias": -0.6,
+     "mae": 0.8,
+     "rmse": 1.17,
+     "p95": 2.95,
+     "max": 3.24,
+     "reps": 3,
+     "worstRomErr": 0.56
+    },
+    {
+     "seed": 12,
+     "n": 2550,
+     "coverage": 100,
+     "bias": 0.27,
+     "mae": 0.46,
+     "rmse": 0.55,
+     "p95": 0.99,
+     "max": 1.04,
+     "reps": 3,
+     "worstRomErr": 0.42
+    },
+    {
+     "seed": 13,
+     "n": 2550,
+     "coverage": 100,
+     "bias": -0.04,
+     "mae": 0.36,
+     "rmse": 0.49,
+     "p95": 1.15,
+     "max": 1.34,
+     "reps": 3,
+     "worstRomErr": 0.31
+    },
+    {
+     "seed": 14,
+     "n": 2550,
+     "coverage": 100,
+     "bias": -0.18,
+     "mae": 0.42,
+     "rmse": 0.63,
+     "p95": 1.55,
+     "max": 1.79,
+     "reps": 3,
+     "worstRomErr": 0.17
+    },
+    {
+     "seed": 15,
+     "n": 2550,
+     "coverage": 100,
+     "bias": -0.31,
+     "mae": 0.49,
+     "rmse": 0.72,
+     "p95": 1.66,
+     "max": 1.9,
+     "reps": 3,
+     "worstRomErr": 0.07
+    },
+    {
+     "seed": 16,
+     "n": 2550,
+     "coverage": 100,
+     "bias": -0.63,
+     "mae": 0.8,
+     "rmse": 1.17,
+     "p95": 2.86,
+     "max": 3.2,
+     "reps": 3,
+     "worstRomErr": 0.5
+    },
+    {
+     "seed": 17,
+     "n": 2550,
+     "coverage": 100,
+     "bias": 0.4,
+     "mae": 0.43,
+     "rmse": 0.5,
+     "p95": 0.89,
+     "max": 0.94,
+     "reps": 3,
+     "worstRomErr": 0.63
+    },
+    {
+     "seed": 18,
+     "n": 2550,
+     "coverage": 100,
+     "bias": -0.22,
+     "mae": 0.44,
+     "rmse": 0.63,
+     "p95": 1.41,
+     "max": 1.61,
+     "reps": 3,
+     "worstRomErr": 0.03
+    }
+   ],
+   "summary": {
+    "worstRmse": 1.17,
+    "worstRomErr": 0.63,
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C3-fast",
+   "criterion": "C3: RMSE ≤ 5°, ошибка ROM повтора ≤ 4°",
+   "setup": "подъём вперёд 0 → 150° за 0.6 с, 3 повтора; датчик «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 900,
+     "coverage": 100,
+     "bias": -0.47,
+     "mae": 2.18,
+     "rmse": 3.06,
+     "p95": 6.86,
+     "max": 9.34,
+     "reps": 3,
+     "worstRomErr": 2.11
+    },
+    {
+     "seed": 12,
+     "n": 900,
+     "coverage": 100,
+     "bias": 0.04,
+     "mae": 1.99,
+     "rmse": 2.7,
+     "p95": 5.51,
+     "max": 7.95,
+     "reps": 3,
+     "worstRomErr": 0.98
+    },
+    {
+     "seed": 13,
+     "n": 900,
+     "coverage": 100,
+     "bias": -0.06,
+     "mae": 1.55,
+     "rmse": 2.41,
+     "p95": 5.79,
+     "max": 6.95,
+     "reps": 3,
+     "worstRomErr": 0.28
+    },
+    {
+     "seed": 14,
+     "n": 900,
+     "coverage": 100,
+     "bias": -0.11,
+     "mae": 1.53,
+     "rmse": 2.43,
+     "p95": 5.81,
+     "max": 7.23,
+     "reps": 3,
+     "worstRomErr": 0.27
+    },
+    {
+     "seed": 15,
+     "n": 900,
+     "coverage": 100,
+     "bias": -0.19,
+     "mae": 1.6,
+     "rmse": 2.48,
+     "p95": 6.01,
+     "max": 7.17,
+     "reps": 3,
+     "worstRomErr": 0.56
+    },
+    {
+     "seed": 16,
+     "n": 900,
+     "coverage": 100,
+     "bias": -0.47,
+     "mae": 2.07,
+     "rmse": 2.94,
+     "p95": 6.42,
+     "max": 8.91,
+     "reps": 3,
+     "worstRomErr": 1.84
+    },
+    {
+     "seed": 17,
+     "n": 900,
+     "coverage": 100,
+     "bias": 0.12,
+     "mae": 1.78,
+     "rmse": 2.48,
+     "p95": 5.59,
+     "max": 6.9,
+     "reps": 3,
+     "worstRomErr": 0.51
+    },
+    {
+     "seed": 18,
+     "n": 900,
+     "coverage": 100,
+     "bias": -0.17,
+     "mae": 1.66,
+     "rmse": 2.49,
+     "p95": 6.07,
+     "max": 6.94,
+     "reps": 3,
+     "worstRomErr": 0.69
+    }
+   ],
+   "summary": {
+    "worstRmse": 3.06,
+    "worstRomErr": 2.11,
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C4-flick",
+   "criterion": "C4: упор посчитан, шаг помечен «saturation», нет NaN",
+   "setup": "локоть 0 → 130° за 0,15 с (пик ~1600 °/с), 3 раза",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "saturated": 78,
+     "flagged": "нет",
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 12,
+     "saturated": 78,
+     "flagged": "нет",
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 13,
+     "saturated": 78,
+     "flagged": "нет",
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 14,
+     "saturated": 78,
+     "flagged": "нет",
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 15,
+     "saturated": 78,
+     "flagged": "нет",
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 16,
+     "saturated": 78,
+     "flagged": "нет",
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 17,
+     "saturated": 78,
+     "flagged": "нет",
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 18,
+     "saturated": 78,
+     "flagged": "нет",
+     "nan": "нет",
+     "reps": 3
+    }
+   ],
+   "summary": {
+    "minSaturated": 78,
+    "flaggedAll": "нет"
+   },
+   "summaryRule": "все зёрна",
+   "pass": false
+  },
+  {
+   "id": "C5-gyro-drift",
+   "criterion": "C5: MAE ≤ 1,0° при +0,5 °/с после калибровки",
+   "setup": "shoulder_flexion, right, датчик «typical» + калибровка в 6 положениях; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.88,
+     "mae": 0.88,
+     "rmse": 1.02,
+     "p95": 1.58,
+     "max": 1.62
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.74,
+     "mae": 0.74,
+     "rmse": 0.79,
+     "p95": 1.08,
+     "max": 1.1
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.18,
+     "mae": 0.18,
+     "rmse": 0.19,
+     "p95": 0.25,
+     "max": 0.34
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.11,
+     "mae": 0.18,
+     "rmse": 0.21,
+     "p95": 0.36,
+     "max": 0.38
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.31,
+     "mae": 0.32,
+     "rmse": 0.4,
+     "p95": 0.64,
+     "max": 0.65
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.96,
+     "mae": 0.96,
+     "rmse": 1.13,
+     "p95": 1.76,
+     "max": 1.77
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 1,
+     "mae": 1,
+     "rmse": 1.07,
+     "p95": 1.53,
+     "max": 1.55
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.17,
+     "mae": 0.2,
+     "rmse": 0.24,
+     "p95": 0.4,
+     "max": 0.42
+    }
+   ],
+   "summary": {
+    "worstMae": 1,
+    "worstMax": 1.77,
+    "meanMae": 0.56
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C6-edge-nocal",
+   "criterion": "C6: без поправок — записать",
+   "setup": "подъём вперёд, ступени; датчик «edge»",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -1.02,
+     "mae": 1.74,
+     "rmse": 1.9,
+     "p95": 2.62,
+     "max": 2.69
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.46,
+     "mae": 1.27,
+     "rmse": 1.49,
+     "p95": 2.54,
+     "max": 2.56
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -5.27,
+     "mae": 5.27,
+     "rmse": 6.26,
+     "p95": 9.36,
+     "max": 9.39
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -1.75,
+     "mae": 1.75,
+     "rmse": 2.09,
+     "p95": 4.02,
+     "max": 4.04
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 3.99,
+     "mae": 3.99,
+     "rmse": 4.04,
+     "p95": 4.78,
+     "max": 4.8
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 3.21,
+     "mae": 3.21,
+     "rmse": 3.23,
+     "p95": 3.78,
+     "max": 3.81
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 5.18,
+     "mae": 5.18,
+     "rmse": 5.49,
+     "p95": 7.07,
+     "max": 7.11
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -5.73,
+     "mae": 5.73,
+     "rmse": 6.71,
+     "p95": 9.77,
+     "max": 9.8
+    }
+   ],
+   "summary": {
+    "worstMae": 5.73,
+    "worstMax": 9.8,
+    "meanMae": 3.52
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C6-edge-cal",
+   "criterion": "C6: с поправками 6 положений MAE ≤ 1,0°",
+   "setup": "подъём вперёд, ступени; датчик «edge»",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -1.13,
+     "mae": 1.13,
+     "rmse": 1.24,
+     "p95": 1.82,
+     "max": 1.9
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.5,
+     "mae": 0.5,
+     "rmse": 0.57,
+     "p95": 0.86,
+     "max": 0.87
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.07,
+     "mae": 0.08,
+     "rmse": 0.09,
+     "p95": 0.14,
+     "max": 0.19
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.36,
+     "mae": 0.36,
+     "rmse": 0.4,
+     "p95": 0.62,
+     "max": 0.64
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.54,
+     "mae": 0.54,
+     "rmse": 0.59,
+     "p95": 0.87,
+     "max": 0.88
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -1.22,
+     "mae": 1.22,
+     "rmse": 1.36,
+     "p95": 2.02,
+     "max": 2.07
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.77,
+     "mae": 0.77,
+     "rmse": 0.87,
+     "p95": 1.3,
+     "max": 1.32
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.4,
+     "mae": 0.4,
+     "rmse": 0.44,
+     "p95": 0.65,
+     "max": 0.68
+    }
+   ],
+   "summary": {
+    "worstMae": 1.22,
+    "worstMax": 2.07,
+    "meanMae": 0.63
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": false
+  },
+  {
+   "id": "C7-noise3",
+   "criterion": "C7: MAE ≤ 1,5° при шуме × 3",
+   "setup": "shoulder_flexion, right, датчик «typical» + калибровка в 6 положениях; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -1.15,
+     "mae": 1.15,
+     "rmse": 1.27,
+     "p95": 1.88,
+     "max": 1.93
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.43,
+     "mae": 0.44,
+     "rmse": 0.5,
+     "p95": 0.75,
+     "max": 0.78
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.08,
+     "mae": 0.09,
+     "rmse": 0.11,
+     "p95": 0.24,
+     "max": 0.35
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.36,
+     "mae": 0.36,
+     "rmse": 0.4,
+     "p95": 0.65,
+     "max": 0.71
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.58,
+     "mae": 0.58,
+     "rmse": 0.64,
+     "p95": 0.91,
+     "max": 0.93
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -1.23,
+     "mae": 1.23,
+     "rmse": 1.38,
+     "p95": 2.05,
+     "max": 2.09
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.76,
+     "mae": 0.76,
+     "rmse": 0.86,
+     "p95": 1.3,
+     "max": 1.35
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.42,
+     "mae": 0.42,
+     "rmse": 0.46,
+     "p95": 0.67,
+     "max": 0.72
+    }
+   ],
+   "summary": {
+    "worstMae": 1.23,
+    "worstMax": 2.09,
+    "meanMae": 0.63
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C8-jitter",
+   "criterion": "C8: MAE растёт ≤ 0,3° при дрожании σ = 1 мс",
+   "setup": "медленные повторы; то же зерно с дрожанием и без",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "maeBase": 0.8,
+     "maeJitter": 0.8,
+     "delta": 0
+    },
+    {
+     "seed": 12,
+     "maeBase": 0.46,
+     "maeJitter": 0.47,
+     "delta": 0.01
+    },
+    {
+     "seed": 13,
+     "maeBase": 0.36,
+     "maeJitter": 0.36,
+     "delta": 0
+    },
+    {
+     "seed": 14,
+     "maeBase": 0.42,
+     "maeJitter": 0.43,
+     "delta": 0
+    },
+    {
+     "seed": 15,
+     "maeBase": 0.49,
+     "maeJitter": 0.49,
+     "delta": 0
+    },
+    {
+     "seed": 16,
+     "maeBase": 0.8,
+     "maeJitter": 0.8,
+     "delta": 0
+    },
+    {
+     "seed": 17,
+     "maeBase": 0.43,
+     "maeJitter": 0.44,
+     "delta": 0.01
+    },
+    {
+     "seed": 18,
+     "maeBase": 0.44,
+     "maeJitter": 0.45,
+     "delta": 0
+    }
+   ],
+   "summary": {
+    "worstDelta": 0.01
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C9-drops",
+   "criterion": "C9: MAE растёт ≤ 0,3° при 5 % пропусков; после пачки 0,3 с ошибка < 2° не позже 1 с",
+   "setup": "медленные повторы; кадры теряются до движка",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "maeBase": 0.8,
+     "maeDrop5": 0.82,
+     "delta": 0.01,
+     "errAfterBurst": 1.59,
+     "burstFlag": "нет"
+    },
+    {
+     "seed": 12,
+     "maeBase": 0.46,
+     "maeDrop5": 0.47,
+     "delta": 0,
+     "errAfterBurst": 0.5,
+     "burstFlag": "нет"
+    },
+    {
+     "seed": 13,
+     "maeBase": 0.36,
+     "maeDrop5": 0.36,
+     "delta": 0,
+     "errAfterBurst": 0.22,
+     "burstFlag": "нет"
+    },
+    {
+     "seed": 14,
+     "maeBase": 0.42,
+     "maeDrop5": 0.42,
+     "delta": 0,
+     "errAfterBurst": 0.15,
+     "burstFlag": "нет"
+    },
+    {
+     "seed": 15,
+     "maeBase": 0.49,
+     "maeDrop5": 0.49,
+     "delta": 0,
+     "errAfterBurst": 0.46,
+     "burstFlag": "нет"
+    },
+    {
+     "seed": 16,
+     "maeBase": 0.8,
+     "maeDrop5": 0.8,
+     "delta": 0,
+     "errAfterBurst": 1.46,
+     "burstFlag": "нет"
+    },
+    {
+     "seed": 17,
+     "maeBase": 0.43,
+     "maeDrop5": 0.43,
+     "delta": -0.01,
+     "errAfterBurst": 0.56,
+     "burstFlag": "нет"
+    },
+    {
+     "seed": 18,
+     "maeBase": 0.44,
+     "maeDrop5": 0.44,
+     "delta": 0,
+     "errAfterBurst": 0.4,
+     "burstFlag": "нет"
+    }
+   ],
+   "summary": {
+    "worstDelta": 0.01,
+    "worstErrAfterBurst": 1.59
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C10-duplicates",
+   "criterion": "C10: повтор строки не сбрасывает фильтр; MAE растёт ≤ 0,1°",
+   "setup": "2 % строк приходят дважды; путь USB и путь «в обход разбора»",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "maeBase": 0.8,
+     "maeParser": 0.8,
+     "deltaParser": 0,
+     "maeRawDup": 0.79,
+     "deltaRawDup": -0.01,
+     "dropped": 59
+    },
+    {
+     "seed": 12,
+     "maeBase": 0.46,
+     "maeParser": 0.46,
+     "deltaParser": 0,
+     "maeRawDup": 0.51,
+     "deltaRawDup": 0.05,
+     "dropped": 60
+    },
+    {
+     "seed": 13,
+     "maeBase": 0.36,
+     "maeParser": 0.36,
+     "deltaParser": 0,
+     "maeRawDup": 0.51,
+     "deltaRawDup": 0.15,
+     "dropped": 59
+    },
+    {
+     "seed": 14,
+     "maeBase": 0.42,
+     "maeParser": 0.42,
+     "deltaParser": 0,
+     "maeRawDup": 0.63,
+     "deltaRawDup": 0.2,
+     "dropped": 70
+    },
+    {
+     "seed": 15,
+     "maeBase": 0.49,
+     "maeParser": 0.49,
+     "deltaParser": 0,
+     "maeRawDup": 0.61,
+     "deltaRawDup": 0.12,
+     "dropped": 47
+    },
+    {
+     "seed": 16,
+     "maeBase": 0.8,
+     "maeParser": 0.8,
+     "deltaParser": 0,
+     "maeRawDup": 0.92,
+     "deltaRawDup": 0.13,
+     "dropped": 50
+    },
+    {
+     "seed": 17,
+     "maeBase": 0.43,
+     "maeParser": 0.43,
+     "deltaParser": 0,
+     "maeRawDup": 0.56,
+     "deltaRawDup": 0.12,
+     "dropped": 63
+    },
+    {
+     "seed": 18,
+     "maeBase": 0.44,
+     "maeParser": 0.44,
+     "deltaParser": 0,
+     "maeRawDup": 0.59,
+     "deltaRawDup": 0.15,
+     "dropped": 67
+    }
+   ],
+   "summary": {
+    "worstDeltaParser": 0,
+    "worstDeltaRawDup": 0.2
+   },
+   "summaryRule": "худшее по зёрнам; критерий — путь USB",
+   "pass": true
+  },
+  {
+   "id": "C11-reset",
+   "criterion": "C11: время только растёт, разрыв учтён, нет NaN",
+   "setup": "seq снова с 0 после 15 с записи, 1 с без данных; путь USB",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "monotonic": "да",
+     "resets": 1,
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 12,
+     "monotonic": "да",
+     "resets": 1,
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 13,
+     "monotonic": "да",
+     "resets": 1,
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 14,
+     "monotonic": "да",
+     "resets": 1,
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 15,
+     "monotonic": "да",
+     "resets": 1,
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 16,
+     "monotonic": "да",
+     "resets": 1,
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 17,
+     "monotonic": "да",
+     "resets": 1,
+     "nan": "нет",
+     "reps": 3
+    },
+    {
+     "seed": 18,
+     "monotonic": "да",
+     "resets": 1,
+     "nan": "нет",
+     "reps": 3
+    }
+   ],
+   "summary": {
+    "allMonotonic": "да",
+    "anyNaN": "нет"
+   },
+   "summaryRule": "все зёрна",
+   "pass": true
+  },
+  {
+   "id": "C12-long",
+   "criterion": "C12: MAE последней минуты ≤ MAE первой + 0,5°",
+   "setup": "10 мин: подъём вперёд до 120° каждые 10 с, смещение гироскопа — случайное блуждание 0,02 °/с/√с",
+   "seeds": [
+    11,
+    12
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "maeFirst": 0.76,
+     "maeLast": 0.73,
+     "growth": -0.03,
+     "driftEnd": 0.39
+    },
+    {
+     "seed": 12,
+     "maeFirst": 0.39,
+     "maeLast": 0.41,
+     "growth": 0.01,
+     "driftEnd": 0.55
+    }
+   ],
+   "summary": {
+    "worstGrowth": 0.01
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C13-elbow-0-5",
+   "criterion": "C13: ошибка ROM ≤ 5° или шаг помечен",
+   "setup": "локоть до 120°, плечо вперёд на 5° вместе со сгибанием; «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.15,
+     "mae": 1.01,
+     "rmse": 1.31,
+     "p95": 2.81,
+     "max": 3.39,
+     "reps": 3,
+     "worstRomErr": 0.36,
+     "flagged": "нет"
+    },
+    {
+     "seed": 12,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.49,
+     "mae": 1.23,
+     "rmse": 1.57,
+     "p95": 3.43,
+     "max": 4.02,
+     "reps": 3,
+     "worstRomErr": 0.94,
+     "flagged": "нет"
+    },
+    {
+     "seed": 13,
+     "n": 1650,
+     "coverage": 100,
+     "bias": 0.65,
+     "mae": 0.95,
+     "rmse": 1.13,
+     "p95": 2.04,
+     "max": 2.54,
+     "reps": 3,
+     "worstRomErr": 1.13,
+     "flagged": "нет"
+    },
+    {
+     "seed": 14,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.24,
+     "mae": 1.07,
+     "rmse": 1.38,
+     "p95": 3.08,
+     "max": 3.64,
+     "reps": 3,
+     "worstRomErr": 0.48,
+     "flagged": "нет"
+    },
+    {
+     "seed": 15,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.34,
+     "mae": 0.94,
+     "rmse": 1.35,
+     "p95": 3.27,
+     "max": 3.94,
+     "reps": 3,
+     "worstRomErr": 0.46,
+     "flagged": "нет"
+    },
+    {
+     "seed": 16,
+     "n": 1650,
+     "coverage": 100,
+     "bias": 0.08,
+     "mae": 1.06,
+     "rmse": 1.4,
+     "p95": 3.03,
+     "max": 3.61,
+     "reps": 3,
+     "worstRomErr": 0.05,
+     "flagged": "нет"
+    },
+    {
+     "seed": 17,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.23,
+     "mae": 1.09,
+     "rmse": 1.41,
+     "p95": 3.18,
+     "max": 3.74,
+     "reps": 3,
+     "worstRomErr": 0.5,
+     "flagged": "нет"
+    },
+    {
+     "seed": 18,
+     "n": 1650,
+     "coverage": 100,
+     "bias": 0.03,
+     "mae": 1.14,
+     "rmse": 1.54,
+     "p95": 3.44,
+     "max": 4.07,
+     "reps": 3,
+     "worstRomErr": 0.14,
+     "flagged": "нет"
+    }
+   ],
+   "summary": {
+    "worstRomErr": 1.13,
+    "silentOver5": "нет",
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C13-elbow-0-10",
+   "criterion": "C13: ошибка ROM ≤ 5° или шаг помечен",
+   "setup": "локоть до 120°, плечо вперёд на 10° вместе со сгибанием; «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.12,
+     "mae": 1.05,
+     "rmse": 1.37,
+     "p95": 2.93,
+     "max": 3.58,
+     "reps": 3,
+     "worstRomErr": 0.27,
+     "flagged": "нет"
+    },
+    {
+     "seed": 12,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.46,
+     "mae": 1.26,
+     "rmse": 1.62,
+     "p95": 3.6,
+     "max": 4.24,
+     "reps": 3,
+     "worstRomErr": 0.84,
+     "flagged": "нет"
+    },
+    {
+     "seed": 13,
+     "n": 1650,
+     "coverage": 100,
+     "bias": 0.62,
+     "mae": 0.97,
+     "rmse": 1.16,
+     "p95": 2.12,
+     "max": 2.68,
+     "reps": 3,
+     "worstRomErr": 1.02,
+     "flagged": "нет"
+    },
+    {
+     "seed": 14,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.23,
+     "mae": 1.12,
+     "rmse": 1.46,
+     "p95": 3.29,
+     "max": 3.9,
+     "reps": 3,
+     "worstRomErr": 0.43,
+     "flagged": "нет"
+    },
+    {
+     "seed": 15,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.31,
+     "mae": 0.95,
+     "rmse": 1.4,
+     "p95": 3.37,
+     "max": 4.12,
+     "reps": 3,
+     "worstRomErr": 0.37,
+     "flagged": "нет"
+    },
+    {
+     "seed": 16,
+     "n": 1650,
+     "coverage": 100,
+     "bias": 0.1,
+     "mae": 1.11,
+     "rmse": 1.47,
+     "p95": 3.18,
+     "max": 3.82,
+     "reps": 3,
+     "worstRomErr": 0.02,
+     "flagged": "нет"
+    },
+    {
+     "seed": 17,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.23,
+     "mae": 1.14,
+     "rmse": 1.49,
+     "p95": 3.37,
+     "max": 3.99,
+     "reps": 3,
+     "worstRomErr": 0.49,
+     "flagged": "нет"
+    },
+    {
+     "seed": 18,
+     "n": 1650,
+     "coverage": 100,
+     "bias": 0.02,
+     "mae": 1.21,
+     "rmse": 1.62,
+     "p95": 3.68,
+     "max": 4.34,
+     "reps": 3,
+     "worstRomErr": 0.13,
+     "flagged": "нет"
+    }
+   ],
+   "summary": {
+    "worstRomErr": 1.02,
+    "silentOver5": "нет",
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C13-elbow-0-15",
+   "criterion": "C13: ошибка ROM ≤ 5° или шаг помечен",
+   "setup": "локоть до 120°, плечо вперёд на 15° вместе со сгибанием; «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.09,
+     "mae": 1.08,
+     "rmse": 1.43,
+     "p95": 3.08,
+     "max": 3.77,
+     "reps": 3,
+     "worstRomErr": 0.15,
+     "flagged": "нет"
+    },
+    {
+     "seed": 12,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.44,
+     "mae": 1.29,
+     "rmse": 1.68,
+     "p95": 3.78,
+     "max": 4.47,
+     "reps": 3,
+     "worstRomErr": 0.75,
+     "flagged": "нет"
+    },
+    {
+     "seed": 13,
+     "n": 1650,
+     "coverage": 100,
+     "bias": 0.58,
+     "mae": 1,
+     "rmse": 1.2,
+     "p95": 2.22,
+     "max": 2.82,
+     "reps": 3,
+     "worstRomErr": 0.92,
+     "flagged": "нет"
+    },
+    {
+     "seed": 14,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.21,
+     "mae": 1.17,
+     "rmse": 1.53,
+     "p95": 3.5,
+     "max": 4.18,
+     "reps": 3,
+     "worstRomErr": 0.36,
+     "flagged": "нет"
+    },
+    {
+     "seed": 15,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.27,
+     "mae": 0.96,
+     "rmse": 1.44,
+     "p95": 3.51,
+     "max": 4.29,
+     "reps": 3,
+     "worstRomErr": 0.26,
+     "flagged": "нет"
+    },
+    {
+     "seed": 16,
+     "n": 1650,
+     "coverage": 100,
+     "bias": 0.12,
+     "mae": 1.15,
+     "rmse": 1.54,
+     "p95": 3.33,
+     "max": 4.04,
+     "reps": 3,
+     "worstRomErr": 0.1,
+     "flagged": "нет"
+    },
+    {
+     "seed": 17,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.24,
+     "mae": 1.2,
+     "rmse": 1.57,
+     "p95": 3.59,
+     "max": 4.25,
+     "reps": 3,
+     "worstRomErr": 0.48,
+     "flagged": "нет"
+    },
+    {
+     "seed": 18,
+     "n": 1650,
+     "coverage": 100,
+     "bias": 0.02,
+     "mae": 1.27,
+     "rmse": 1.71,
+     "p95": 3.92,
+     "max": 4.63,
+     "reps": 3,
+     "worstRomErr": 0.12,
+     "flagged": "нет"
+    }
+   ],
+   "summary": {
+    "worstRomErr": 0.92,
+    "silentOver5": "нет",
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C13-elbow-0-20",
+   "criterion": "C13: ошибка ROM ≤ 5° или шаг помечен",
+   "setup": "локоть до 120°, плечо вперёд на 20° вместе со сгибанием; «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.04,
+     "mae": 1.11,
+     "rmse": 1.49,
+     "p95": 3.22,
+     "max": 3.96,
+     "reps": 3,
+     "worstRomErr": 0.04,
+     "flagged": "нет"
+    },
+    {
+     "seed": 12,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.43,
+     "mae": 1.33,
+     "rmse": 1.74,
+     "p95": 3.96,
+     "max": 4.71,
+     "reps": 3,
+     "worstRomErr": 0.68,
+     "flagged": "да"
+    },
+    {
+     "seed": 13,
+     "n": 1650,
+     "coverage": 100,
+     "bias": 0.54,
+     "mae": 1.02,
+     "rmse": 1.24,
+     "p95": 2.37,
+     "max": 2.95,
+     "reps": 3,
+     "worstRomErr": 0.89,
+     "flagged": "нет"
+    },
+    {
+     "seed": 14,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.18,
+     "mae": 1.21,
+     "rmse": 1.61,
+     "p95": 3.7,
+     "max": 4.45,
+     "reps": 3,
+     "worstRomErr": 0.28,
+     "flagged": "нет"
+    },
+    {
+     "seed": 15,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.23,
+     "mae": 0.98,
+     "rmse": 1.5,
+     "p95": 3.59,
+     "max": 4.45,
+     "reps": 3,
+     "worstRomErr": 0.13,
+     "flagged": "нет"
+    },
+    {
+     "seed": 16,
+     "n": 1650,
+     "coverage": 100,
+     "bias": 0.16,
+     "mae": 1.2,
+     "rmse": 1.61,
+     "p95": 3.48,
+     "max": 4.26,
+     "reps": 3,
+     "worstRomErr": 0.2,
+     "flagged": "нет"
+    },
+    {
+     "seed": 17,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -0.25,
+     "mae": 1.26,
+     "rmse": 1.65,
+     "p95": 3.81,
+     "max": 4.53,
+     "reps": 3,
+     "worstRomErr": 0.5,
+     "flagged": "да"
+    },
+    {
+     "seed": 18,
+     "n": 1650,
+     "coverage": 100,
+     "bias": 0.03,
+     "mae": 1.33,
+     "rmse": 1.8,
+     "p95": 4.14,
+     "max": 4.92,
+     "reps": 3,
+     "worstRomErr": 0.11,
+     "flagged": "нет"
+    }
+   ],
+   "summary": {
+    "worstRomErr": 0.89,
+    "silentOver5": "нет",
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C13-elbow-180-5",
+   "criterion": "C13: ошибка ROM ≤ 5° или шаг помечен",
+   "setup": "локоть до 120°, плечо назад на 5° вместе со сгибанием; «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -4.73,
+     "mae": 5.21,
+     "rmse": 6.98,
+     "p95": 11.58,
+     "max": 11.99,
+     "reps": 3,
+     "worstRomErr": 10.45,
+     "flagged": "нет"
+    },
+    {
+     "seed": 12,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -5.11,
+     "mae": 5.52,
+     "rmse": 7.43,
+     "p95": 12.25,
+     "max": 12.73,
+     "reps": 3,
+     "worstRomErr": 11.15,
+     "flagged": "нет"
+    },
+    {
+     "seed": 13,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -3.85,
+     "mae": 4.3,
+     "rmse": 5.72,
+     "p95": 9.23,
+     "max": 9.6,
+     "reps": 3,
+     "worstRomErr": 8.73,
+     "flagged": "нет"
+    },
+    {
+     "seed": 14,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -4.81,
+     "mae": 5.27,
+     "rmse": 7.08,
+     "p95": 11.79,
+     "max": 12.22,
+     "reps": 3,
+     "worstRomErr": 10.56,
+     "flagged": "нет"
+    },
+    {
+     "seed": 15,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -4.93,
+     "mae": 5.15,
+     "rmse": 6.95,
+     "p95": 10.71,
+     "max": 10.83,
+     "reps": 3,
+     "worstRomErr": 10.51,
+     "flagged": "нет"
+    },
+    {
+     "seed": 16,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -4.5,
+     "mae": 5.15,
+     "rmse": 6.85,
+     "p95": 11.67,
+     "max": 12.13,
+     "reps": 3,
+     "worstRomErr": 10.1,
+     "flagged": "нет"
+    },
+    {
+     "seed": 17,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -4.76,
+     "mae": 5.26,
+     "rmse": 7.06,
+     "p95": 11.82,
+     "max": 12.28,
+     "reps": 3,
+     "worstRomErr": 10.51,
+     "flagged": "нет"
+    },
+    {
+     "seed": 18,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -4.53,
+     "mae": 5.21,
+     "rmse": 6.95,
+     "p95": 12.04,
+     "max": 12.56,
+     "reps": 3,
+     "worstRomErr": 10.13,
+     "flagged": "нет"
+    }
+   ],
+   "summary": {
+    "worstRomErr": 11.15,
+    "silentOver5": "да",
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": false
+  },
+  {
+   "id": "C13-elbow-180-10",
+   "criterion": "C13: ошибка ROM ≤ 5° или шаг помечен",
+   "setup": "локоть до 120°, плечо назад на 10° вместе со сгибанием; «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -9.29,
+     "mae": 9.65,
+     "rmse": 13.19,
+     "p95": 21.06,
+     "max": 21.42,
+     "reps": 3,
+     "worstRomErr": 20.49,
+     "flagged": "нет"
+    },
+    {
+     "seed": 12,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -9.66,
+     "mae": 9.95,
+     "rmse": 13.64,
+     "p95": 21.76,
+     "max": 22.13,
+     "reps": 3,
+     "worstRomErr": 21.18,
+     "flagged": "нет"
+    },
+    {
+     "seed": 13,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -8.37,
+     "mae": 8.7,
+     "rmse": 11.9,
+     "p95": 18.83,
+     "max": 19.1,
+     "reps": 3,
+     "worstRomErr": 18.64,
+     "flagged": "нет"
+    },
+    {
+     "seed": 14,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -9.36,
+     "mae": 9.71,
+     "rmse": 13.29,
+     "p95": 21.3,
+     "max": 21.66,
+     "reps": 3,
+     "worstRomErr": 20.59,
+     "flagged": "нет"
+    },
+    {
+     "seed": 15,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -9.49,
+     "mae": 9.61,
+     "rmse": 13.17,
+     "p95": 20.73,
+     "max": 20.77,
+     "reps": 3,
+     "worstRomErr": 20.45,
+     "flagged": "нет"
+    },
+    {
+     "seed": 16,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -9.06,
+     "mae": 9.56,
+     "rmse": 13.04,
+     "p95": 21.06,
+     "max": 21.47,
+     "reps": 3,
+     "worstRomErr": 20.12,
+     "flagged": "нет"
+    },
+    {
+     "seed": 17,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -9.3,
+     "mae": 9.68,
+     "rmse": 13.24,
+     "p95": 21.25,
+     "max": 21.66,
+     "reps": 3,
+     "worstRomErr": 20.48,
+     "flagged": "нет"
+    },
+    {
+     "seed": 18,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -9.07,
+     "mae": 9.62,
+     "rmse": 13.11,
+     "p95": 21.41,
+     "max": 21.89,
+     "reps": 3,
+     "worstRomErr": 20.11,
+     "flagged": "нет"
+    }
+   ],
+   "summary": {
+    "worstRomErr": 21.18,
+    "silentOver5": "да",
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": false
+  },
+  {
+   "id": "C13-elbow-180-15",
+   "criterion": "C13: ошибка ROM ≤ 5° или шаг помечен",
+   "setup": "локоть до 120°, плечо назад на 15° вместе со сгибанием; «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -13.86,
+     "mae": 14.13,
+     "rmse": 19.43,
+     "p95": 30.85,
+     "max": 31.09,
+     "reps": 3,
+     "worstRomErr": 30.54,
+     "flagged": "нет"
+    },
+    {
+     "seed": 12,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -14.2,
+     "mae": 14.42,
+     "rmse": 19.85,
+     "p95": 31.5,
+     "max": 31.76,
+     "reps": 3,
+     "worstRomErr": 31.18,
+     "flagged": "нет"
+    },
+    {
+     "seed": 13,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -12.91,
+     "mae": 13.17,
+     "rmse": 18.11,
+     "p95": 28.68,
+     "max": 28.87,
+     "reps": 3,
+     "worstRomErr": 28.57,
+     "flagged": "нет"
+    },
+    {
+     "seed": 14,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -13.92,
+     "mae": 14.19,
+     "rmse": 19.53,
+     "p95": 31.08,
+     "max": 31.35,
+     "reps": 3,
+     "worstRomErr": 30.61,
+     "flagged": "нет"
+    },
+    {
+     "seed": 15,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -14.04,
+     "mae": 14.12,
+     "rmse": 19.43,
+     "p95": 30.77,
+     "max": 30.82,
+     "reps": 3,
+     "worstRomErr": 30.38,
+     "flagged": "нет"
+    },
+    {
+     "seed": 16,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -13.63,
+     "mae": 14.04,
+     "rmse": 19.27,
+     "p95": 30.77,
+     "max": 31.12,
+     "reps": 3,
+     "worstRomErr": 30.16,
+     "flagged": "нет"
+    },
+    {
+     "seed": 17,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -13.83,
+     "mae": 14.13,
+     "rmse": 19.43,
+     "p95": 30.95,
+     "max": 31.27,
+     "reps": 3,
+     "worstRomErr": 30.43,
+     "flagged": "нет"
+    },
+    {
+     "seed": 18,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -13.62,
+     "mae": 14.07,
+     "rmse": 19.32,
+     "p95": 31.06,
+     "max": 31.49,
+     "reps": 3,
+     "worstRomErr": 30.1,
+     "flagged": "нет"
+    }
+   ],
+   "summary": {
+    "worstRomErr": 31.18,
+    "silentOver5": "да",
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": false
+  },
+  {
+   "id": "C13-elbow-180-20",
+   "criterion": "C13: ошибка ROM ≤ 5° или шаг помечен",
+   "setup": "локоть до 120°, плечо назад на 20° вместе со сгибанием; «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -18.43,
+     "mae": 18.64,
+     "rmse": 25.69,
+     "p95": 40.74,
+     "max": 40.87,
+     "reps": 3,
+     "worstRomErr": 40.62,
+     "flagged": "да"
+    },
+    {
+     "seed": 12,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -18.73,
+     "mae": 18.89,
+     "rmse": 26.05,
+     "p95": 41.32,
+     "max": 41.46,
+     "reps": 3,
+     "worstRomErr": 41.15,
+     "flagged": "нет"
+    },
+    {
+     "seed": 13,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -17.45,
+     "mae": 17.66,
+     "rmse": 24.34,
+     "p95": 38.59,
+     "max": 38.71,
+     "reps": 3,
+     "worstRomErr": 38.51,
+     "flagged": "да"
+    },
+    {
+     "seed": 14,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -18.47,
+     "mae": 18.68,
+     "rmse": 25.77,
+     "p95": 40.93,
+     "max": 41.13,
+     "reps": 3,
+     "worstRomErr": 40.64,
+     "flagged": "да"
+    },
+    {
+     "seed": 15,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -18.6,
+     "mae": 18.65,
+     "rmse": 25.69,
+     "p95": 40.82,
+     "max": 40.87,
+     "reps": 3,
+     "worstRomErr": 40.31,
+     "flagged": "да"
+    },
+    {
+     "seed": 16,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -18.21,
+     "mae": 18.53,
+     "rmse": 25.53,
+     "p95": 40.61,
+     "max": 40.87,
+     "reps": 3,
+     "worstRomErr": 40.23,
+     "flagged": "да"
+    },
+    {
+     "seed": 17,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -18.34,
+     "mae": 18.58,
+     "rmse": 25.62,
+     "p95": 40.72,
+     "max": 40.97,
+     "reps": 3,
+     "worstRomErr": 40.36,
+     "flagged": "нет"
+    },
+    {
+     "seed": 18,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -18.17,
+     "mae": 18.55,
+     "rmse": 25.55,
+     "p95": 40.83,
+     "max": 41.2,
+     "reps": 3,
+     "worstRomErr": 40.1,
+     "flagged": "да"
+    }
+   ],
+   "summary": {
+    "worstRomErr": 41.15,
+    "silentOver5": "да",
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": false
+  },
+  {
+   "id": "C13-elbow-90-5",
+   "criterion": "C13: ошибка ROM ≤ 5° или шаг помечен",
+   "setup": "локоть до 120°, плечо в сторону на 5° вместе со сгибанием; «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -2.44,
+     "mae": 3.04,
+     "rmse": 3.92,
+     "p95": 7.03,
+     "max": 7.54,
+     "reps": 3,
+     "worstRomErr": 5.44,
+     "flagged": "нет"
+    },
+    {
+     "seed": 12,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -2.83,
+     "mae": 3.38,
+     "rmse": 4.41,
+     "p95": 7.78,
+     "max": 8.29,
+     "reps": 3,
+     "worstRomErr": 6.21,
+     "flagged": "нет"
+    },
+    {
+     "seed": 13,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -1.65,
+     "mae": 2.26,
+     "rmse": 2.81,
+     "p95": 4.81,
+     "max": 5.22,
+     "reps": 3,
+     "worstRomErr": 3.99,
+     "flagged": "нет"
+    },
+    {
+     "seed": 14,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -2.59,
+     "mae": 3.18,
+     "rmse": 4.12,
+     "p95": 7.37,
+     "max": 7.86,
+     "reps": 3,
+     "worstRomErr": 5.75,
+     "flagged": "нет"
+    },
+    {
+     "seed": 15,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -2.72,
+     "mae": 3.1,
+     "rmse": 4.03,
+     "p95": 5.99,
+     "max": 6.3,
+     "reps": 3,
+     "worstRomErr": 5.74,
+     "flagged": "нет"
+    },
+    {
+     "seed": 16,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -2.25,
+     "mae": 3.01,
+     "rmse": 3.86,
+     "p95": 7.27,
+     "max": 7.83,
+     "reps": 3,
+     "worstRomErr": 5.13,
+     "flagged": "нет"
+    },
+    {
+     "seed": 17,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -2.5,
+     "mae": 3.14,
+     "rmse": 4.06,
+     "p95": 7.45,
+     "max": 7.97,
+     "reps": 3,
+     "worstRomErr": 5.58,
+     "flagged": "нет"
+    },
+    {
+     "seed": 18,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -2.26,
+     "mae": 3.1,
+     "rmse": 3.99,
+     "p95": 7.68,
+     "max": 8.2,
+     "reps": 3,
+     "worstRomErr": 5.24,
+     "flagged": "нет"
+    }
+   ],
+   "summary": {
+    "worstRomErr": 6.21,
+    "silentOver5": "да",
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": false
+  },
+  {
+   "id": "C13-elbow-90-10",
+   "criterion": "C13: ошибка ROM ≤ 5° или шаг помечен",
+   "setup": "локоть до 120°, плечо в сторону на 10° вместе со сгибанием; «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -4.77,
+     "mae": 5.27,
+     "rmse": 7.06,
+     "p95": 11.75,
+     "max": 12.18,
+     "reps": 3,
+     "worstRomErr": 10.67,
+     "flagged": "нет"
+    },
+    {
+     "seed": 12,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -5.21,
+     "mae": 5.67,
+     "rmse": 7.65,
+     "p95": 12.66,
+     "max": 13.12,
+     "reps": 3,
+     "worstRomErr": 11.6,
+     "flagged": "нет"
+    },
+    {
+     "seed": 13,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -4.03,
+     "mae": 4.54,
+     "rmse": 6.05,
+     "p95": 9.74,
+     "max": 10.06,
+     "reps": 3,
+     "worstRomErr": 9.41,
+     "flagged": "нет"
+    },
+    {
+     "seed": 14,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -5.01,
+     "mae": 5.5,
+     "rmse": 7.41,
+     "p95": 12.33,
+     "max": 12.77,
+     "reps": 3,
+     "worstRomErr": 11.22,
+     "flagged": "нет"
+    },
+    {
+     "seed": 15,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -5.14,
+     "mae": 5.44,
+     "rmse": 7.32,
+     "p95": 11.46,
+     "max": 11.51,
+     "reps": 3,
+     "worstRomErr": 11.15,
+     "flagged": "нет"
+    },
+    {
+     "seed": 16,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -4.61,
+     "mae": 5.26,
+     "rmse": 7.02,
+     "p95": 12.06,
+     "max": 12.56,
+     "reps": 3,
+     "worstRomErr": 10.4,
+     "flagged": "нет"
+    },
+    {
+     "seed": 17,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -4.85,
+     "mae": 5.41,
+     "rmse": 7.27,
+     "p95": 12.31,
+     "max": 12.79,
+     "reps": 3,
+     "worstRomErr": 10.9,
+     "flagged": "нет"
+    },
+    {
+     "seed": 18,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -4.6,
+     "mae": 5.37,
+     "rmse": 7.16,
+     "p95": 12.46,
+     "max": 12.93,
+     "reps": 3,
+     "worstRomErr": 10.57,
+     "flagged": "нет"
+    }
+   ],
+   "summary": {
+    "worstRomErr": 11.6,
+    "silentOver5": "да",
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": false
+  },
+  {
+   "id": "C13-elbow-90-15",
+   "criterion": "C13: ошибка ROM ≤ 5° или шаг помечен",
+   "setup": "локоть до 120°, плечо в сторону на 15° вместе со сгибанием; «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -7.15,
+     "mae": 7.58,
+     "rmse": 10.35,
+     "p95": 16.82,
+     "max": 17.2,
+     "reps": 3,
+     "worstRomErr": 16.13,
+     "flagged": "нет"
+    },
+    {
+     "seed": 12,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -7.64,
+     "mae": 8.05,
+     "rmse": 11.03,
+     "p95": 17.91,
+     "max": 18.32,
+     "reps": 3,
+     "worstRomErr": 17.23,
+     "flagged": "нет"
+    },
+    {
+     "seed": 13,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -6.48,
+     "mae": 6.94,
+     "rmse": 9.47,
+     "p95": 15.2,
+     "max": 15.38,
+     "reps": 3,
+     "worstRomErr": 15.09,
+     "flagged": "нет"
+    },
+    {
+     "seed": 14,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -7.49,
+     "mae": 7.92,
+     "rmse": 10.85,
+     "p95": 17.71,
+     "max": 18.09,
+     "reps": 3,
+     "worstRomErr": 16.95,
+     "flagged": "нет"
+    },
+    {
+     "seed": 15,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -7.62,
+     "mae": 7.87,
+     "rmse": 10.77,
+     "p95": 17.2,
+     "max": 17.26,
+     "reps": 3,
+     "worstRomErr": 16.78,
+     "flagged": "нет"
+    },
+    {
+     "seed": 16,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -7.03,
+     "mae": 7.6,
+     "rmse": 10.35,
+     "p95": 17.21,
+     "max": 17.66,
+     "reps": 3,
+     "worstRomErr": 15.9,
+     "flagged": "нет"
+    },
+    {
+     "seed": 17,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -7.26,
+     "mae": 7.78,
+     "rmse": 10.63,
+     "p95": 17.55,
+     "max": 17.99,
+     "reps": 3,
+     "worstRomErr": 16.46,
+     "flagged": "нет"
+    },
+    {
+     "seed": 18,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -7,
+     "mae": 7.73,
+     "rmse": 10.5,
+     "p95": 17.57,
+     "max": 18.03,
+     "reps": 3,
+     "worstRomErr": 16.13,
+     "flagged": "нет"
+    }
+   ],
+   "summary": {
+    "worstRomErr": 17.23,
+    "silentOver5": "да",
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": false
+  },
+  {
+   "id": "C13-elbow-90-20",
+   "criterion": "C13: ошибка ROM ≤ 5° или шаг помечен",
+   "setup": "локоть до 120°, плечо в сторону на 20° вместе со сгибанием; «typical» + 6 положений",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -9.58,
+     "mae": 9.97,
+     "rmse": 13.75,
+     "p95": 22.28,
+     "max": 22.61,
+     "reps": 3,
+     "worstRomErr": 21.81,
+     "flagged": "нет"
+    },
+    {
+     "seed": 12,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -10.14,
+     "mae": 10.51,
+     "rmse": 14.53,
+     "p95": 23.54,
+     "max": 23.86,
+     "reps": 3,
+     "worstRomErr": 23.09,
+     "flagged": "да"
+    },
+    {
+     "seed": 13,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -8.99,
+     "mae": 9.43,
+     "rmse": 13.02,
+     "p95": 21.05,
+     "max": 21.13,
+     "reps": 3,
+     "worstRomErr": 20.99,
+     "flagged": "нет"
+    },
+    {
+     "seed": 14,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -10.03,
+     "mae": 10.42,
+     "rmse": 14.42,
+     "p95": 23.46,
+     "max": 23.78,
+     "reps": 3,
+     "worstRomErr": 22.92,
+     "flagged": "да"
+    },
+    {
+     "seed": 15,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -10.14,
+     "mae": 10.38,
+     "rmse": 14.33,
+     "p95": 23.16,
+     "max": 23.23,
+     "reps": 3,
+     "worstRomErr": 22.62,
+     "flagged": "нет"
+    },
+    {
+     "seed": 16,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -9.5,
+     "mae": 10.02,
+     "rmse": 13.8,
+     "p95": 22.69,
+     "max": 23.13,
+     "reps": 3,
+     "worstRomErr": 21.64,
+     "flagged": "нет"
+    },
+    {
+     "seed": 17,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -9.73,
+     "mae": 10.22,
+     "rmse": 14.11,
+     "p95": 23.12,
+     "max": 23.56,
+     "reps": 3,
+     "worstRomErr": 22.25,
+     "flagged": "нет"
+    },
+    {
+     "seed": 18,
+     "n": 1650,
+     "coverage": 100,
+     "bias": -9.46,
+     "mae": 10.16,
+     "rmse": 13.96,
+     "p95": 23.05,
+     "max": 23.5,
+     "reps": 3,
+     "worstRomErr": 21.93,
+     "flagged": "нет"
+    }
+   ],
+   "summary": {
+    "worstRomErr": 23.09,
+    "silentOver5": "да",
+    "minReps": 3
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": false
+  },
+  {
+   "id": "C14-shoulder_flexion-10",
+   "criterion": "C14: записать ошибку против анатомического угла; если > 5° — нужно предупреждение",
+   "setup": "плечо поднято вперёд на 10° в позе калибровки; движение до 140°",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "reps": 3,
+     "romErr": -10.83,
+     "events": 1
+    },
+    {
+     "seed": 12,
+     "reps": 3,
+     "romErr": -9.69,
+     "events": 1
+    },
+    {
+     "seed": 13,
+     "reps": 3,
+     "romErr": -9.77,
+     "events": 1
+    },
+    {
+     "seed": 14,
+     "reps": 3,
+     "romErr": -9.91,
+     "events": 1
+    },
+    {
+     "seed": 15,
+     "reps": 3,
+     "romErr": -10.21,
+     "events": 1
+    },
+    {
+     "seed": 16,
+     "reps": 3,
+     "romErr": -10.82,
+     "events": 1
+    },
+    {
+     "seed": 17,
+     "reps": 3,
+     "romErr": -9.5,
+     "events": 1
+    },
+    {
+     "seed": 18,
+     "reps": 3,
+     "romErr": -10.19,
+     "events": 1
+    }
+   ],
+   "summary": {
+    "worstRomErr": 10.83
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true,
+   "note": "описательный: прибор меряет дугу от позы калибровки"
+  },
+  {
+   "id": "C14-shoulder_flexion-20",
+   "criterion": "C14: записать ошибку против анатомического угла; если > 5° — нужно предупреждение",
+   "setup": "плечо поднято вперёд на 20° в позе калибровки; движение до 140°",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "reps": 3,
+     "romErr": -20.65,
+     "events": 1
+    },
+    {
+     "seed": 12,
+     "reps": 3,
+     "romErr": -19.75,
+     "events": 1
+    },
+    {
+     "seed": 13,
+     "reps": 3,
+     "romErr": -19.71,
+     "events": 1
+    },
+    {
+     "seed": 14,
+     "reps": 3,
+     "romErr": -19.82,
+     "events": 1
+    },
+    {
+     "seed": 15,
+     "reps": 3,
+     "romErr": -20.09,
+     "events": 1
+    },
+    {
+     "seed": 16,
+     "reps": 3,
+     "romErr": -20.63,
+     "events": 1
+    },
+    {
+     "seed": 17,
+     "reps": 3,
+     "romErr": -19.52,
+     "events": 1
+    },
+    {
+     "seed": 18,
+     "reps": 3,
+     "romErr": -20.08,
+     "events": 1
+    }
+   ],
+   "summary": {
+    "worstRomErr": 20.65
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true,
+   "note": "описательный: прибор меряет дугу от позы калибровки"
+  },
+  {
+   "id": "C14-elbow_flexion-20",
+   "criterion": "C14: записать ошибку против анатомического угла; если > 5° — нужно предупреждение",
+   "setup": "локоть согнут (контрактура) на 20° в позе калибровки; движение до 140°",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "reps": 3,
+     "romErr": -20.16,
+     "events": 1
+    },
+    {
+     "seed": 12,
+     "reps": 3,
+     "romErr": -20.46,
+     "events": 1
+    },
+    {
+     "seed": 13,
+     "reps": 3,
+     "romErr": -18.88,
+     "events": 1
+    },
+    {
+     "seed": 14,
+     "reps": 3,
+     "romErr": -20.24,
+     "events": 1
+    },
+    {
+     "seed": 15,
+     "reps": 3,
+     "romErr": -19.75,
+     "events": 1
+    },
+    {
+     "seed": 16,
+     "reps": 3,
+     "romErr": -20.06,
+     "events": 1
+    },
+    {
+     "seed": 17,
+     "reps": 3,
+     "romErr": -20.23,
+     "events": 1
+    },
+    {
+     "seed": 18,
+     "reps": 3,
+     "romErr": -20.13,
+     "events": 1
+    }
+   ],
+   "summary": {
+    "worstRomErr": 20.46
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true,
+   "note": "описательный: прибор меряет дугу от позы калибровки"
+  },
+  {
+   "id": "C14-elbow_flexion-30",
+   "criterion": "C14: записать ошибку против анатомического угла; если > 5° — нужно предупреждение",
+   "setup": "локоть согнут (контрактура) на 30° в позе калибровки; движение до 140°",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "reps": 3,
+     "romErr": -30.09,
+     "events": 1
+    },
+    {
+     "seed": 12,
+     "reps": 3,
+     "romErr": -30.28,
+     "events": 1
+    },
+    {
+     "seed": 13,
+     "reps": 3,
+     "romErr": -28.99,
+     "events": 1
+    },
+    {
+     "seed": 14,
+     "reps": 3,
+     "romErr": -30.15,
+     "events": 1
+    },
+    {
+     "seed": 15,
+     "reps": 3,
+     "romErr": -29.6,
+     "events": 1
+    },
+    {
+     "seed": 16,
+     "reps": 3,
+     "romErr": -30.06,
+     "events": 1
+    },
+    {
+     "seed": 17,
+     "reps": 3,
+     "romErr": -30.14,
+     "events": 1
+    },
+    {
+     "seed": 18,
+     "reps": 3,
+     "romErr": -30.12,
+     "events": 1
+    }
+   ],
+   "summary": {
+    "worstRomErr": 30.28
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true,
+   "note": "описательный: прибор меряет дугу от позы калибровки"
+  },
+  {
+   "id": "C15-flex-mis5",
+   "criterion": "C15: подъём MAE ≤ 1°",
+   "setup": "shoulder_flexion, right, датчик «typical» + калибровка в 6 положениях, перекос 5°; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.69,
+     "mae": 0.69,
+     "rmse": 0.78,
+     "p95": 1.21,
+     "max": 1.23
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.66,
+     "mae": 0.66,
+     "rmse": 0.74,
+     "p95": 1.1,
+     "max": 1.13
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.81,
+     "mae": 0.81,
+     "rmse": 0.92,
+     "p95": 1.42,
+     "max": 1.44
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.01,
+     "mae": 0.04,
+     "rmse": 0.05,
+     "p95": 0.09,
+     "max": 0.17
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.41,
+     "mae": 0.41,
+     "rmse": 0.46,
+     "p95": 0.68,
+     "max": 0.7
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.93,
+     "mae": 0.93,
+     "rmse": 1.05,
+     "p95": 1.57,
+     "max": 1.59
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.02,
+     "mae": 0.04,
+     "rmse": 0.05,
+     "p95": 0.1,
+     "max": 0.12
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 1,
+     "mae": 1,
+     "rmse": 1.14,
+     "p95": 1.73,
+     "max": 1.78
+    }
+   ],
+   "summary": {
+    "worstMae": 1,
+    "worstMax": 1.78,
+    "meanMae": 0.57
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C15-elbow-mis5",
+   "criterion": "C15: локоть MAE ≤ 1,5°",
+   "setup": "elbow_flexion, right, датчик «typical» + калибровка в 6 положениях, перекос 5°; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.98,
+     "mae": 0.98,
+     "rmse": 1.06,
+     "p95": 1.55,
+     "max": 1.58
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.92,
+     "mae": 0.92,
+     "rmse": 1.01,
+     "p95": 1.5,
+     "max": 1.53
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.55,
+     "mae": 0.55,
+     "rmse": 0.59,
+     "p95": 0.87,
+     "max": 0.92
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.58,
+     "mae": 0.58,
+     "rmse": 0.64,
+     "p95": 0.93,
+     "max": 0.98
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.48,
+     "mae": 0.48,
+     "rmse": 0.51,
+     "p95": 0.73,
+     "max": 0.75
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.12,
+     "mae": 0.12,
+     "rmse": 0.14,
+     "p95": 0.23,
+     "max": 0.33
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.69,
+     "mae": 0.69,
+     "rmse": 0.75,
+     "p95": 1.1,
+     "max": 1.14
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.55,
+     "mae": 0.55,
+     "rmse": 0.61,
+     "p95": 0.9,
+     "max": 0.92
+    }
+   ],
+   "summary": {
+    "worstMae": 0.98,
+    "worstMax": 1.58,
+    "meanMae": 0.61
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C15-rot-mis5",
+   "criterion": "C15: поворот MAE ≤ 3°",
+   "setup": "forearm_rotation, right, датчик «typical» + калибровка в 6 положениях, перекос 5°; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.49,
+     "mae": 0.49,
+     "rmse": 0.51,
+     "p95": 0.69,
+     "max": 0.84
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 1.14,
+     "mae": 1.14,
+     "rmse": 1.27,
+     "p95": 1.81,
+     "max": 1.84
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.73,
+     "mae": 0.73,
+     "rmse": 0.83,
+     "p95": 1.27,
+     "max": 1.3
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.28,
+     "mae": 0.28,
+     "rmse": 0.29,
+     "p95": 0.4,
+     "max": 0.44
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.29,
+     "mae": 0.29,
+     "rmse": 0.35,
+     "p95": 0.56,
+     "max": 0.69
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.22,
+     "mae": 0.22,
+     "rmse": 0.25,
+     "p95": 0.39,
+     "max": 0.46
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.15,
+     "mae": 0.24,
+     "rmse": 0.29,
+     "p95": 0.46,
+     "max": 0.57
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.62,
+     "mae": 0.62,
+     "rmse": 0.62,
+     "p95": 0.71,
+     "max": 0.75
+    }
+   ],
+   "summary": {
+    "worstMae": 1.14,
+    "worstMax": 1.84,
+    "meanMae": 0.5
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C15-flex-mis10",
+   "criterion": "C15: подъём MAE ≤ 1°",
+   "setup": "shoulder_flexion, right, датчик «typical» + калибровка в 6 положениях, перекос 10°; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.65,
+     "mae": 0.65,
+     "rmse": 0.74,
+     "p95": 1.14,
+     "max": 1.16
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.63,
+     "mae": 0.63,
+     "rmse": 0.72,
+     "p95": 1.05,
+     "max": 1.08
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.87,
+     "mae": 0.87,
+     "rmse": 1,
+     "p95": 1.52,
+     "max": 1.54
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0,
+     "mae": 0.07,
+     "rmse": 0.08,
+     "p95": 0.13,
+     "max": 0.21
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.42,
+     "mae": 0.42,
+     "rmse": 0.48,
+     "p95": 0.7,
+     "max": 0.72
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.86,
+     "mae": 0.86,
+     "rmse": 0.98,
+     "p95": 1.45,
+     "max": 1.47
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.05,
+     "mae": 0.08,
+     "rmse": 0.09,
+     "p95": 0.17,
+     "max": 0.19
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.92,
+     "mae": 0.92,
+     "rmse": 1.05,
+     "p95": 1.59,
+     "max": 1.64
+    }
+   ],
+   "summary": {
+    "worstMae": 0.92,
+    "worstMax": 1.64,
+    "meanMae": 0.56
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C15-elbow-mis10",
+   "criterion": "C15: локоть MAE ≤ 1,5°",
+   "setup": "elbow_flexion, right, датчик «typical» + калибровка в 6 положениях, перекос 10°; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.95,
+     "mae": 0.95,
+     "rmse": 1.03,
+     "p95": 1.52,
+     "max": 1.54
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.82,
+     "mae": 0.82,
+     "rmse": 0.91,
+     "p95": 1.35,
+     "max": 1.37
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.64,
+     "mae": 0.64,
+     "rmse": 0.7,
+     "p95": 1.01,
+     "max": 1.05
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.61,
+     "mae": 0.61,
+     "rmse": 0.68,
+     "p95": 0.98,
+     "max": 1.03
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.52,
+     "mae": 0.52,
+     "rmse": 0.55,
+     "p95": 0.8,
+     "max": 0.82
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.11,
+     "mae": 0.11,
+     "rmse": 0.14,
+     "p95": 0.24,
+     "max": 0.33
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.71,
+     "mae": 0.71,
+     "rmse": 0.78,
+     "p95": 1.14,
+     "max": 1.17
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.55,
+     "mae": 0.55,
+     "rmse": 0.61,
+     "p95": 0.9,
+     "max": 0.91
+    }
+   ],
+   "summary": {
+    "worstMae": 0.95,
+    "worstMax": 1.54,
+    "meanMae": 0.61
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C15-rot-mis10",
+   "criterion": "C15: поворот MAE ≤ 3°",
+   "setup": "forearm_rotation, right, датчик «typical» + калибровка в 6 положениях, перекос 10°; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.59,
+     "mae": 0.59,
+     "rmse": 0.64,
+     "p95": 0.94,
+     "max": 1.09
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 1.17,
+     "mae": 1.17,
+     "rmse": 1.32,
+     "p95": 1.91,
+     "max": 1.93
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.73,
+     "mae": 0.73,
+     "rmse": 0.83,
+     "p95": 1.28,
+     "max": 1.31
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.12,
+     "mae": 0.13,
+     "rmse": 0.15,
+     "p95": 0.28,
+     "max": 0.29
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.35,
+     "mae": 0.37,
+     "rmse": 0.46,
+     "p95": 0.75,
+     "max": 0.87
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.3,
+     "mae": 0.35,
+     "rmse": 0.42,
+     "p95": 0.63,
+     "max": 0.7
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.32,
+     "mae": 0.45,
+     "rmse": 0.53,
+     "p95": 0.82,
+     "max": 0.83
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.75,
+     "mae": 0.75,
+     "rmse": 0.75,
+     "p95": 0.81,
+     "max": 0.85
+    }
+   ],
+   "summary": {
+    "worstMae": 1.17,
+    "worstMax": 1.93,
+    "meanMae": 0.57
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C16-trunk",
+   "criterion": "C16: наклон туловища с ошибкой ≤ 1,5°",
+   "setup": "подъём вперёд до 150°, туловище отклоняется назад на 10° вместе с рукой",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "trunkMae": 0.08,
+     "trunkMax": 0.21,
+     "armMae": 0.92,
+     "worldVsThoraxMax": 10
+    },
+    {
+     "seed": 12,
+     "trunkMae": 0.11,
+     "trunkMax": 0.3,
+     "armMae": 0.67,
+     "worldVsThoraxMax": 10
+    },
+    {
+     "seed": 13,
+     "trunkMae": 0.09,
+     "trunkMax": 0.24,
+     "armMae": 0.6,
+     "worldVsThoraxMax": 10
+    },
+    {
+     "seed": 14,
+     "trunkMae": 0.11,
+     "trunkMax": 0.25,
+     "armMae": 0.64,
+     "worldVsThoraxMax": 10
+    },
+    {
+     "seed": 15,
+     "trunkMae": 0.1,
+     "trunkMax": 0.22,
+     "armMae": 0.64,
+     "worldVsThoraxMax": 10
+    },
+    {
+     "seed": 16,
+     "trunkMae": 0.1,
+     "trunkMax": 0.3,
+     "armMae": 0.88,
+     "worldVsThoraxMax": 10
+    },
+    {
+     "seed": 17,
+     "trunkMae": 0.1,
+     "trunkMax": 0.31,
+     "armMae": 0.59,
+     "worldVsThoraxMax": 10
+    },
+    {
+     "seed": 18,
+     "trunkMae": 0.1,
+     "trunkMax": 0.3,
+     "armMae": 0.62,
+     "worldVsThoraxMax": 10
+    }
+   ],
+   "summary": {
+    "worstTrunkMax": 0.31,
+    "worstTrunkMae": 0.11
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C17-rot-right",
+   "criterion": "C17: знак верный (MAE ≤ 3°)",
+   "setup": "forearm_rotation, right, датчик «typical» + калибровка в 6 положениях; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.26,
+     "mae": 0.35,
+     "rmse": 0.42,
+     "p95": 0.64,
+     "max": 0.69
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.07,
+     "mae": 0.13,
+     "rmse": 0.16,
+     "p95": 0.33,
+     "max": 0.42
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.49,
+     "mae": 0.49,
+     "rmse": 0.49,
+     "p95": 0.6,
+     "max": 0.66
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.4,
+     "mae": 0.4,
+     "rmse": 0.44,
+     "p95": 0.67,
+     "max": 0.72
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.83,
+     "mae": 0.86,
+     "rmse": 1.03,
+     "p95": 1.59,
+     "max": 1.61
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.31,
+     "mae": 0.59,
+     "rmse": 0.75,
+     "p95": 1.12,
+     "max": 1.14
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.18,
+     "mae": 0.18,
+     "rmse": 0.18,
+     "p95": 0.23,
+     "max": 0.25
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.17,
+     "mae": 0.2,
+     "rmse": 0.25,
+     "p95": 0.45,
+     "max": 0.5
+    }
+   ],
+   "summary": {
+    "worstMae": 0.86,
+    "worstMax": 1.61,
+    "meanMae": 0.4
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  },
+  {
+   "id": "C17-rot-left",
+   "criterion": "C17: знак верный (MAE ≤ 3°)",
+   "setup": "forearm_rotation, left, датчик «typical» + калибровка в 6 положениях; окна удержаний",
+   "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.15,
+     "mae": 0.3,
+     "rmse": 0.37,
+     "p95": 0.56,
+     "max": 0.59
+    },
+    {
+     "seed": 12,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.05,
+     "mae": 0.11,
+     "rmse": 0.14,
+     "p95": 0.22,
+     "max": 0.31
+    },
+    {
+     "seed": 13,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.01,
+     "mae": 0.07,
+     "rmse": 0.09,
+     "p95": 0.16,
+     "max": 0.29
+    },
+    {
+     "seed": 14,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 0.38,
+     "mae": 0.38,
+     "rmse": 0.42,
+     "p95": 0.67,
+     "max": 0.71
+    },
+    {
+     "seed": 15,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.49,
+     "mae": 0.63,
+     "rmse": 0.75,
+     "p95": 1.21,
+     "max": 1.23
+    },
+    {
+     "seed": 16,
+     "n": 1255,
+     "coverage": 100,
+     "bias": 1.1,
+     "mae": 1.1,
+     "rmse": 1.27,
+     "p95": 1.87,
+     "max": 1.88
+    },
+    {
+     "seed": 17,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.07,
+     "mae": 0.07,
+     "rmse": 0.08,
+     "p95": 0.13,
+     "max": 0.16
+    },
+    {
+     "seed": 18,
+     "n": 1255,
+     "coverage": 100,
+     "bias": -0.24,
+     "mae": 0.25,
+     "rmse": 0.3,
+     "p95": 0.48,
+     "max": 0.53
+    }
+   ],
+   "summary": {
+    "worstMae": 1.1,
+    "worstMax": 1.88,
+    "meanMae": 0.36
+   },
+   "summaryRule": "худшее по зёрнам",
+   "pass": true
+  }
+ ]
+}

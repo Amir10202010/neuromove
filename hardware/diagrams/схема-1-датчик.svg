@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="980" viewBox="0 0 1400 980" font-family="Inter, 'Helvetica Neue', Arial, sans-serif">
+<rect width="1400" height="980" fill="#ffffff"/>
+<text x="40.0" y="50.0" font-size="27" fill="#212529" text-anchor="start" font-weight="bold">Завтра: один датчик «П», кабель 4 пин мама–мама 70 см прямо на ESP32</text>
+<text x="40.0" y="82.0" font-size="15" fill="#495057" text-anchor="start" font-weight="normal">Прошивка как есть, макетная плата не нужна. USB отключён, пока подключаешь.</text>
+<rect x="520.0" y="120.0" width="300.0" height="110.0" rx="12" fill="#1c6dd0" opacity="1.0"/>
+<text x="670.0" y="152.0" font-size="19" fill="#ffffff" text-anchor="middle" font-weight="bold">П — плечо</text>
+<text x="670.0" y="176.0" font-size="13" fill="#d0ebff" text-anchor="middle" font-weight="normal">шина 0, адрес 0x68, AD0 никуда</text>
+<rect x="554.0" y="216.0" width="212.0" height="26.0" rx="3" fill="#111111" opacity="1.0"/>
+<text x="570.0" y="204.0" font-size="13" fill="#ffffff" text-anchor="middle" font-weight="bold">VCC</text>
+<text x="620.0" y="204.0" font-size="13" fill="#ffffff" text-anchor="middle" font-weight="bold">GND</text>
+<text x="670.0" y="204.0" font-size="13" fill="#ffffff" text-anchor="middle" font-weight="bold">SCL</text>
+<text x="720.0" y="204.0" font-size="13" fill="#ffffff" text-anchor="middle" font-weight="bold">SDA</text>
+<text x="810.0" y="204.0" font-size="12" fill="#a5d8ff" text-anchor="end" font-weight="normal">AD0 —</text>
+<rect x="110.0" y="530.0" width="1160.0" height="230.0" rx="14" fill="#1f3a5f" opacity="1.0"/>
+<rect x="120.0" y="615.0" width="230.0" height="125.0" rx="6" fill="#c9c9c9" opacity="1.0"/>
+<text x="235.0" y="682.0" font-size="15" fill="#495057" text-anchor="middle" font-weight="normal">модуль ESP32</text>
+<rect x="1140.0" y="630.0" width="90.0" height="70.0" rx="6" fill="#9a9a9a" opacity="1.0"/>
+<text x="1185.0" y="672.0" font-size="15" fill="#ffffff" text-anchor="middle" font-weight="bold">USB</text>
+<text x="650.0" y="740.0" font-size="15" fill="#d0ebff" text-anchor="middle" font-weight="normal">ESP32 DevKit, вид сверху: антенна слева, USB справа</text>
+<rect x="219.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#8a7a3a" opacity="1.0"/>
+<text x="230.0" y="594.0" font-size="12" fill="#a5b4c8" text-anchor="middle" font-weight="normal">D23</text>
+<rect x="279.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#f1c232" opacity="1.0"/>
+<text x="290.0" y="594.0" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">D22</text>
+<rect x="339.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#8a7a3a" opacity="1.0"/>
+<text x="350.0" y="594.0" font-size="12" fill="#a5b4c8" text-anchor="middle" font-weight="normal">TX0</text>
+<rect x="399.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#8a7a3a" opacity="1.0"/>
+<text x="410.0" y="594.0" font-size="12" fill="#a5b4c8" text-anchor="middle" font-weight="normal">RX0</text>
+<rect x="459.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#f1c232" opacity="1.0"/>
+<text x="470.0" y="594.0" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">D21</text>
+<rect x="519.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#8a7a3a" opacity="1.0"/>
+<text x="530.0" y="594.0" font-size="12" fill="#a5b4c8" text-anchor="middle" font-weight="normal">D19</text>
+<rect x="579.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#8a7a3a" opacity="1.0"/>
+<text x="590.0" y="594.0" font-size="12" fill="#a5b4c8" text-anchor="middle" font-weight="normal">D18</text>
+<rect x="639.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#8a7a3a" opacity="1.0"/>
+<text x="650.0" y="594.0" font-size="12" fill="#a5b4c8" text-anchor="middle" font-weight="normal">D5</text>
+<rect x="699.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#8a7a3a" opacity="1.0"/>
+<text x="710.0" y="594.0" font-size="12" fill="#a5b4c8" text-anchor="middle" font-weight="normal">D17</text>
+<rect x="759.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#8a7a3a" opacity="1.0"/>
+<text x="770.0" y="594.0" font-size="12" fill="#a5b4c8" text-anchor="middle" font-weight="normal">D16</text>
+<rect x="819.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#8a7a3a" opacity="1.0"/>
+<text x="830.0" y="594.0" font-size="12" fill="#a5b4c8" text-anchor="middle" font-weight="normal">D4</text>
+<rect x="879.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#8a7a3a" opacity="1.0"/>
+<text x="890.0" y="594.0" font-size="12" fill="#a5b4c8" text-anchor="middle" font-weight="normal">D2</text>
+<rect x="939.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#8a7a3a" opacity="1.0"/>
+<text x="950.0" y="594.0" font-size="12" fill="#a5b4c8" text-anchor="middle" font-weight="normal">D15</text>
+<rect x="999.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#f1c232" opacity="1.0"/>
+<text x="1010.0" y="594.0" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">GND</text>
+<rect x="1059.0" y="549.0" width="22.0" height="22.0" rx="3" fill="#f1c232" opacity="1.0"/>
+<text x="1070.0" y="594.0" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">3V3</text>
+<path d="M 570.0 242.0 C 570.0 394.0 1070.0 394.0 1070.0 546.0" fill="none" stroke="#e03131" stroke-width="5" stroke-linecap="round"/>
+<rect x="1061.0" y="514.0" width="18.0" height="32.0" rx="3" fill="#111111" opacity="1.0"/>
+<path d="M 620.0 242.0 C 620.0 394.0 1010.0 394.0 1010.0 546.0" fill="none" stroke="#212529" stroke-width="5" stroke-linecap="round"/>
+<rect x="1001.0" y="514.0" width="18.0" height="32.0" rx="3" fill="#111111" opacity="1.0"/>
+<path d="M 670.0 242.0 C 670.0 394.0 290.0 394.0 290.0 546.0" fill="none" stroke="#868e96" stroke-width="5" stroke-linecap="round"/>
+<rect x="281.0" y="514.0" width="18.0" height="32.0" rx="3" fill="#111111" opacity="1.0"/>
+<path d="M 720.0 242.0 C 720.0 394.0 470.0 394.0 470.0 546.0" fill="none" stroke="#2f9e44" stroke-width="5" stroke-linecap="round"/>
+<rect x="461.0" y="514.0" width="18.0" height="32.0" rx="3" fill="#111111" opacity="1.0"/>
+<text x="1040.0" y="205.0" font-size="14" fill="#495057" text-anchor="start" font-weight="normal">колодка на 4 вывода подряд:</text>
+<text x="1040.0" y="225.0" font-size="14" fill="#495057" text-anchor="start" font-weight="bold">VCC, GND, SCL, SDA</text>
+<text x="40.0" y="470.0" font-size="14" fill="#495057" text-anchor="start" font-weight="normal">у ESP32 — 4 коротких провода</text>
+<text x="40.0" y="490.0" font-size="14" fill="#495057" text-anchor="start" font-weight="normal">мама–папа: «папа» в колодку</text>
+<text x="40.0" y="510.0" font-size="14" fill="#495057" text-anchor="start" font-weight="normal">кабеля, «мама» на вывод ESP32</text>
+<text x="40.0" y="830.0" font-size="14" fill="#212529" text-anchor="start" font-weight="normal">1. Одна колодка кабеля — на датчик: VCC, GND, SCL, SDA. Ничего не разбирать.</text>
+<text x="40.0" y="856.0" font-size="14" fill="#212529" text-anchor="start" font-weight="normal">2. Во вторую колодку — «папы» четырёх коротких проводов мама–папа (10–20 см, можно и 40). Их «мамы» — на ESP32:</text>
+<text x="40.0" y="882.0" font-size="14" fill="#212529" text-anchor="start" font-weight="normal">   VCC на 3V3, GND на GND, SCL на D22, SDA на D21. Стык колодки и переходников обмотать изолентой, чтобы не разошёлся.</text>
+<text x="40.0" y="908.0" font-size="14" fill="#212529" text-anchor="start" font-weight="normal">3. USB, монитор порта 460800, scan: шина 0 — 0x68. Пошевелить кабель, глядя в монитор: строк «перезапускаю шину» быть не должно.</text>
+<text x="40.0" y="934.0" font-size="14" fill="#c92a2a" text-anchor="start" font-weight="normal">Цвета жил у купленного кабеля могут быть другими: сверять по месту в колодке, а не по цвету.</text>
+</svg>

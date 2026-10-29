@@ -1,0 +1,60 @@
+/* Печать: только лист отчёта, без меню и кнопок. A4, поля 14 мм. */
+
+@page {
+  size: A4;
+  margin: 14mm;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+  }
+  .print-toolbar,
+  .toasts,
+  .coach,
+  .coach-scrim,
+  .coach-ring,
+  .guide-pill,
+  .demo-banner,
+  .sidebar,
+  .topbar,
+  .bottom-nav,
+  .control-bar {
+    display: none !important;
+  }
+  .print-page {
+    background: #fff;
+    padding: 0;
+  }
+  .sheet {
+    width: auto;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+  .sheet section,
+  .sheet table {
+    break-inside: avoid;
+  }
+  .sheet__scroll {
+    overflow: visible;
+  }
+  .sheet__watermark {
+    display: grid;
+    position: fixed;
+    color: rgba(183, 69, 44, 0.1);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  svg {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}

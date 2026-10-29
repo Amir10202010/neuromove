@@ -1,0 +1,212 @@
+/* Графики: тонкие линии, сетка на один тон темнее фона, подписи — цветом текста. */
+
+.chart {
+  position: relative;
+  width: 100%;
+}
+.chart__svg:focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.chart__grid {
+  stroke: var(--grid);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+.chart__tick {
+  fill: var(--text-3);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.chart__row-label {
+  fill: var(--text-2);
+  font-size: 12.5px;
+  font-weight: 550;
+}
+.chart__value {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.chart__value--sm {
+  font-size: 11px;
+  fill: var(--text-2);
+}
+.chart__end-label {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.chart__goal {
+  stroke: var(--goal);
+  stroke-width: 1.25;
+  stroke-dasharray: 5 4;
+}
+.chart__goal-label {
+  fill: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+}
+.chart__prev-mark {
+  stroke: var(--text);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.chart__crosshair {
+  stroke: var(--text-3);
+  stroke-width: 1;
+  pointer-events: none;
+}
+.chart__series--muted {
+  opacity: 0.55;
+}
+.chart__tooltip {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  min-width: 150px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  padding: 8px 10px;
+  font-size: 12px;
+}
+.chart__tooltip-title {
+  color: var(--text-3);
+  margin-bottom: 4px;
+}
+.chart__tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.7;
+}
+.chart__tooltip-key {
+  width: 12px;
+  height: 2.5px;
+  border-radius: 2px;
+  flex: none;
+}
+.chart__tooltip-key--goal {
+  background: repeating-linear-gradient(90deg, var(--goal) 0 3px, transparent 3px 5px);
+}
+.chart__tooltip-value {
+  font-weight: 650;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.chart__tooltip-label {
+  color: var(--text-2);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-bottom: 10px;
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+.legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.legend__key {
+  display: inline-block;
+  flex: none;
+}
+.legend__key--line {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+.legend__key--dashed {
+  width: 16px;
+  height: 0;
+  border-top: 1.5px dashed;
+}
+.legend__key--dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.legend__key--bar {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.chart-card__header {
+  align-items: flex-start;
+}
+
+/* Угломер */
+.goniometer {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.goniometer__band {
+  stroke: var(--fig-sector);
+}
+.goniometer__tickline {
+  stroke: var(--fig-muted);
+  stroke-width: 1;
+}
+.goniometer__tickline.is-2 {
+  stroke-width: 1.25;
+}
+.goniometer__tickline.is-3 {
+  stroke: var(--text-2);
+  stroke-width: 1.5;
+}
+.goniometer__tick {
+  fill: var(--text-3);
+  font-size: 10.5px;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+}
+.goniometer__value {
+  fill: var(--text);
+  font-family: var(--font-display);
+  font-size: 54px;
+  font-weight: 560;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+.goniometer__deg {
+  font-size: 30px;
+  font-weight: 450;
+  fill: var(--text-3);
+}
+.goniometer__side {
+  fill: var(--text-3);
+  font-size: 11px;
+  font-weight: 550;
+}
+
+.live-trace {
+  width: 100%;
+}
+.live-trace canvas {
+  display: block;
+}
+
+.bodymap__label {
+  fill: var(--text-3);
+  font-size: 10px;
+  font-weight: 550;
+}
+
+.dumbbell-row:hover .chart__row-label {
+  fill: var(--brand-700);
+}
+.chart__end-label--muted {
+  fill: var(--text-3);
+  font-weight: 550;
+}

@@ -1,0 +1,146 @@
+/* Дизайн-токены NeuroMove.
+   Направление «Инструмент»: спокойный рабочий стол в цветах знака. Рамка окна и боковая
+   панель — тёплая бумага; рабочая область — светлый лист поверх неё; карточки — белые,
+   плоские, с тонкой линией вместо тени. Графит — текст и главные кнопки, киноварь — только
+   демо и гид («смотрите сюда»). Цвета данных — только для данных. Левая сторона тела —
+   синий, правая — оранжевый: пара проверена на различимость при дальтонизме (ΔE 24.7).
+   Контраст текста проверен на каждом слое (рамка, лист, карточка): не ниже 4.5:1. */
+
+:root {
+  color-scheme: light;
+
+  /* Слои: рамка → лист → карточка */
+  --frame: #eeebe4;
+  --sheet: #faf9f6;
+  --bg: #faf9f6;
+  --surface: #ffffff;
+  --surface-2: #fbfaf7;
+  --surface-sunken: #f2efe9;
+  --surface-hover: #f5f3ee;
+  --border: #e5e1d8;
+  --border-strong: #d3cdc1;
+  --hairline: rgba(29, 33, 31, 0.08);
+  --text: #1d211f;
+  --text-2: #4d534b;
+  /* Третий уровень текста — не светлее 4.5:1 на рамке, листе и дорожке переключателя (WCAG AA) */
+  --text-3: #5c6159;
+  --text-inverse: #ffffff;
+
+  /* Боковая панель — цвет рамки: панель и рамка — одно, рабочая область — лист поверх */
+  --side: #eeebe4;
+
+  /* Бренд — графит: главные кнопки, выбранное, ссылки */
+  --brand-900: #0f1211;
+  --brand-800: #343a36;
+  --brand-700: #1d211f;
+  --brand-600: #1d211f;
+  --brand-500: #1d211f;
+  --brand-200: #d9d4ca;
+  --brand-100: #ebe7df;
+  --brand-50: #f3f1eb;
+
+  /* Данные: стороны тела. Цвет — у отметок, текст — всегда в цветах текста */
+  --left: #2a78d6;
+  --left-soft: #dbe8f8;
+  --right: #eb6834;
+  --right-soft: #fbe3d8;
+  --muted-series: #a8aba3;
+  --goal: #1d211f;
+  --grid: #ece9e2;
+  --axis: #d3cec4;
+
+  /* Рисунки (figures/): контур тушью, светлое тело, светлый корпус датчика на тёмном ремешке */
+  --fig-ink: #1d211f;
+  --fig-fill: #f5f2eb;
+  --fig-pod: #fdfbf6;
+  --fig-muted: #857f73;
+  --fig-ghost: rgba(29, 33, 31, 0.12);
+  --fig-sector: #ebe7de;
+  /* Текст цветом стороны — темнее отметок, чтобы читался (не ниже 4.5:1 на белом) */
+  --left-text: #1d5aab;
+  --right-text: #ad461b;
+
+  /* Состояния — всегда с иконкой и подписью, не одним цветом */
+  --good: #1f9d55;
+  --good-text: #16713c;
+  --good-bg: #e6f3ea;
+  --warn: #f0a81c;
+  --warn-text: #8a5800;
+  --warn-bg: #fcf1d9;
+  --serious: #ec835a;
+  --critical: #c8372d;
+  --critical-text: #a92e25;
+  --critical-bg: #fbe9e6;
+  --info: #2a78d6;
+  --info-text: #1f5aa5;
+  --info-bg: #e8f0fb;
+
+  /* Демо и гид — киноварь из знака: «это демо», «смотрите сюда» — не тревога */
+  --demo: #b7452c;
+  --demo-strong: #9a3822;
+  --demo-bg: #f8ebe5;
+  --demo-border: #ecc9bb;
+
+  /* Типографика */
+  --font: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* Крупные заголовки и числа-приборы: Inter с осью оптического размера (Inter Display) */
+  --font-display: 'Inter Display', 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 14.5px;
+  --fs-md: 15.5px;
+  --fs-lg: 17px;
+  --fs-xl: 20px;
+  --fs-2xl: 26px;
+  --fs-3xl: 32px;
+  --fs-4xl: 44px;
+
+  /* Отступы — шаг 4 px */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+
+  --r-sm: 6px;
+  --r-md: 9px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+
+  /* Глубина — почти без теней: слои различаются тоном и тонкой линией.
+     Тень — только у того, что лежит поверх (окна, меню, уведомления) */
+  --shadow-xs: 0 1px 0 rgba(29, 33, 31, 0.03);
+  --shadow-sm: 0 1px 2px rgba(29, 33, 31, 0.05), 0 0 0 1px rgba(29, 33, 31, 0.02);
+  --shadow-md: 0 10px 24px -8px rgba(29, 33, 31, 0.14), 0 2px 4px rgba(29, 33, 31, 0.04);
+  --shadow-lg: 0 24px 56px -16px rgba(29, 33, 31, 0.28), 0 4px 12px rgba(29, 33, 31, 0.06);
+  /* Фокус с клавиатуры — заметное кольцо графита с зазором (WCAG 2.4.7, 2.4.11) */
+  --focus: 0 0 0 2px var(--sheet), 0 0 0 4px var(--text);
+
+  /* Движение: быстро отвечать на действие, мягко договаривать. Пружина — только для «встал
+     на место» (датчик на связи, шаг засчитан), не для перемещений */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast: 120ms;
+  --t-med: 200ms;
+  --t-slow: 360ms;
+  --t-scene: 640ms;
+
+  --sidebar-w: 240px;
+  --topbar-h: 56px;
+  --control-h: 38px;
+  /* Отступ рабочей области от краёв окна */
+  --inset: 8px;
+}
+
+@media (pointer: coarse) {
+  :root {
+    --control-h: 44px; /* пальцем на планшете — крупнее цели */
+  }
+}

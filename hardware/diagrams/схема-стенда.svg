@@ -1,0 +1,272 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1300" viewBox="0 0 1600 1300" font-family="Inter, 'Helvetica Neue', Arial, sans-serif">
+<rect x="0.0" y="0.0" width="1600.0" height="1300.0" rx="0" fill="#ffffff" opacity="1.0"/>
+<text x="40.0" y="52.0" font-size="28" fill="#212529" text-anchor="start" font-weight="bold">Стенд NeuroMove: три датчика, три шины, кабели по 4 жилы</text>
+<text x="40.0" y="84.0" font-size="15" fill="#495057" text-anchor="start" font-weight="normal">Вид сверху, крышки сняты. Все датчики на адресе 0x68, AD0 никуда. Резисторов нет: подтяжки 4,7 кОм уже стоят на каждом GY-521.</text>
+<rect x="542.0" y="122.0" width="1036.0" height="896.0" rx="26" fill="#f1f3f5" opacity="1.0" stroke="#adb5bd" stroke-width="3"/>
+<rect x="560.0" y="140.0" width="1000.0" height="860.0" rx="12" fill="#ffffff" opacity="1.0" stroke="#adb5bd" stroke-width="2"/>
+<text x="1060.0" y="1048.0" font-size="15" fill="#495057" text-anchor="middle" font-weight="normal">корпус ESP32 v3 · 58 × 45 × 32 мм · крышка с дверцей прижимает три кабеля</text>
+<rect x="656.0" y="512.0" width="868.0" height="230.0" rx="10" fill="#f8f9fa" opacity="1.0" stroke="#ced4da" stroke-width="2"/>
+<text x="656.0" y="502.0" font-size="13" fill="#868e96" text-anchor="start" font-weight="normal">макетная плата 170 точек: в столбце пять дырок a–e соединены</text>
+<text x="690.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">1</text>
+<text x="740.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">2</text>
+<text x="790.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">3</text>
+<text x="840.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">4</text>
+<text x="890.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">5</text>
+<text x="940.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">6</text>
+<text x="990.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">7</text>
+<text x="1040.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">8</text>
+<text x="1090.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">9</text>
+<text x="1140.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">10</text>
+<text x="1190.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">11</text>
+<text x="1240.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">12</text>
+<text x="1290.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">13</text>
+<text x="1340.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">14</text>
+<text x="1390.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">15</text>
+<text x="1440.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">16</text>
+<text x="1490.0" y="540.0" font-size="11" fill="#adb5bd" text-anchor="middle" font-weight="normal">17</text>
+<text x="640.0" y="565.0" font-size="13" fill="#868e96" text-anchor="middle" font-weight="bold">a</text>
+<circle cx="690" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="740" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="790" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="840" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="890" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="940" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="990" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="1040" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="1090" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="1140" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="1190" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="1240" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="1290" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="1340" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="1390" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="1440" cy="560" r="5" fill="#dee2e6"/>
+<circle cx="1490" cy="560" r="5" fill="#dee2e6"/>
+<text x="640.0" y="603.0" font-size="13" fill="#868e96" text-anchor="middle" font-weight="bold">b</text>
+<circle cx="690" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="740" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="790" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="840" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="890" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="940" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="990" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="1040" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="1090" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="1140" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="1190" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="1240" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="1290" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="1340" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="1390" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="1440" cy="598" r="5" fill="#dee2e6"/>
+<circle cx="1490" cy="598" r="5" fill="#dee2e6"/>
+<text x="640.0" y="641.0" font-size="13" fill="#868e96" text-anchor="middle" font-weight="bold">c</text>
+<circle cx="690" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="740" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="790" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="840" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="890" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="940" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="990" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="1040" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="1090" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="1140" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="1190" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="1240" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="1290" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="1340" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="1390" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="1440" cy="636" r="5" fill="#dee2e6"/>
+<circle cx="1490" cy="636" r="5" fill="#dee2e6"/>
+<text x="640.0" y="679.0" font-size="13" fill="#868e96" text-anchor="middle" font-weight="bold">d</text>
+<circle cx="690" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="740" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="790" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="840" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="890" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="940" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="990" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="1040" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="1090" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="1140" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="1190" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="1240" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="1290" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="1340" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="1390" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="1440" cy="674" r="5" fill="#dee2e6"/>
+<circle cx="1490" cy="674" r="5" fill="#dee2e6"/>
+<text x="640.0" y="717.0" font-size="13" fill="#868e96" text-anchor="middle" font-weight="bold">e</text>
+<circle cx="690" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="740" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="790" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="840" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="890" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="940" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="990" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="1040" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="1090" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="1140" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="1190" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="1240" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="1290" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="1340" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="1390" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="1440" cy="712" r="5" fill="#dee2e6"/>
+<circle cx="1490" cy="712" r="5" fill="#dee2e6"/>
+<rect x="560.0" y="690.0" width="994.0" height="270.0" rx="12" fill="#1f3a5f" opacity="0.96"/>
+<rect x="570.0" y="772.0" width="180.0" height="150.0" rx="6" fill="#c9c9c9" opacity="1.0"/>
+<text x="660.0" y="852.0" font-size="13" fill="#495057" text-anchor="middle" font-weight="normal">модуль ESP32</text>
+<rect x="1500.0" y="807.0" width="80.0" height="70.0" rx="6" fill="#9a9a9a" opacity="1.0"/>
+<text x="1540.0" y="848.0" font-size="15" fill="#ffffff" text-anchor="middle" font-weight="bold">USB</text>
+<text x="1090.0" y="944.0" font-size="13" fill="#d0ebff" text-anchor="middle" font-weight="normal">ESP32 воткнута в ряд e правым рядом выводов: D23 в столбец 1, 3V3 в 15. Левый ряд висит, к нему ничего</text>
+<rect x="682.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#7c6d34" opacity="1.0"/>
+<text x="690.0" y="742.0" font-size="10" fill="#9fb0c4" text-anchor="middle" font-weight="normal">D23</text>
+<rect x="732.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#f1c232" opacity="1.0"/>
+<text x="740.0" y="742.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">D22</text>
+<rect x="782.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#7c6d34" opacity="1.0"/>
+<text x="790.0" y="742.0" font-size="10" fill="#9fb0c4" text-anchor="middle" font-weight="normal">TX0</text>
+<rect x="832.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#7c6d34" opacity="1.0"/>
+<text x="840.0" y="742.0" font-size="10" fill="#9fb0c4" text-anchor="middle" font-weight="normal">RX0</text>
+<rect x="882.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#f1c232" opacity="1.0"/>
+<text x="890.0" y="742.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">D21</text>
+<rect x="932.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#f1c232" opacity="1.0"/>
+<text x="940.0" y="742.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">D19</text>
+<rect x="982.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#f1c232" opacity="1.0"/>
+<text x="990.0" y="742.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">D18</text>
+<rect x="1032.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#7c6d34" opacity="1.0"/>
+<text x="1040.0" y="742.0" font-size="10" fill="#9fb0c4" text-anchor="middle" font-weight="normal">D5</text>
+<rect x="1082.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#f1c232" opacity="1.0"/>
+<text x="1090.0" y="742.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">D17</text>
+<rect x="1132.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#f1c232" opacity="1.0"/>
+<text x="1140.0" y="742.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">D16</text>
+<rect x="1182.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#7c6d34" opacity="1.0"/>
+<text x="1190.0" y="742.0" font-size="10" fill="#9fb0c4" text-anchor="middle" font-weight="normal">D4</text>
+<rect x="1232.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#7c6d34" opacity="1.0"/>
+<text x="1240.0" y="742.0" font-size="10" fill="#9fb0c4" text-anchor="middle" font-weight="normal">D2</text>
+<rect x="1282.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#7c6d34" opacity="1.0"/>
+<text x="1290.0" y="742.0" font-size="10" fill="#9fb0c4" text-anchor="middle" font-weight="normal">D15</text>
+<rect x="1332.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#f1c232" opacity="1.0"/>
+<text x="1340.0" y="742.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">GND</text>
+<rect x="1382.0" y="704.0" width="16.0" height="16.0" rx="3" fill="#f1c232" opacity="1.0"/>
+<text x="1390.0" y="742.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">3V3</text>
+<rect x="34.0" y="120.0" width="332.0" height="270.0" rx="18" fill="#e9ecef" opacity="1.0" stroke="#adb5bd" stroke-width="2"/>
+<rect x="90.0" y="128.0" width="220.0" height="12.0" rx="4" fill="#ffffff" opacity="1.0" stroke="#adb5bd" stroke-width="1"/>
+<rect x="90.0" y="370.0" width="220.0" height="12.0" rx="4" fill="#ffffff" opacity="1.0" stroke="#adb5bd" stroke-width="1"/>
+<rect x="50.0" y="150.0" width="300.0" height="210.0" rx="16" fill="#f1f3f5" opacity="1.0" stroke="#adb5bd" stroke-width="3"/>
+<rect x="90.0" y="172.0" width="150.0" height="166.0" rx="8" fill="#1c6dd0" opacity="1.0"/>
+<text x="165.0" y="220.0" font-size="40" fill="#ffffff" text-anchor="middle" font-weight="bold">П</text>
+<text x="165.0" y="248.0" font-size="14" fill="#d0ebff" text-anchor="middle" font-weight="normal">плечо</text>
+<text x="165.0" y="272.0" font-size="13" fill="#a5d8ff" text-anchor="middle" font-weight="normal">0x68</text>
+<rect x="240.0" y="178.0" width="26.0" height="154.0" rx="3" fill="#111111" opacity="1.0"/>
+<text x="234.0" y="206.0" font-size="11" fill="#ffffff" text-anchor="end" font-weight="bold">VCC</text>
+<path d="M 266.0 202.0 C 348.8 202.0 358.0 202.0 358.0 246.0" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<text x="234.0" y="236.0" font-size="11" fill="#ffffff" text-anchor="end" font-weight="bold">GND</text>
+<path d="M 266.0 232.0 C 348.8 232.0 358.0 232.0 358.0 252.0" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/>
+<text x="234.0" y="266.0" font-size="11" fill="#ffffff" text-anchor="end" font-weight="bold">SCL</text>
+<path d="M 266.0 262.0 C 348.8 262.0 358.0 262.0 358.0 258.0" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round"/>
+<text x="234.0" y="296.0" font-size="11" fill="#ffffff" text-anchor="end" font-weight="bold">SDA</text>
+<path d="M 266.0 292.0 C 348.8 292.0 358.0 292.0 358.0 264.0" fill="none" stroke="#2f9e44" stroke-width="3" stroke-linecap="round"/>
+<text x="200.0" y="408.0" font-size="13" fill="#495057" text-anchor="middle" font-weight="normal">корпус датчика v3 «П» · шина 0 · D21, D22</text>
+<path d="M 358.0 246.0 C 450.0 246.0 450.0 321.0 542.0 321.0" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<path d="M 358.0 252.0 C 450.0 252.0 450.0 327.0 542.0 327.0" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/>
+<path d="M 358.0 258.0 C 450.0 258.0 450.0 333.0 542.0 333.0" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round"/>
+<path d="M 358.0 264.0 C 450.0 264.0 450.0 339.0 542.0 339.0" fill="none" stroke="#2f9e44" stroke-width="3" stroke-linecap="round"/>
+<rect x="538.0" y="316.0" width="26.0" height="28.0" rx="3" fill="#ffffff" opacity="1.0" stroke="#adb5bd" stroke-width="1"/>
+<text x="516.0" y="335.0" font-size="15" fill="#495057" text-anchor="end" font-weight="bold">П</text>
+<rect x="590.0" y="314.0" width="22.0" height="32.0" rx="3" fill="#111111" opacity="1.0"/>
+<path d="M 564.0 321.0 C 577.0 321.0 577.0 321.0 590.0 321.0" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<path d="M 612.0 321.0 C 1039.9 321.0 1390.0 321.0 1390.0 554.0" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1390" cy="560" r="7" fill="#495057"/>
+<path d="M 564.0 327.0 C 577.0 327.0 577.0 327.0 590.0 327.0" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/>
+<path d="M 612.0 327.0 C 1012.4 327.0 1340.0 327.0 1340.0 554.0" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1340" cy="560" r="7" fill="#495057"/>
+<path d="M 564.0 333.0 C 577.0 333.0 577.0 333.0 590.0 333.0" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round"/>
+<path d="M 612.0 333.0 C 682.4 333.0 740.0 333.0 740.0 554.0" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round"/>
+<circle cx="740" cy="560" r="7" fill="#495057"/>
+<path d="M 564.0 339.0 C 577.0 339.0 577.0 339.0 590.0 339.0" fill="none" stroke="#2f9e44" stroke-width="3" stroke-linecap="round"/>
+<path d="M 612.0 339.0 C 764.9 339.0 890.0 339.0 890.0 554.0" fill="none" stroke="#2f9e44" stroke-width="3" stroke-linecap="round"/>
+<circle cx="890" cy="560" r="7" fill="#495057"/>
+<rect x="34.0" y="420.0" width="332.0" height="270.0" rx="18" fill="#e9ecef" opacity="1.0" stroke="#adb5bd" stroke-width="2"/>
+<rect x="90.0" y="428.0" width="220.0" height="12.0" rx="4" fill="#ffffff" opacity="1.0" stroke="#adb5bd" stroke-width="1"/>
+<rect x="90.0" y="670.0" width="220.0" height="12.0" rx="4" fill="#ffffff" opacity="1.0" stroke="#adb5bd" stroke-width="1"/>
+<rect x="50.0" y="450.0" width="300.0" height="210.0" rx="16" fill="#f1f3f5" opacity="1.0" stroke="#adb5bd" stroke-width="3"/>
+<rect x="90.0" y="472.0" width="150.0" height="166.0" rx="8" fill="#1c6dd0" opacity="1.0"/>
+<text x="165.0" y="520.0" font-size="40" fill="#ffffff" text-anchor="middle" font-weight="bold">ПР</text>
+<text x="165.0" y="548.0" font-size="14" fill="#d0ebff" text-anchor="middle" font-weight="normal">предплечье</text>
+<text x="165.0" y="572.0" font-size="13" fill="#a5d8ff" text-anchor="middle" font-weight="normal">0x68</text>
+<rect x="240.0" y="478.0" width="26.0" height="154.0" rx="3" fill="#111111" opacity="1.0"/>
+<text x="234.0" y="506.0" font-size="11" fill="#ffffff" text-anchor="end" font-weight="bold">VCC</text>
+<path d="M 266.0 502.0 C 348.8 502.0 358.0 502.0 358.0 546.0" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<text x="234.0" y="536.0" font-size="11" fill="#ffffff" text-anchor="end" font-weight="bold">GND</text>
+<path d="M 266.0 532.0 C 348.8 532.0 358.0 532.0 358.0 552.0" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/>
+<text x="234.0" y="566.0" font-size="11" fill="#ffffff" text-anchor="end" font-weight="bold">SCL</text>
+<path d="M 266.0 562.0 C 348.8 562.0 358.0 562.0 358.0 558.0" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round"/>
+<text x="234.0" y="596.0" font-size="11" fill="#ffffff" text-anchor="end" font-weight="bold">SDA</text>
+<path d="M 266.0 592.0 C 348.8 592.0 358.0 592.0 358.0 564.0" fill="none" stroke="#2f9e44" stroke-width="3" stroke-linecap="round"/>
+<text x="200.0" y="708.0" font-size="13" fill="#495057" text-anchor="middle" font-weight="normal">корпус датчика v3 «ПР» · шина 1 · D19, D18</text>
+<path d="M 358.0 546.0 C 450.0 546.0 450.0 381.0 542.0 381.0" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<path d="M 358.0 552.0 C 450.0 552.0 450.0 387.0 542.0 387.0" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/>
+<path d="M 358.0 558.0 C 450.0 558.0 450.0 393.0 542.0 393.0" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round"/>
+<path d="M 358.0 564.0 C 450.0 564.0 450.0 399.0 542.0 399.0" fill="none" stroke="#2f9e44" stroke-width="3" stroke-linecap="round"/>
+<rect x="538.0" y="376.0" width="26.0" height="28.0" rx="3" fill="#ffffff" opacity="1.0" stroke="#adb5bd" stroke-width="1"/>
+<text x="516.0" y="395.0" font-size="15" fill="#495057" text-anchor="end" font-weight="bold">ПР</text>
+<rect x="590.0" y="374.0" width="22.0" height="32.0" rx="3" fill="#111111" opacity="1.0"/>
+<path d="M 564.0 381.0 C 577.0 381.0 577.0 381.0 590.0 381.0" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<path d="M 612.0 381.0 C 1039.9 381.0 1390.0 381.0 1390.0 592.0" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1390" cy="598" r="7" fill="#495057"/>
+<path d="M 564.0 387.0 C 577.0 387.0 577.0 387.0 590.0 387.0" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/>
+<path d="M 612.0 387.0 C 1012.4 387.0 1340.0 387.0 1340.0 592.0" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1340" cy="598" r="7" fill="#495057"/>
+<path d="M 564.0 393.0 C 577.0 393.0 577.0 393.0 590.0 393.0" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round"/>
+<path d="M 612.0 393.0 C 819.9 393.0 990.0 393.0 990.0 592.0" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round"/>
+<circle cx="990" cy="598" r="7" fill="#495057"/>
+<path d="M 564.0 399.0 C 577.0 399.0 577.0 399.0 590.0 399.0" fill="none" stroke="#2f9e44" stroke-width="3" stroke-linecap="round"/>
+<path d="M 612.0 399.0 C 792.4 399.0 940.0 399.0 940.0 592.0" fill="none" stroke="#2f9e44" stroke-width="3" stroke-linecap="round"/>
+<circle cx="940" cy="598" r="7" fill="#495057"/>
+<rect x="34.0" y="720.0" width="332.0" height="270.0" rx="18" fill="#e9ecef" opacity="1.0" stroke="#adb5bd" stroke-width="2"/>
+<rect x="90.0" y="728.0" width="220.0" height="12.0" rx="4" fill="#ffffff" opacity="1.0" stroke="#adb5bd" stroke-width="1"/>
+<rect x="90.0" y="970.0" width="220.0" height="12.0" rx="4" fill="#ffffff" opacity="1.0" stroke="#adb5bd" stroke-width="1"/>
+<rect x="50.0" y="750.0" width="300.0" height="210.0" rx="16" fill="#f1f3f5" opacity="1.0" stroke="#adb5bd" stroke-width="3"/>
+<rect x="90.0" y="772.0" width="150.0" height="166.0" rx="8" fill="#1c6dd0" opacity="1.0"/>
+<text x="165.0" y="820.0" font-size="40" fill="#ffffff" text-anchor="middle" font-weight="bold">Г</text>
+<text x="165.0" y="848.0" font-size="14" fill="#d0ebff" text-anchor="middle" font-weight="normal">грудь</text>
+<text x="165.0" y="872.0" font-size="13" fill="#a5d8ff" text-anchor="middle" font-weight="normal">0x68</text>
+<rect x="240.0" y="778.0" width="26.0" height="154.0" rx="3" fill="#111111" opacity="1.0"/>
+<text x="234.0" y="806.0" font-size="11" fill="#ffffff" text-anchor="end" font-weight="bold">VCC</text>
+<path d="M 266.0 802.0 C 348.8 802.0 358.0 802.0 358.0 846.0" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<text x="234.0" y="836.0" font-size="11" fill="#ffffff" text-anchor="end" font-weight="bold">GND</text>
+<path d="M 266.0 832.0 C 348.8 832.0 358.0 832.0 358.0 852.0" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/>
+<text x="234.0" y="866.0" font-size="11" fill="#ffffff" text-anchor="end" font-weight="bold">SCL</text>
+<path d="M 266.0 862.0 C 348.8 862.0 358.0 862.0 358.0 858.0" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round"/>
+<text x="234.0" y="896.0" font-size="11" fill="#ffffff" text-anchor="end" font-weight="bold">SDA</text>
+<path d="M 266.0 892.0 C 348.8 892.0 358.0 892.0 358.0 864.0" fill="none" stroke="#2f9e44" stroke-width="3" stroke-linecap="round"/>
+<text x="200.0" y="1008.0" font-size="13" fill="#495057" text-anchor="middle" font-weight="normal">корпус датчика v3 «Г» · шина 2 · D16, D17, программная</text>
+<path d="M 358.0 846.0 C 450.0 846.0 450.0 441.0 542.0 441.0" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<path d="M 358.0 852.0 C 450.0 852.0 450.0 447.0 542.0 447.0" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/>
+<path d="M 358.0 858.0 C 450.0 858.0 450.0 453.0 542.0 453.0" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round"/>
+<path d="M 358.0 864.0 C 450.0 864.0 450.0 459.0 542.0 459.0" fill="none" stroke="#2f9e44" stroke-width="3" stroke-linecap="round"/>
+<rect x="538.0" y="436.0" width="26.0" height="28.0" rx="3" fill="#ffffff" opacity="1.0" stroke="#adb5bd" stroke-width="1"/>
+<text x="516.0" y="455.0" font-size="15" fill="#495057" text-anchor="end" font-weight="bold">Г</text>
+<rect x="590.0" y="434.0" width="22.0" height="32.0" rx="3" fill="#111111" opacity="1.0"/>
+<path d="M 564.0 441.0 C 577.0 441.0 577.0 441.0 590.0 441.0" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<path d="M 612.0 441.0 C 1039.9 441.0 1390.0 441.0 1390.0 630.0" fill="none" stroke="#e03131" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1390" cy="636" r="7" fill="#495057"/>
+<path d="M 564.0 447.0 C 577.0 447.0 577.0 447.0 590.0 447.0" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/>
+<path d="M 612.0 447.0 C 1012.4 447.0 1340.0 447.0 1340.0 630.0" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1340" cy="636" r="7" fill="#495057"/>
+<path d="M 564.0 453.0 C 577.0 453.0 577.0 453.0 590.0 453.0" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round"/>
+<path d="M 612.0 453.0 C 874.9 453.0 1090.0 453.0 1090.0 630.0" fill="none" stroke="#868e96" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1090" cy="636" r="7" fill="#495057"/>
+<path d="M 564.0 459.0 C 577.0 459.0 577.0 459.0 590.0 459.0" fill="none" stroke="#2f9e44" stroke-width="3" stroke-linecap="round"/>
+<path d="M 612.0 459.0 C 902.4 459.0 1140.0 459.0 1140.0 630.0" fill="none" stroke="#2f9e44" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1140" cy="636" r="7" fill="#495057"/>
+<text x="590.0" y="300.0" font-size="13" fill="#495057" text-anchor="start" font-weight="normal">колодка кабеля → 4 провода папа–папа 10 см</text>
+<text x="455.0" y="230.0" font-size="13" fill="#868e96" text-anchor="middle" font-weight="normal">кабели 4 пин</text>
+<text x="455.0" y="248.0" font-size="13" fill="#868e96" text-anchor="middle" font-weight="normal">мама–мама 70 см</text>
+<text x="40.0" y="1100.0" font-size="14" fill="#212529" text-anchor="start" font-weight="normal">Ряд a — «П», ряд b — «ПР», ряд c — «Г». Столбец 15 (3V3): VCC всех трёх. Столбец 14 (GND): GND всех трёх. Ряд d закрыт краем ESP32.</text>
+<text x="40.0" y="1128.0" font-size="14" fill="#212529" text-anchor="start" font-weight="normal">SCL и SDA: «П» — столбцы 2 и 5 (D22, D21), «ПР» — 7 и 6 (D18, D19), «Г» — 9 и 10 (D17, D16; на других платах их зовут TX2 и RX2).</text>
+<text x="40.0" y="1156.0" font-size="14" fill="#212529" text-anchor="start" font-weight="normal">Купить: кабель DuPont 4 пин мама–мама 70 см — 3 шт. по 200 ₸; провода папа–папа 10 см — 2 упаковки по 10 шт. по 150 ₸ (нужно 12). Около 900 ₸.</text>
+<text x="40.0" y="1184.0" font-size="14" fill="#212529" text-anchor="start" font-weight="normal">Прошивка: по умолчанию три шины (NeuroMoveStand/config.h). scan: шина 0 — 0x68, шина 1 — 0x68, шина 2 — 0x68.</text>
+<text x="40.0" y="1212.0" font-size="14" fill="#c92a2a" text-anchor="start" font-weight="normal">Цвета жил у купленного кабеля могут быть другими: сверять по месту в колодке — VCC, GND, SCL, SDA, как на датчике.</text>
+</svg>

@@ -1,0 +1,8 @@
+{
+ "measured": "2026-10-02T04:14:27.481Z",
+ "node": "v24.14.1",
+ "engineUsPerFrame": 1.2920069999999935,
+ "engineShareOfBudgetPct": 0.012920069999999935,
+ "parseUsPerLine": 1.2360416666666652,
+ "demoSeedMs": 1693.511958
+}

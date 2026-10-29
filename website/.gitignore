@@ -1,0 +1,12 @@
+# Зависимости и сборки, которые пересчитываются командой `npm run build`.
+# Исключение — demo/NeuroMove.html: готовый файл для показа в клинике
+# без Node.js и без интернета. Его коммитим, как club/presentations/dist.
+node_modules/
+dist/
+dist-demo/
+*.tsbuildinfo
+coverage/
+# Отчёты сквозных тестов Playwright — пересчитываются командой `npm run e2e`
+e2e-report/
+e2e-results/
+.vercel/

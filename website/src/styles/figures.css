@@ -1,0 +1,182 @@
+/* Рисунки NeuroMove (src/figures/): подписи, датчики, движение.
+   Движение показывает причину и следствие: датчик вышел на связь — корпус «встаёт» на место
+   и светодиод загорается один раз; ждём — мягкий импульс, пока ждём, и ни секундой дольше. */
+
+.fig-label {
+  font-family: var(--font);
+  font-weight: 560;
+  font-variant-numeric: tabular-nums;
+  fill: var(--text-3);
+}
+.fig-label--ink {
+  fill: var(--text);
+  font-weight: 650;
+}
+.fig-label--left {
+  fill: var(--left-text);
+  font-weight: 650;
+}
+.fig-label--right {
+  fill: var(--right-text);
+  font-weight: 650;
+}
+
+.fig-callout__text {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  fill: var(--text-2);
+}
+.fig-callout__sub {
+  font-family: var(--font);
+  font-size: 9.5px;
+  font-weight: 500;
+  fill: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Датчик ждёт связи: импульс расходится от корпуса */
+.fig-pod__pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fig-pulse 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) infinite;
+}
+@keyframes fig-pulse {
+  from {
+    opacity: 0.55;
+    transform: scale(0.55);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+/* Датчик вышел на связь: корпус «встаёт» на ремешок, светодиод вспыхивает один раз */
+.fig-pod--on .fig-pod__led,
+.fig-pod--low .fig-pod__led {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fig-led-on 520ms var(--ease-spring) both;
+}
+@keyframes fig-led-on {
+  0% {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.8);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.fig-pod--lost .fig-pod__led {
+  animation: fig-blink 1s steps(2, jump-none) infinite;
+}
+@keyframes fig-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fig-pod__pulse {
+    display: none;
+  }
+  .fig-pod__led {
+    animation: none !important;
+  }
+}
+
+/* Схема датчиков и живая фигура — не шире контейнера */
+.bodymap,
+.stick,
+.calib,
+.empty-art {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Рисунок к цифрам: по умолчанию вписывается в ширину контейнера; контейнеры с заданной
+   высотой (.fig__pic, .moves__pic, .plan__icon) задают height: 100% */
+.mfig {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Статус-кольцо (figures/StatusRing.tsx) ─────────────────────────────── */
+.ring {
+  flex: none;
+  display: inline-block;
+  vertical-align: middle;
+}
+.ring__track {
+  stroke: var(--text-3);
+}
+.ring--active .ring__track,
+.ring--paused .ring__track {
+  stroke: var(--text);
+}
+.ring__pie {
+  fill: var(--text);
+  transition: d var(--t-med) var(--ease-out);
+}
+.ring__mark {
+  stroke: var(--text-2);
+  fill: none;
+}
+.ring__fill {
+  fill: var(--text);
+}
+.ring__check {
+  stroke: var(--surface);
+}
+.ring--done {
+  animation: ring-done 420ms var(--ease-spring) both;
+}
+.ring--error .ring__fill {
+  fill: var(--critical);
+}
+@keyframes ring-done {
+  from {
+    transform: scale(0.6);
+  }
+}
+
+/* ── Калибровка (figures/CalibrationFigure.tsx) ─────────────────────────── */
+.calib__tick {
+  stroke: var(--border-strong);
+  transition: stroke 160ms linear;
+}
+.calib__tick.is-on {
+  stroke: var(--text);
+}
+.calib.is-moved .calib__tick.is-on {
+  stroke: var(--warn);
+}
+.calib.is-done .calib__tick {
+  stroke: var(--good);
+}
+/* Пошевелился — фигура вздрагивает дважды и замирает (не бесконечно) */
+.calib.is-moved .calib__body {
+  animation: calib-shake 420ms var(--ease-in-out) 2;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+@keyframes calib-shake {
+  25% {
+    transform: rotate(-1.6deg);
+  }
+  75% {
+    transform: rotate(1.6deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ring--done,
+  .calib.is-moved .calib__body {
+    animation: none;
+  }
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "file": "A1-1-proba",
+    "triangles": 15570,
+    "maximum_vertex_difference_mm": 1.709103857960405e-05,
+    "geometry_and_world_positions_unchanged": true
+  },
+  {
+    "file": "A1-2-datchiki",
+    "triangles": 31616,
+    "maximum_vertex_difference_mm": 1.709103857960405e-05,
+    "geometry_and_world_positions_unchanged": true
+  },
+  {
+    "file": "A1-3-esp32",
+    "triangles": 16716,
+    "maximum_vertex_difference_mm": 1.0813348247766524e-05,
+    "geometry_and_world_positions_unchanged": true
+  }
+]

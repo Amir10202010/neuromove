@@ -1,0 +1,15 @@
+{
+  "strap_width_mm": 38,
+  "slot_length_mm": 39,
+  "slot_width_mm": 3.2,
+  "base_length_mm": 45.8,
+  "body_length_mm": 35.800000000000004,
+  "body_width_mm": 27.820000000000004,
+  "central_housing_difference_mm3": 0,
+  "single_valid_solid": true,
+  "mesh_watertight": true,
+  "other_three_meshes_unchanged": true,
+  "placements_and_process_unchanged": true,
+  "minimum_gap_mm": 7.000001481469724,
+  "project": "C:\\Users\\sagin\\Documents\\Programming\\future\\neuromove\\firmware\\enclosure\\print-ready\\A1-2-datchiki-G38-ready.3mf"
+}
