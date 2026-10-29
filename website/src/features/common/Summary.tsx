@@ -8,7 +8,7 @@
 // Цифры и пороги — из session/story.ts, одни и те же для приложения и стартовой страницы.
 
 import { ArrowDown, ArrowUp, Minus, TriangleAlert } from 'lucide-react';
-import { href } from '../../website/router';
+import { href } from '../../app/router';
 import { ArmsCompare, RaiseProgress, TrunkLean } from '../../charts/MoveFigures';
 import type { Patient, Session } from '../../data/models';
 import { useI18n } from '../../i18n';

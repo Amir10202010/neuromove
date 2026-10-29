@@ -4,7 +4,7 @@
 // Выводы о лечении — за врачом: так и написано в отчёте.
 
 import { ArrowLeft, Printer } from 'lucide-react';
-import { href } from '../../website/router';
+import { href } from '../../app/router';
 import { RaiseProgress } from '../../charts/MoveFigures';
 import type { Session } from '../../data/models';
 import { useI18n } from '../../i18n';

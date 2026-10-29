@@ -10,7 +10,7 @@ import './styles/figures.css';
 import './styles/pages.css';
 import './styles/landing.css';
 import './styles/print.css';
-import { App } from './website/App';
+import { App } from './app/App';
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>

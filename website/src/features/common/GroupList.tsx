@@ -5,7 +5,7 @@
 // короткая строка под ним, по тем же правилам, что наблюдения после сеанса.
 
 import { ChevronRight, TriangleAlert } from 'lucide-react';
-import { href } from '../../website/router';
+import { href } from '../../app/router';
 import type { Patient, Session } from '../../data/models';
 import { useI18n } from '../../i18n';
 import { ALERT_RULES } from '../../session/alerts';

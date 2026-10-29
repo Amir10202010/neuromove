@@ -1,7 +1,7 @@
 // «Начать демо для клиники»: одна кнопка — и всё готово к показу.
 // Сбрасываем демо в исходное состояние, открываем пациента P01 и включаем гид.
 
-import { navigate } from '../../website/router';
+import { navigate } from '../../app/router';
 import { PROTOCOLS, resolveSteps } from '../../core/protocols';
 import { useAppStore } from '../../state/appStore';
 import { useSessionStore } from '../../state/sessionStore';

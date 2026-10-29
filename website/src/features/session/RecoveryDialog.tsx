@@ -1,6 +1,6 @@
 import { History } from 'lucide-react';
 import { useState } from 'react';
-import { navigate } from '../../website/router';
+import { navigate } from '../../app/router';
 import { useI18n } from '../../i18n';
 import { currentClinician, useAppStore } from '../../state/appStore';
 import { clearRecovery, readRecovery, sessionFromRecovery, type RecoveryRecord } from '../../state/sessionController';

@@ -1,6 +1,6 @@
 import { NotebookPen, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { href } from '../../website/router';
+import { href } from '../../app/router';
 import type { Patient } from '../../data/models';
 import { useI18n } from '../../i18n';
 import { currentClinician, useAppStore, useWorkspaceData } from '../../state/appStore';

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { href, navigate } from '../../website/router';
+import { href, navigate } from '../../app/router';
 import type { ProtocolId } from '../../core/protocols';
 import { useNow } from '../../hooks/useNow';
 import { useI18n } from '../../i18n';

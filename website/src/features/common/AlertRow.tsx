@@ -1,5 +1,5 @@
 import { Check, CircleAlert, Flag, Info, TriangleAlert } from 'lucide-react';
-import { href } from '../../website/router';
+import { href } from '../../app/router';
 import type { Alert, Patient } from '../../data/models';
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../state/appStore';

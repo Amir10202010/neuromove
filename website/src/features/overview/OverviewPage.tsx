@@ -1,6 +1,6 @@
 import { ArrowRight, CalendarClock, CheckCircle2, FlaskConical, Play, Plus, UserPlus, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { href, navigate } from '../../website/router';
+import { href, navigate } from '../../app/router';
 import { RaiseProgress } from '../../charts/MoveFigures';
 import { Sparkline } from '../../charts/Sparkline';
 import type { Patient, Session } from '../../data/models';

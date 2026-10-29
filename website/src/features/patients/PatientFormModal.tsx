@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { navigate } from '../../website/router';
+import { navigate } from '../../app/router';
 import type { AffectedSide, CpForm, Level, Patient, PatientStatus } from '../../data/models';
 import { useI18n } from '../../i18n';
 import { newId } from '../../lib/ids';

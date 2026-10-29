@@ -3,7 +3,7 @@
 
 import { Bluetooth, CircleAlert, FileUp, FlaskConical, PlugZap, Square, Usb } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import { href } from '../../website/router';
+import { href } from '../../app/router';
 import { BodyMap } from '../../charts/BodyMap';
 import { MotionPipeline } from '../../core/pipeline';
 import { angleBetween } from '../../core/orientation';

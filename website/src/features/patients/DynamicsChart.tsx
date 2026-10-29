@@ -1,7 +1,7 @@
 // Динамика пациента по сеансам: выбранная метрика и движение, обе стороны, цель пунктиром.
 
 import { useState } from 'react';
-import { navigate } from '../../website/router';
+import { navigate } from '../../app/router';
 import { ChartFrame, type LegendItem } from '../../charts/ChartFrame';
 import { TimeSeriesChart, type TsSeries } from '../../charts/TimeSeriesChart';
 import { EXERCISE_IDS, type ExerciseId } from '../../core/exercises';

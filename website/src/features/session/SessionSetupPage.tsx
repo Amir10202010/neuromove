@@ -1,6 +1,6 @@
 import { Bluetooth, Cable, FileUp, FlaskConical, PlugZap, Usb } from 'lucide-react';
 import { useMemo, useRef, useState, type ReactNode } from 'react';
-import { href, navigate } from '../../website/router';
+import { href, navigate } from '../../app/router';
 import { BodyMap } from '../../charts/BodyMap';
 import { MoveIcon } from '../../charts/MoveFigures';
 import { EXERCISE_IDS, type ExerciseId } from '../../core/exercises';

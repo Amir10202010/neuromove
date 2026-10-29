@@ -1,6 +1,6 @@
 import { Building2, ChevronsUpDown, FlaskConical } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { navigate } from '../website/router';
+import { navigate } from '../app/router';
 import type { Workspace } from '../data/models';
 import { useI18n } from '../i18n';
 import { initials } from '../lib/initials';

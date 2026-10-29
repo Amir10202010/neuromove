@@ -2,7 +2,7 @@
 // PDF — через печать браузера («Сохранить как PDF»): библиотека не нужна (софт.md).
 
 import { ArrowLeft, Printer } from 'lucide-react';
-import { href } from '../../website/router';
+import { href } from '../../app/router';
 import { BarPairs } from '../../charts/BarPairs';
 import { TimeSeriesChart } from '../../charts/TimeSeriesChart';
 import { EXERCISES, EXERCISE_IDS } from '../../core/exercises';

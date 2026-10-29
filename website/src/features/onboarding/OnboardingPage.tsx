@@ -1,6 +1,6 @@
 import { ArrowLeft, ArrowRight, Bluetooth, FileUp, FlaskConical, Microscope, Stethoscope, Usb, UserRound } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
-import { navigate } from '../../website/router';
+import { navigate } from '../../app/router';
 import { BodyMap } from '../../charts/BodyMap';
 import { CalibrationFigure } from '../../figures/CalibrationFigure';
 import { EmptyArt } from '../../figures/EmptyArt';

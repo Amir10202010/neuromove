@@ -1,5 +1,5 @@
 import { Cpu } from 'lucide-react';
-import { href } from '../../website/router';
+import { href } from '../../app/router';
 import { useI18n } from '../../i18n';
 import { useDeviceMonitor } from '../../state/deviceMonitor';
 import { useControllerState, useSessionStore } from '../../state/sessionStore';

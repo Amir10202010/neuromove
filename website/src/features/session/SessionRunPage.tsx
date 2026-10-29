@@ -1,7 +1,7 @@
 import { Maximize2, Pause, Play, RotateCcw, SkipForward, Square, X, Zap } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { href, navigate } from '../../website/router';
+import { href, navigate } from '../../app/router';
 import { useI18n } from '../../i18n';
 import { PageHeader } from '../../layout/PageHeader';
 import { currentClinician, useAppStore } from '../../state/appStore';

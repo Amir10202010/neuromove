@@ -1,6 +1,6 @@
 import { Search, UserPlus } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { navigate } from '../../website/router';
+import { navigate } from '../../app/router';
 import { Sparkline } from '../../charts/Sparkline';
 import { useI18n } from '../../i18n';
 import { PageHeader } from '../../layout/PageHeader';

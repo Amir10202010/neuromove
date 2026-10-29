@@ -1,6 +1,6 @@
 import { Building2, Database, Download, ExternalLink, FlaskConical, RotateCcw, Trash2, Upload } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { navigate } from '../../website/router';
+import { navigate } from '../../app/router';
 import { ALGORITHM_VERSION, APP_VERSION, BUILD_DATE } from '../../core/version';
 import { previewBackup, type BackupPreview } from '../../data/backup';
 import { downloadText, exportName, metricsCsv, stamp } from '../../data/export';

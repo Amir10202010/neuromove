@@ -3,7 +3,7 @@
 
 import { Download } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { navigate } from '../../website/router';
+import { navigate } from '../../app/router';
 import { ChartFrame } from '../../charts/ChartFrame';
 import { ColumnChart, type Column } from '../../charts/ColumnChart';
 import { DotPlot } from '../../charts/DotPlot';

@@ -10,7 +10,7 @@
 
 import { ArrowLeft, ArrowRight, Check, ChevronDown, ChevronUp, MonitorPlay, RotateCcw, X, Zap } from 'lucide-react';
 import { useEffect } from 'react';
-import { navigate, useRoute, type Route } from '../../website/router';
+import { navigate, useRoute, type Route } from '../../app/router';
 import { useI18n, type TKey } from '../../i18n';
 import { GUIDE_STEPS, useAppStore, type GuideStep } from '../../state/appStore';
 import { useControllerState, useSessionStore } from '../../state/sessionStore';

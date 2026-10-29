@@ -1,6 +1,6 @@
 import { Download, FileHeart, Pencil, Play, StickyNote, Target, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { href, navigate } from '../../website/router';
+import { href, navigate } from '../../app/router';
 import { Sparkline } from '../../charts/Sparkline';
 import { downloadText, exportName, metricsCsv, stamp } from '../../data/export';
 import type { Patient, Session } from '../../data/models';

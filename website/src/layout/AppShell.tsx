@@ -5,7 +5,7 @@
 
 import { ChartNoAxesCombined, Cpu, History, House, Menu, MonitorPlay, Plus, RotateCcw, Settings, UsersRound, WifiOff } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
-import { href, navigate, useRoute, type Route } from '../website/router';
+import { href, navigate, useRoute, type Route } from '../app/router';
 import { DemoGuide } from '../features/demo/DemoGuide';
 import { useI18n, type TKey } from '../i18n';
 import { useAppStore, useWorkspaceData } from '../state/appStore';

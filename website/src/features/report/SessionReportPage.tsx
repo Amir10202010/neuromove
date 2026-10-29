@@ -1,6 +1,6 @@
 import { Download, FileHeart, Printer, Save, TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
-import { href } from '../../website/router';
+import { href } from '../../app/router';
 import { BarPairs, type BarPairRow } from '../../charts/BarPairs';
 import { ChartFrame } from '../../charts/ChartFrame';
 import { TraceChart } from '../../charts/TraceChart';

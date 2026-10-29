@@ -5,7 +5,7 @@
 
 import { ArrowRight, LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
-import { href, navigate } from '../../website/router';
+import { href, navigate } from '../../app/router';
 import { useI18n } from '../../i18n';
 import { useAppStore } from '../../state/appStore';
 import { startClinicDemo } from '../demo/clinicDemo';

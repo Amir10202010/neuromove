@@ -1,4 +1,4 @@
-import { href } from '../website/router';
+import { href } from '../app/router';
 import { useI18n } from '../i18n';
 import { LinkButton } from '../ui/Button';
 import { EmptyState } from '../ui/EmptyState';

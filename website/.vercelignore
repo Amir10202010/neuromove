@@ -1,5 +1,5 @@
-demo/
-docs/
-coverage/
-dist-demo/
+/demo/
+/docs/
+/coverage/
+/dist-demo/
 *.tsbuildinfo
