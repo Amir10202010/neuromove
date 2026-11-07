@@ -46,6 +46,7 @@ export const en: typeof ru = {
   },
 
   nav: {
+    research: 'Research',
     overview: 'Home',
     patients: 'Patients',
     sessions: 'Sessions',

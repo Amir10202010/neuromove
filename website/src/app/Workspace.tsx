@@ -18,6 +18,11 @@ import { SessionSetupPage } from '../features/session/SessionSetupPage';
 import { SessionsPage } from '../features/sessions/SessionsPage';
 import { SettingsPage } from '../features/settings/SettingsPage';
 import { AppShell } from '../layout/AppShell';
+import { ResearchPage } from '../features/research/ResearchPage';
+import { ProtocolStudio } from '../features/research/ProtocolStudio';
+import { ValidationSetup } from '../features/research/ValidationSetup';
+import { ValidationSessionPage } from '../features/research/ValidationSessionPage';
+import { DatasetsPage } from '../features/research/DatasetsPage';
 import { ErrorBoundary } from './ErrorBoundary';
 import type { Route } from './router';
 
@@ -43,6 +48,16 @@ function Page({ route }: { route: Route }) {
       return <DevicesPage />;
     case 'settings':
       return <SettingsPage />;
+    case 'research':
+      return <ResearchPage />;
+    case 'researchProtocols':
+      return <ProtocolStudio />;
+    case 'researchNew':
+      return <ValidationSetup protocolKey={route.protocolKey} />;
+    case 'researchSession':
+      return <ValidationSessionPage id={route.id} />;
+    case 'researchDatasets':
+      return <DatasetsPage />;
     default:
       return <NotFoundPage />;
   }

@@ -33,20 +33,39 @@ describe('хранилище IndexedDB', () => {
   });
 
   it('схема по версиям: база версии 1 переходит на следующую без «хранилище уже есть»', async () => {
-    const v1 = await openDB('nm-test', 1, { upgrade: (db, old) => upgradeSchema(db, old) });
-    await v1.put('patients', { id: 'p1', workspace: 'clinic' });
-    v1.close();
-    // Будущая версия 2: тот же upgradeSchema плюс свой шаг
-    const v2 = await openDB('nm-test', 2, {
-      upgrade: (db, old) => {
-        upgradeSchema(db, old);
-        if (old < 2) db.createObjectStore('v2-only');
+    // A v1 database exactly as the previous app version created it (only the v1 stores)
+    const v1 = await openDB('neuromove', 1, {
+      upgrade: (db) => {
+        for (const name of ['patients', 'sessions', 'notes', 'alerts']) {
+          const st = db.createObjectStore(name, { keyPath: 'id' });
+          st.createIndex('workspace', 'workspace');
+          if (name !== 'patients') st.createIndex('patientId', 'patientId');
+        }
+        db.createObjectStore('meta', { keyPath: 'key' });
+        db.createObjectStore('raw', { keyPath: 'key' }).createIndex('sessionId', 'sessionId');
       },
     });
-    expect([...v2.objectStoreNames].sort()).toEqual(['alerts', 'meta', 'notes', 'patients', 'raw', 'sessions', 'v2-only']);
-    // Данные версии 1 на месте
-    expect(await v2.get('patients', 'p1')).toEqual({ id: 'p1', workspace: 'clinic' });
-    v2.close();
+    await v1.put('patients', { id: 'p1', workspace: 'clinic' });
+    await v1.put('sessions', { id: 's1', workspace: 'clinic', patientId: 'p1' });
+    v1.close();
+    // The real app opens it at the current version: additive upgrade, v1 data untouched
+    const storage = await openStorage();
+    expect(storage.kind).toBe('indexeddb');
+    const loaded = await storage.loadAll();
+    expect(loaded.patients).toEqual([{ id: 'p1', workspace: 'clinic' }]);
+    expect(loaded.sessions).toEqual([{ id: 's1', workspace: 'clinic', patientId: 'p1' }]);
+    expect(await storage.listOutbox()).toEqual([]);
+    expect(await storage.getAllResearch('trials')).toEqual([]);
+    // And a future v3 step on top of upgradeSchema still works
+    const v3 = await openDB('nm-test', 3, {
+      upgrade: (db, old) => {
+        upgradeSchema(db, old);
+        if (old < 3) db.createObjectStore('v3-only');
+      },
+    });
+    expect([...v3.objectStoreNames]).toContain('v3-only');
+    expect([...v3.objectStoreNames]).toContain('outbox');
+    v3.close();
   });
 });
 

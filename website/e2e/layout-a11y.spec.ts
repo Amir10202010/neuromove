@@ -21,6 +21,10 @@ const ROUTES = [
   '#/devices',
   '#/settings',
   '#/onboarding',
+  '#/research',
+  '#/research/protocols',
+  '#/research/new',
+  '#/research/datasets',
 ];
 
 /** Что вылезает за правый край: селектор и на сколько пикселей. */

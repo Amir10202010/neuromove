@@ -4,7 +4,7 @@
 // и параллельно пишем в IndexedDB. Экран обновляется сразу, диск — следом.
 
 import { create } from 'zustand';
-import { checkStoredRecords, parseWorkspaceBackup } from '../data/backup';
+import { checkStoredRecords, parseWorkspaceBackup, type RejectedRecord } from '../data/backup';
 import { openStorage, type CollectionName, type DataStorage } from '../data/db';
 import { isSimulatedSession, type Alert, type Goal, type Locale, type Note, type Patient, type Profile, type Session, type Settings, type Workspace, type WorkspaceData } from '../data/models';
 import { DEMO_SEED_VERSION, dayDiff, demoSessionCount, generateDemoWorkspace, shiftWorkspaceDates } from '../data/seed/demo';
@@ -12,6 +12,9 @@ import type { DeviceKind, RawFrame } from '../devices/types';
 import { makeT } from '../i18n';
 import { newId } from '../lib/ids';
 import { evaluateSession } from '../session/alerts';
+import { ENTITY_OF_COLLECTION, makeOp } from '../sync/ops';
+import { remoteListeners, scheduleSync, setRawSource, useSyncStore, type SyncConfig } from '../sync/engine';
+import type { PullChange } from '../sync/types';
 
 export type ToastKind = 'good' | 'info' | 'warn' | 'critical';
 export interface Toast {
@@ -38,6 +41,12 @@ interface State {
   storageKind: 'indexeddb' | 'memory';
   /** Сколько записей хранилища не прошли проверку при загрузке: не показаны, но и не удалены. */
   storageRejected: number;
+  /** Writes started but not yet confirmed by IndexedDB. 0 = everything shown is on disk. */
+  pendingWrites: number;
+  /** Last failed local write (cleared by the next successful one). */
+  writeError: string | null;
+  /** Another tab holds the old database version open; the upgrade waits for it to close. */
+  dbBlocked: boolean;
   settings: Settings;
   profile: Profile | null;
   patients: Patient[];
@@ -77,6 +86,12 @@ interface Actions {
   clearClinic(): Promise<void>;
   markBackup(): void;
   getRaw(sessionId: string): Promise<RawFrame[] | null>;
+  /** Resolve when every write started so far is committed. false = at least one of them failed. */
+  flush(): Promise<boolean>;
+  /** Records hidden at load time (failed validation), exactly as stored — for download and analysis. */
+  exportQuarantine(): string;
+  /** The storage instance (research module and sync engine share it). */
+  storage(): DataStorage | null;
   toast(kind: ToastKind, title: string, desc?: string): void;
   dismissToast(id: string): void;
   startGuide(): void;
@@ -122,6 +137,11 @@ const DEFAULT_SETTINGS: Settings = { locale: 'ru', workspace: 'demo', autoAdvanc
 
 let storage: DataStorage | null = null;
 let initialization: Promise<void> | null = null;
+/** Records that failed validation at load: shown nowhere, deleted never (replaceWorkspace preserves them). */
+let quarantine: RejectedRecord[] = [];
+const quarantineIds = () => new Set(quarantine.map((r) => r.id).filter(Boolean));
+/** In-flight local writes: flush() awaits them. */
+const inflight = new Set<Promise<boolean>>();
 /** Копия служебной записи о демо — чтобы не читать базу ради одного флага. */
 let demoMetaCache: DemoMeta | null = null;
 
@@ -134,12 +154,68 @@ export const useAppStore = create<State & Actions>((set, get) => {
   /** Запись на диск в фоне; ошибку показываем, но не роняем интерфейс. */
   const persist = (task: (st: DataStorage) => Promise<void>) => {
     if (!storage) return;
-    task(storage).catch(() => {
-      const t = makeT(get().settings.locale);
-      get().toast('critical', t('errors.saveFailed'));
+    set({ pendingWrites: get().pendingWrites + 1 });
+    const p: Promise<boolean> = task(storage).then(
+      () => {
+        set({ writeError: null });
+        return true;
+      },
+      (e: unknown) => {
+        const t = makeT(get().settings.locale);
+        get().toast('critical', t('errors.saveFailed'));
+        set({ writeError: e instanceof Error ? e.message : String(e) });
+        return false;
+      },
+    );
+    inflight.add(p);
+    void p.finally(() => {
+      inflight.delete(p);
+      set({ pendingWrites: Math.max(0, get().pendingWrites - 1) });
     });
   };
-  const put = (c: CollectionName, v: Patient | Session | Note | Alert) => persist((st) => st.put(c, v));
+  // Clinic records go to the sync outbox in the same IndexedDB transaction as the record itself.
+  // Demo records never leave the browser.
+  const put = (c: CollectionName, v: Patient | Session | Note | Alert) => {
+    persist((st) => st.put(c, v, v.workspace === 'clinic' ? makeOp(ENTITY_OF_COLLECTION[c], v.id, v) : undefined));
+    if (v.workspace === 'clinic') scheduleSync();
+  };
+  const tombstone = (c: CollectionName, ws: string, id: string) => {
+    if (ws !== 'clinic') return;
+    persist((st) => st.enqueue(makeOp(ENTITY_OF_COLLECTION[c], id, null, true)));
+    scheduleSync();
+  };
+
+  /**
+   * A change pulled from the server: written locally WITHOUT a new outbox op (it is already on the
+   * server). Base records pass the same validation as records loaded from disk; research records are
+   * written to their stores and announced to the research store.
+   */
+  const COLLECTION_OF: Record<string, CollectionName> = { participant: 'patients', rehab_session: 'sessions', note: 'notes', alert: 'alerts' };
+  const RESEARCH_OF: Record<string, 'protocols' | 'vsessions' | 'trials'> = { protocol_version: 'protocols', validation_session: 'vsessions', trial: 'trials' };
+  const applyRemote = async (ch: PullChange) => {
+    if (!storage) return;
+    const c = COLLECTION_OF[ch.entity];
+    if (c) {
+      if (ch.deleted) {
+        await storage.remove(c, ch.entityId);
+        set({ [c]: (get()[c] as { id: string }[]).filter((x) => x.id !== ch.entityId) } as Partial<State>);
+        return;
+      }
+      const one = { patients: [], sessions: [], notes: [], alerts: [], [c]: [ch.payload] } as unknown as WorkspaceData;
+      const checked = checkStoredRecords(one);
+      const v = checked.data[c][0] as Patient | Session | Note | Alert | undefined;
+      if (!v || v.workspace !== 'clinic') return;
+      await storage.put(c, v);
+      const list = get()[c] as { id: string }[];
+      set({ [c]: list.some((x) => x.id === v.id) ? list.map((x) => (x.id === v.id ? v : x)) : [...list, v] } as Partial<State>);
+      return;
+    }
+    const r = RESEARCH_OF[ch.entity];
+    if (r && ch.payload && !ch.deleted) {
+      await storage.putResearchBatch(r, [ch.payload as never], []);
+      for (const l of remoteListeners) l(ch);
+    }
+  };
   const markDemoModified = () => {
     if (get().settings.workspace !== 'demo' || !demoMetaCache || demoMetaCache.modified) return;
     demoMetaCache = { ...demoMetaCache, modified: true };
@@ -168,6 +244,9 @@ export const useAppStore = create<State & Actions>((set, get) => {
     seedProgress: { done: 0, total: 0 },
     storageKind: 'indexeddb',
     storageRejected: 0,
+    pendingWrites: 0,
+    writeError: null,
+    dbBlocked: false,
     settings: DEFAULT_SETTINGS,
     profile: null,
     patients: [],
@@ -183,7 +262,12 @@ export const useAppStore = create<State & Actions>((set, get) => {
       if (initialization) return initialization;
       set({ status: 'loading' });
       initialization = (async () => {
-      storage = await openStorage();
+      const onBlocked = () => set({ dbBlocked: true });
+      if (typeof window !== 'undefined') window.addEventListener('neuromove:db-blocked', onBlocked);
+      storage = await openStorage().finally(() => {
+        if (typeof window !== 'undefined') window.removeEventListener('neuromove:db-blocked', onBlocked);
+        set({ dbBlocked: false });
+      });
       const loaded = await storage.loadAll();
       const settings = { ...DEFAULT_SETTINGS, ...(loaded.meta.settings as Partial<Settings> | undefined) };
       const profile = (loaded.meta.profile as Profile | undefined) ?? null;
@@ -193,6 +277,7 @@ export const useAppStore = create<State & Actions>((set, get) => {
       // Записи из базы — через те же проверки, что архив: испорченная запись не уронит экран
       const checked = checkStoredRecords({ patients: loaded.patients, sessions: loaded.sessions, notes: loaded.notes, alerts: loaded.alerts });
       let data: WorkspaceData = checked.data;
+      quarantine = checked.records;
       set({ storageRejected: checked.rejected });
       const demoMeta = loaded.meta.demo as DemoMeta | undefined;
       let snapshot = loaded.meta.demoSnapshot as WorkspaceData | undefined;
@@ -215,6 +300,10 @@ export const useAppStore = create<State & Actions>((set, get) => {
         data = mergeWs(pickWs(data, 'clinic'), shifted);
       }
       set({ ...data, status: 'ready' });
+      // Sync engine: starts disabled unless the team enabled cloud sync on this device
+      const st = storage;
+      setRawSource({ sessions: () => get().sessions.filter((x) => x.workspace === 'clinic' && x.hasRaw).map((x) => x.id), get: (id) => st.getRaw(id) });
+      void useSyncStore.getState().start(st, applyRemote, loaded.meta.sync as Partial<SyncConfig> | undefined, (c) => st.setMeta('sync', c));
       if (checked.rejected) get().toast('critical', makeT(get().settings.locale)('errors.corruptedRecords', { count: checked.rejected }));
       })().catch(() => { set({ status: 'error' }); }).finally(() => { initialization = null; });
       return initialization;
@@ -289,6 +378,12 @@ export const useAppStore = create<State & Actions>((set, get) => {
         for (const x of s.notes.filter((n) => n.patientId === id)) await st.remove('notes', x.id);
         for (const x of s.alerts.filter((n) => n.patientId === id)) await st.remove('alerts', x.id);
       });
+      // Server side this is a soft delete (deleted_at), children first so references stay valid
+      const ws = s.patients.find((x) => x.id === id)?.workspace ?? 'demo';
+      for (const x of s.alerts.filter((n) => n.patientId === id)) tombstone('alerts', ws, x.id);
+      for (const x of s.notes.filter((n) => n.patientId === id)) tombstone('notes', ws, x.id);
+      for (const x of sessions) tombstone('sessions', ws, x.id);
+      tombstone('patients', ws, id);
       markDemoModified();
     },
 
@@ -368,8 +463,10 @@ export const useAppStore = create<State & Actions>((set, get) => {
     },
 
     deleteNote(id) {
+      const ws = get().notes.find((n) => n.id === id)?.workspace ?? 'demo';
       set({ notes: get().notes.filter((n) => n.id !== id) });
       persist((st) => st.remove('notes', id));
+      tombstone('notes', ws, id);
       markDemoModified();
     },
 
@@ -421,8 +518,15 @@ export const useAppStore = create<State & Actions>((set, get) => {
           const ids = new Set(other[key].map(entry => entry.id));
           if (data[key].some(entry => ids.has(entry.id))) return false;
         }
-        await storage?.replaceWorkspace(ws, data);
+        await storage?.replaceWorkspace(ws, data, quarantineIds());
         set(mergeWs(pickWs(get(), ws === 'demo' ? 'clinic' : 'demo'), data));
+        // Imported clinic records are queued for the server like any other edit
+        if (ws === 'clinic' && storage) {
+          for (const x of data.patients) await storage.enqueue(makeOp('participant', x.id, x));
+          for (const x of data.sessions) await storage.enqueue(makeOp('rehab_session', x.id, x));
+          for (const x of data.notes) await storage.enqueue(makeOp('note', x.id, x));
+          for (const x of data.alerts) await storage.enqueue(makeOp('alert', x.id, x));
+        }
         if (ws === 'demo') markDemoModified();
         return true;
       } catch {
@@ -431,7 +535,8 @@ export const useAppStore = create<State & Actions>((set, get) => {
     },
 
     async clearClinic() {
-      await storage?.replaceWorkspace('clinic', { patients: [], sessions: [], notes: [], alerts: [] });
+      // Clears this browser only. Synced records stay on the server; quarantined records are kept.
+      await storage?.replaceWorkspace('clinic', { patients: [], sessions: [], notes: [], alerts: [] }, quarantineIds());
       set(mergeWs(pickWs(get(), 'demo'), { patients: [], sessions: [], notes: [], alerts: [] }));
     },
 
@@ -443,6 +548,19 @@ export const useAppStore = create<State & Actions>((set, get) => {
 
     async getRaw(sessionId) {
       return storage ? storage.getRaw(sessionId) : null;
+    },
+
+    async flush() {
+      const all = await Promise.all([...inflight]);
+      return all.every(Boolean);
+    },
+
+    exportQuarantine() {
+      return JSON.stringify({ format: 'neuromove-quarantine', version: 1, exportedAt: new Date().toISOString(), records: quarantine }, null, 1);
+    },
+
+    storage() {
+      return storage;
     },
 
     toast(kind, title, desc) {

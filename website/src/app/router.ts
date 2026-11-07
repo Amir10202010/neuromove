@@ -20,6 +20,11 @@ export type Route =
   | { name: 'devices' }
   | { name: 'settings' }
   | { name: 'lab' }
+  | { name: 'research' }
+  | { name: 'researchProtocols' }
+  | { name: 'researchNew'; protocolKey: string | null }
+  | { name: 'researchSession'; id: string }
+  | { name: 'researchDatasets' }
   | { name: 'notFound' };
 
 export function parseHash(hash: string): Route {
@@ -34,7 +39,8 @@ export function parseHash(hash: string): Route {
   switch (a) {
     // Адреса сайта из версии от 27 сентября: страниц больше нет — ведём на стартовую
     // или сразу в приложение, а не на «страница не найдена»
-    case 'technology': case 'product': case 'research': case 'company': case 'contact': case 'privacy':
+    // ('research' was one of them until 8 Nov 2026; it is now the research module)
+    case 'technology': case 'product': case 'company': case 'contact': case 'privacy':
       return parts.length === 1 ? { name: 'welcome' } : { name: 'notFound' };
     case 'portal':
       return { name: 'overview' };
@@ -60,6 +66,14 @@ export function parseHash(hash: string): Route {
       return { name: 'devices' };
     case 'settings':
       return { name: 'settings' };
+    // Research platform: goniometer validation, protocols, datasets
+    case 'research':
+      if (!b) return { name: 'research' };
+      if (b === 'protocols' && !c) return { name: 'researchProtocols' };
+      if (b === 'datasets' && !c) return { name: 'researchDatasets' };
+      if (b === 'new' && !c) return { name: 'researchNew', protocolKey: q.get('protocol') };
+      if (b === 'sessions' && c) return { name: 'researchSession', id: c };
+      return { name: 'notFound' };
     // Лаборатория рисунков — только в режиме разработки (App.tsx), в сборке это «не найдено»
     case 'lab':
       return { name: 'lab' };
@@ -106,6 +120,16 @@ export function href(r: Route): string {
       return '#/settings';
     case 'lab':
       return '#/lab';
+    case 'research':
+      return '#/research';
+    case 'researchProtocols':
+      return '#/research/protocols';
+    case 'researchDatasets':
+      return '#/research/datasets';
+    case 'researchNew':
+      return `#/research/new${r.protocolKey ? `?protocol=${e(r.protocolKey)}` : ''}`;
+    case 'researchSession':
+      return `#/research/sessions/${e(r.id)}`;
     case 'notFound':
       return '#/404';
   }

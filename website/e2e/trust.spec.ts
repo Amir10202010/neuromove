@@ -7,10 +7,13 @@ import { parseImuCsv, serializeImuCsv } from '../src/devices/contract';
 import { benchCsv, simulateBench } from '../src/simulation/bench';
 import { recordingCsv, startDemoTest, waitReady, watchErrors } from './helpers';
 
-test('политика безопасности запрещает странице сетевые запросы', async ({ page }) => {
+// Since 8 Nov 2026 the site may reach its OWN origin (/api, team cloud sync — off by default).
+// Any third-party destination is still blocked by the browser. The single-file demo keeps 'none'.
+test('политика безопасности запрещает странице запросы к чужим адресам', async ({ page }) => {
   await page.goto('./');
   const policy = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
-  expect(policy).toContain("connect-src 'none'");
+  expect(policy).toContain("connect-src 'self'");
+  expect(policy).not.toMatch(/connect-src[^;]*(https?:|\*)/);
   const result = await page.evaluate(() =>
     fetch('https://example.com/collect', { method: 'POST', body: 'x' }).then(
       () => 'sent',

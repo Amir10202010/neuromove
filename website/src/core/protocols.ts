@@ -5,7 +5,14 @@
 import type { Side } from '../devices/types';
 import { EXERCISES, type ExerciseId } from './exercises';
 
-export type ProtocolId = 'upper_standard' | 'upper_quick' | 'elbow_endurance' | 'custom' | 'single';
+/**
+ * Все протоколы, которые может нести сохранённый сеанс. Единственный источник правды и для типа,
+ * и для проверки записей при загрузке (data/backup.ts). Раньше проверка держала свой список без 'single' —
+ * сеансы теста одним датчиком сохранялись в базу, но после перезагрузки скрывались как «повреждённые»
+ * (найдено 8 ноября 2026 по архиву клиники: оповещения ссылались на сеансы, которых не было в списке).
+ */
+export const PROTOCOL_IDS = ['upper_standard', 'upper_quick', 'elbow_endurance', 'custom', 'single'] as const;
+export type ProtocolId = (typeof PROTOCOL_IDS)[number];
 
 export interface ProtocolTemplate {
   id: ProtocolId;

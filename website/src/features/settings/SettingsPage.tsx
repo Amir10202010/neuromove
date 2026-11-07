@@ -15,6 +15,7 @@ import { useSessionStore } from '../../state/sessionStore';
 import { Button } from '../../ui/Button';
 import { Field } from '../../ui/Field';
 import { ConfirmDialog } from '../../ui/Modal';
+import { SyncPanel } from '../research/SyncPanel';
 
 export function SettingsPage() {
   const { t, f } = useI18n();
@@ -89,6 +90,8 @@ export function SettingsPage() {
           </label>
         </div>
       </section>
+
+      <SyncPanel />
 
       <section className="card">
         <div className="card__header">

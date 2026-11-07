@@ -37,6 +37,13 @@ export interface SessionSetup {
    * переименовывается в это место, как бы его ни назвала прошивка (SinglePlacementDevice).
    */
   single?: { placement: Placement };
+  /**
+   * 'validation' = goniometer validation study (research module). Such runs never write the rehab
+   * crash-recovery record (their trials are persisted one by one) and never become rehab sessions.
+   */
+  purpose?: 'rehab' | 'validation';
+  /** Sensors that must stream before calibration; overrides the rehab protocol rule. */
+  requiredOverride?: Placement[];
 }
 
 export type Stage = 'connect' | 'test' | 'saving' | 'done';
@@ -124,7 +131,7 @@ export class SessionController {
   }
 
   get required(): Placement[] {
-    return requiredPlacements(this.setup.steps, this.setup.single);
+    return this.setup.requiredOverride ?? requiredPlacements(this.setup.steps, this.setup.single);
   }
 
   /** Все нужные датчики на связи и поток идёт — можно калибровать. */
@@ -171,7 +178,7 @@ export class SessionController {
     );
     engine.start();
     this.set({ stage: 'test' });
-    this.recoveryTimer = setInterval(() => this.saveRecovery(), 2000);
+    if (this.setup.purpose !== 'validation') this.recoveryTimer = setInterval(() => this.saveRecovery(), 2000);
   }
 
   /** Сценарий демо: какой сбой и когда показать. */
@@ -222,7 +229,10 @@ export class SessionController {
       demo: this.setup.workspace === 'demo' || this.device.kind === 'simulator' || info?.simulated === true,
       hasRaw: raw.length > 0,
     });
-    clearRecovery();
+    // The recovery record is NOT cleared here: the caller clears it only after the session write is
+    // confirmed by IndexedDB (appStore.flush). Clearing it first meant a failed write lost the session.
+    if (this.recoveryTimer) clearInterval(this.recoveryTimer);
+    this.recoveryTimer = null;
     this.set({ stage: 'done', savedSessionId: session.id });
     return session;
   }

@@ -5,7 +5,7 @@ import { href, navigate } from '../../app/router';
 import { useI18n } from '../../i18n';
 import { PageHeader } from '../../layout/PageHeader';
 import { currentClinician, useAppStore } from '../../state/appStore';
-import type { SessionController } from '../../state/sessionController';
+import { clearRecovery, type SessionController } from '../../state/sessionController';
 import { useControllerState, useEngineSnapshot, useSessionStore } from '../../state/sessionStore';
 import type { SimFault } from '../../devices/SimulatorDevice';
 import { Button, LinkButton } from '../../ui/Button';
@@ -119,6 +119,13 @@ function Run({ controller }: { controller: SessionController }) {
     const session = controller.finalize(currentClinician());
     if (!session) return;
     saveSession(session, raw);
+    // Crash-recovery copy is dropped only once IndexedDB confirmed the write (never before)
+    void useAppStore
+      .getState()
+      .flush()
+      .then((ok) => {
+        if (ok) clearRecovery();
+      });
     navigate({ name: 'session', id: session.id, complete: true }, { replace: true });
     void clear();
   }, [state?.stage, controller, saveSession, clear]);

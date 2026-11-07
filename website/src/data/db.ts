@@ -4,11 +4,14 @@
 // Если IndexedDB недоступна (приватное окно, запрет браузера) — работаем в памяти
 // и честно предупреждаем: после закрытия вкладки данные пропадут.
 //
-// Замена на настоящий сервер позже — это новая реализация интерфейса DataStorage,
-// остальной код не меняется.
+// IndexedDB is the local, offline-first copy. When team cloud sync is enabled, PostgreSQL (server/)
+// is the authoritative store; every clinic write is committed here together with an outbox op in ONE
+// transaction, and the sync engine (src/sync/engine.ts) uploads it.
 
 import { openDB, type IDBPDatabase } from 'idb';
 import type { Placement, RawFrame } from '../devices/types';
+import type { ProtocolVersion, Trial, ValidationSession } from '../research/model';
+import type { OutboxOp, SyncStateRow } from '../sync/types';
 import type { Alert, Note, Patient, Session, Workspace, WorkspaceData } from './models';
 
 export type CollectionName = 'patients' | 'sessions' | 'notes' | 'alerts';
@@ -18,17 +21,45 @@ export interface StoredData extends WorkspaceData {
   meta: Record<string, unknown>;
 }
 
+/** Research stores added in schema v2 (validation studies). */
+export type ResearchStore = 'protocols' | 'vsessions' | 'trials';
+export interface ResearchRecords {
+  protocols: ProtocolVersion;
+  vsessions: ValidationSession;
+  trials: Trial;
+}
+
 export interface DataStorage {
   readonly kind: 'indexeddb' | 'memory';
   loadAll(): Promise<StoredData>;
-  put(collection: CollectionName, value: Entity): Promise<void>;
+  /**
+   * Записать сущность. С `op` сущность и операция очереди синхронизации ложатся в ОДНОЙ транзакции:
+   * на диске либо обе, либо ни одной (нет «сохранено, но никогда не уйдёт на сервер»).
+   */
+  put(collection: CollectionName, value: Entity, op?: OutboxOp): Promise<void>;
   remove(collection: CollectionName, id: string): Promise<void>;
-  /** Заменить всё содержимое пространства (сброс демо, загрузка архива). */
-  replaceWorkspace(ws: Workspace, data: WorkspaceData): Promise<void>;
+  /**
+   * Заменить всё содержимое пространства (сброс демо, загрузка архива).
+   * `preserve` — id записей, которые не удаляются ни при каких условиях: записи, не прошедшие проверку
+   * при загрузке («карантин»). Раньше импорт архива удалял и их — скрытые сеансы пропадали навсегда.
+   */
+  replaceWorkspace(ws: Workspace, data: WorkspaceData, preserve?: ReadonlySet<string>): Promise<void>;
   setMeta(key: string, value: unknown): Promise<void>;
   putRaw(sessionId: string, frames: readonly RawFrame[]): Promise<void>;
   getRaw(sessionId: string): Promise<RawFrame[] | null>;
   removeRaw(sessionId: string): Promise<void>;
+  putResearch<S extends ResearchStore>(store: S, value: ResearchRecords[S], op?: OutboxOp): Promise<void>;
+  /** Several records of one store and their outbox ops in ONE transaction (all or nothing). */
+  putResearchBatch<S extends ResearchStore>(store: S, values: readonly ResearchRecords[S][], ops: readonly OutboxOp[]): Promise<void>;
+  getAllResearch<S extends ResearchStore>(store: S): Promise<ResearchRecords[S][]>;
+  /** Очередь синхронизации: новая правка сущности сливается с ещё не подтверждённой (с новым opId). */
+  enqueue(op: OutboxOp): Promise<void>;
+  listOutbox(): Promise<OutboxOp[]>;
+  updateOp(op: OutboxOp): Promise<void>;
+  /** Убрать подтверждённые операции — только если в очереди всё ещё именно этот opId. */
+  removeOps(opIds: readonly string[]): Promise<void>;
+  getSyncState(): Promise<SyncStateRow[]>;
+  putSyncState(rows: readonly SyncStateRow[]): Promise<void>;
 }
 
 /** Сырые отсчёты кусками по 10 секунд: номера и числа в типизированных массивах. */
@@ -45,9 +76,11 @@ interface RawChunk {
 }
 
 const DB_NAME = 'neuromove';
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 const COLLECTIONS: CollectionName[] = ['patients', 'sessions', 'notes', 'alerts'];
 const CHUNK = 1000;
+
+const researchKey = (store: ResearchStore, v: { id?: string; key?: string }): string => (store === 'protocols' ? v.key : v.id) as string;
 
 function packChunk(sessionId: string, index: number, frames: readonly RawFrame[]): RawChunk {
   const placements = [...new Set(frames.flatMap((f) => Object.keys(f.data) as Placement[]))];
@@ -84,6 +117,30 @@ function unpackChunk(c: RawChunk): RawFrame[] {
   return out;
 }
 
+/** Minimal surface of the outbox object store used by `enqueueIn`. */
+interface OutboxStore {
+  index(name: 'entityKey'): { getAll(key: string): Promise<OutboxOp[]> };
+  put(value: OutboxOp): Promise<unknown>;
+}
+
+/**
+ * Coalescing: an entity edited five times while offline is uploaded once, with its latest payload, in the
+ * queue position of its FIRST pending op (parents stay ahead of children). The coalesced op gets a NEW
+ * opId, so a stale in-flight copy of the old op can never be acknowledged in its place. Ops in 'conflict'
+ * are never overwritten silently: the new edit queues behind them.
+ */
+async function enqueueIn(store: OutboxStore, op: OutboxOp): Promise<void> {
+  const entityKey = `${op.entity}:${op.entityId}`;
+  const existing = (await store.index('entityKey').getAll(entityKey)).find((x) => x.state !== 'conflict');
+  const row = { ...op, entityKey } as OutboxOp & { entityKey: string };
+  if (existing) {
+    await store.put({ ...row, seq: existing.seq, baseRev: existing.baseRev ?? op.baseRev, attempts: 0, nextAttemptAt: 0, lastError: null, state: 'pending' } as OutboxOp);
+  } else {
+    delete row.seq;
+    await store.put(row);
+  }
+}
+
 class IdbStorage implements DataStorage {
   readonly kind = 'indexeddb' as const;
   constructor(private readonly db: IDBPDatabase) {}
@@ -101,20 +158,28 @@ class IdbStorage implements DataStorage {
     return { patients, sessions, notes, alerts, meta } as StoredData;
   }
 
-  async put(collection: CollectionName, value: Entity): Promise<void> {
-    await this.db.put(collection, value);
+  async put(collection: CollectionName, value: Entity, op?: OutboxOp): Promise<void> {
+    if (!op) {
+      await this.db.put(collection, value);
+      return;
+    }
+    const tx = this.db.transaction([collection, 'outbox'], 'readwrite');
+    await tx.objectStore(collection).put(value);
+    await enqueueIn(tx.objectStore('outbox') as unknown as OutboxStore, op);
+    await tx.done;
   }
 
   async remove(collection: CollectionName, id: string): Promise<void> {
     await this.db.delete(collection, id);
   }
 
-  async replaceWorkspace(ws: Workspace, data: WorkspaceData): Promise<void> {
+  async replaceWorkspace(ws: Workspace, data: WorkspaceData, preserve: ReadonlySet<string> = new Set()): Promise<void> {
     const tx = this.db.transaction([...COLLECTIONS, 'raw'], 'readwrite');
     for (const name of COLLECTIONS) {
       const store = tx.objectStore(name);
       const idx = store.index('workspace');
       for (const key of await idx.getAllKeys(ws)) {
+        if (preserve.has(String(key))) continue;
         if (name === 'sessions') {
           // Вместе с сеансом удаляем его сырые данные
           const raw = tx.objectStore('raw');
@@ -151,6 +216,61 @@ class IdbStorage implements DataStorage {
     for (const k of await tx.store.index('sessionId').getAllKeys(sessionId)) await tx.store.delete(k);
     await tx.done;
   }
+
+  async putResearch<S extends ResearchStore>(store: S, value: ResearchRecords[S], op?: OutboxOp): Promise<void> {
+    const tx = this.db.transaction(op ? [store, 'outbox'] : [store], 'readwrite');
+    await tx.objectStore(store).put(value);
+    if (op) await enqueueIn(tx.objectStore('outbox') as unknown as OutboxStore, op);
+    await tx.done;
+  }
+
+  async getAllResearch<S extends ResearchStore>(store: S): Promise<ResearchRecords[S][]> {
+    return (await this.db.getAll(store)) as ResearchRecords[S][];
+  }
+
+  async putResearchBatch<S extends ResearchStore>(store: S, values: readonly ResearchRecords[S][], ops: readonly OutboxOp[]): Promise<void> {
+    const tx = this.db.transaction([store, 'outbox'], 'readwrite');
+    for (const v of values) await tx.objectStore(store).put(v);
+    for (const op of ops) await enqueueIn(tx.objectStore('outbox') as unknown as OutboxStore, op);
+    await tx.done;
+  }
+
+  async enqueue(op: OutboxOp): Promise<void> {
+    const tx = this.db.transaction('outbox', 'readwrite');
+    await enqueueIn(tx.store as unknown as OutboxStore, op);
+    await tx.done;
+  }
+
+  async listOutbox(): Promise<OutboxOp[]> {
+    return (await this.db.getAll('outbox')) as OutboxOp[];
+  }
+
+  async updateOp(op: OutboxOp): Promise<void> {
+    const tx = this.db.transaction('outbox', 'readwrite');
+    const current = (await tx.store.index('opId').get(op.opId)) as OutboxOp | undefined;
+    // Coalesced meanwhile (new payload → new opId): the newer op wins, this update is stale
+    if (current) await tx.store.put({ ...current, ...op, seq: current.seq });
+    await tx.done;
+  }
+
+  async removeOps(opIds: readonly string[]): Promise<void> {
+    const tx = this.db.transaction('outbox', 'readwrite');
+    for (const id of opIds) {
+      const key = await tx.store.index('opId').getKey(id);
+      if (key !== undefined) await tx.store.delete(key);
+    }
+    await tx.done;
+  }
+
+  async getSyncState(): Promise<SyncStateRow[]> {
+    return (await this.db.getAll('syncstate')) as SyncStateRow[];
+  }
+
+  async putSyncState(rows: readonly SyncStateRow[]): Promise<void> {
+    const tx = this.db.transaction('syncstate', 'readwrite');
+    for (const r of rows) await tx.store.put(r);
+    await tx.done;
+  }
 }
 
 /** Запасной вариант: всё в памяти вкладки. */
@@ -164,6 +284,10 @@ class MemoryStorage implements DataStorage {
   };
   private meta: Record<string, unknown> = {};
   private raw = new Map<string, RawFrame[]>();
+  private research: { [S in ResearchStore]: Map<string, ResearchRecords[S]> } = { protocols: new Map(), vsessions: new Map(), trials: new Map() };
+  private outbox: OutboxOp[] = [];
+  private seq = 0;
+  private syncState = new Map<string, SyncStateRow>();
 
   async loadAll(): Promise<StoredData> {
     return {
@@ -174,16 +298,17 @@ class MemoryStorage implements DataStorage {
       meta: { ...this.meta },
     };
   }
-  async put(c: CollectionName, v: Entity): Promise<void> {
+  async put(c: CollectionName, v: Entity, op?: OutboxOp): Promise<void> {
     this.data[c].set(v.id, v);
+    if (op) await this.enqueue(op);
   }
   async remove(c: CollectionName, id: string): Promise<void> {
     this.data[c].delete(id);
   }
-  async replaceWorkspace(ws: Workspace, d: WorkspaceData): Promise<void> {
-    for (const [id, entry] of this.data.sessions) if (entry.workspace === ws) this.raw.delete(id);
+  async replaceWorkspace(ws: Workspace, d: WorkspaceData, preserve: ReadonlySet<string> = new Set()): Promise<void> {
+    for (const [id, entry] of this.data.sessions) if (entry.workspace === ws && !preserve.has(id)) this.raw.delete(id);
     for (const c of COLLECTIONS) {
-      for (const [id, v] of this.data[c]) if (v.workspace === ws) this.data[c].delete(id);
+      for (const [id, v] of this.data[c]) if (v.workspace === ws && !preserve.has(id)) this.data[c].delete(id);
       for (const item of d[c]) this.data[c].set(item.id, item);
     }
   }
@@ -198,6 +323,42 @@ class MemoryStorage implements DataStorage {
   }
   async removeRaw(id: string): Promise<void> {
     this.raw.delete(id);
+  }
+  async putResearch<S extends ResearchStore>(store: S, value: ResearchRecords[S], op?: OutboxOp): Promise<void> {
+    (this.research[store] as Map<string, ResearchRecords[S]>).set(researchKey(store, value as never), structuredClone(value));
+    if (op) await this.enqueue(op);
+  }
+  async getAllResearch<S extends ResearchStore>(store: S): Promise<ResearchRecords[S][]> {
+    return [...(this.research[store] as Map<string, ResearchRecords[S]>).values()].map((v) => structuredClone(v));
+  }
+  async putResearchBatch<S extends ResearchStore>(store: S, values: readonly ResearchRecords[S][], ops: readonly OutboxOp[]): Promise<void> {
+    for (const v of values) (this.research[store] as Map<string, ResearchRecords[S]>).set(researchKey(store, v as never), structuredClone(v));
+    for (const op of ops) await this.enqueue(op);
+  }
+  async enqueue(op: OutboxOp): Promise<void> {
+    const i = this.outbox.findIndex((x) => x.entity === op.entity && x.entityId === op.entityId && x.state !== 'conflict');
+    const copy = structuredClone(op);
+    if (i >= 0) {
+      const ex = this.outbox[i] as OutboxOp;
+      this.outbox[i] = { ...copy, seq: ex.seq as number, baseRev: ex.baseRev ?? op.baseRev, attempts: 0, nextAttemptAt: 0, lastError: null, state: 'pending' };
+    } else this.outbox.push({ ...copy, seq: ++this.seq });
+  }
+  async listOutbox(): Promise<OutboxOp[]> {
+    return this.outbox.map((x) => structuredClone(x));
+  }
+  async updateOp(op: OutboxOp): Promise<void> {
+    const i = this.outbox.findIndex((x) => x.opId === op.opId);
+    if (i >= 0) this.outbox[i] = { ...(this.outbox[i] as OutboxOp), ...structuredClone(op), seq: (this.outbox[i] as OutboxOp).seq as number };
+  }
+  async removeOps(opIds: readonly string[]): Promise<void> {
+    const ids = new Set(opIds);
+    this.outbox = this.outbox.filter((x) => !ids.has(x.opId));
+  }
+  async getSyncState(): Promise<SyncStateRow[]> {
+    return [...this.syncState.values()].map((r) => ({ ...r }));
+  }
+  async putSyncState(rows: readonly SyncStateRow[]): Promise<void> {
+    for (const r of rows) this.syncState.set(r.key, { ...r });
   }
 }
 
@@ -224,7 +385,23 @@ export function upgradeSchema(db: IDBPDatabase, oldVersion: number): void {
     db.createObjectStore('meta', { keyPath: 'key' });
     db.createObjectStore('raw', { keyPath: 'key' }).createIndex('sessionId', 'sessionId');
   }
-  // Версия 2 и дальше — здесь: if (oldVersion < 2) { … }, с тестом в storage.test.ts
+  // v2 (8 Nov 2026): validation studies + sync outbox. Purely additive — no v1 store is touched.
+  if (oldVersion < 2) {
+    const protocols = db.createObjectStore('protocols', { keyPath: 'key' });
+    protocols.createIndex('workspace', 'workspace');
+    protocols.createIndex('protocolId', 'protocolId');
+    const vs = db.createObjectStore('vsessions', { keyPath: 'id' });
+    vs.createIndex('workspace', 'workspace');
+    vs.createIndex('participantId', 'participantId');
+    const trials = db.createObjectStore('trials', { keyPath: 'id' });
+    trials.createIndex('sessionId', 'sessionId');
+    trials.createIndex('workspace', 'workspace');
+    const outbox = db.createObjectStore('outbox', { keyPath: 'seq', autoIncrement: true });
+    outbox.createIndex('opId', 'opId', { unique: true });
+    outbox.createIndex('entityKey', 'entityKey');
+    db.createObjectStore('syncstate', { keyPath: 'key' });
+  }
+  // Версия 3 и дальше — здесь: if (oldVersion < 3) { … }, с тестом в storage.test.ts
 }
 
 export async function openStorage(): Promise<DataStorage> {
@@ -238,8 +415,20 @@ export async function openStorage(): Promise<DataStorage> {
       upgrade(db, oldVersion) {
         upgradeSchema(db as unknown as IDBPDatabase, oldVersion);
       },
+      // Another tab (possibly running the previous app version) still holds the old schema open.
+      // Falling back to memory here would silently lose everything recorded in this tab, so instead we
+      // stop the timeout and ask the user to close the other NeuroMove tabs; the open completes then.
+      blocked() {
+        clearTimeout(timer);
+        if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('neuromove:db-blocked'));
+      },
     });
     const db = await Promise.race([opening, timeout]).finally(() => clearTimeout(timer));
+    // A newer version opened in another tab: close so its upgrade can proceed; this tab asks for reload
+    db.addEventListener('versionchange', () => {
+      db.close();
+      if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('neuromove:db-outdated'));
+    });
     // Просим браузер не чистить данные самостоятельно (софт.md, «Сохранность»)
     void navigator.storage?.persist?.().catch(() => false);
     return new IdbStorage(db);

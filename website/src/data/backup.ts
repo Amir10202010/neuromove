@@ -1,4 +1,5 @@
 import { EXERCISES } from '../core/exercises';
+import { PROTOCOL_IDS } from '../core/protocols';
 import { STEP_FLAGS } from '../core/metrics';
 import { SESSION_EVENT_KINDS } from '../session/types';
 import { isSimulatedSession, type Session, type Workspace, type WorkspaceData } from './models';
@@ -33,7 +34,7 @@ const array = (x: unknown, valid: (item: unknown) => boolean): x is unknown[] =>
 const oneOf = (x: unknown, options: readonly unknown[]) => options.includes(x);
 const side = (x: unknown) => oneOf(x, ['left', 'right']);
 const exercise = (x: unknown) => text(x) && Object.hasOwn(EXERCISES, x);
-const protocol = (x: unknown) => oneOf(x, ['upper_standard', 'upper_quick', 'elbow_endurance', 'custom']);
+const protocol = (x: unknown) => oneOf(x, PROTOCOL_IDS);
 const level = (x: unknown) => x === null || oneOf(x, [1,2,3,4,5]);
 const numericFields = (x: Obj, keys: string[]) => keys.every(k => nullableNumber(x[k]));
 const goal = (x: unknown) => object(x) && text(x.id) && exercise(x.exercise) && side(x.side) && number(x.targetRom) && date(x.createdAt) && nullableDate(x.dueDate) && nullableDate(x.achievedAt);
@@ -55,9 +56,16 @@ const alert = (x: unknown) => object(x) && oneOf(x.kind,['rom_drop','trunk_compe
  * (испорчена, осталась от старой версии, подменена, смоделированный сеанс в клинике), не показывается,
  * но и не удаляется: её видно в счётчике, а в базе она остаётся для разбора.
  */
-export function checkStoredRecords(data: WorkspaceData): { data: WorkspaceData; rejected: number } {
+export interface RejectedRecord {
+  collection: 'patients' | 'sessions' | 'notes' | 'alerts';
+  id: string;
+  record: unknown;
+}
+
+export function checkStoredRecords(data: WorkspaceData): { data: WorkspaceData; rejected: number; records: RejectedRecord[] } {
   const validators = { patients: patient, sessions: session, notes: note, alerts: alert };
   let rejected = 0;
+  const records: RejectedRecord[] = [];
   const keep = (key: keyof typeof validators, entry: unknown) => {
     // Проверяется так, как запись легла бы в архив: в памяти «нет значения» — это NaN (у пропущенного
     // шага нет объёма), в JSON — null. Без этого сеанс, завершённый досрочно, пропадал бы после перезагрузки
@@ -74,7 +82,11 @@ export function checkStoredRecords(data: WorkspaceData): { data: WorkspaceData; 
       entry.id !== '' &&
       oneOf(entry.workspace, ['demo', 'clinic']) &&
       !(key === 'sessions' && entry.workspace === 'clinic' && isSimulatedSession(entry as unknown as Session));
-    if (!ok) rejected += 1;
+    if (!ok) {
+      rejected += 1;
+      const id = object(entry) && typeof entry.id === 'string' ? entry.id : '';
+      records.push({ collection: key, id, record: entry });
+    }
     return ok;
   };
   return {
@@ -85,6 +97,7 @@ export function checkStoredRecords(data: WorkspaceData): { data: WorkspaceData; 
       alerts: data.alerts.filter((e) => keep('alerts', e)),
     },
     rejected,
+    records,
   };
 }
 

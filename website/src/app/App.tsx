@@ -57,6 +57,12 @@ function routeTitle(route: Route, t: TFunction, codeOf: (id: string) => string |
         return t('nav.settings');
       case 'lab':
         return 'Lab';
+      case 'research':
+      case 'researchProtocols':
+      case 'researchNew':
+      case 'researchSession':
+      case 'researchDatasets':
+        return t('nav.research');
       case 'notFound':
         return t('errors.notFoundTitle');
     }

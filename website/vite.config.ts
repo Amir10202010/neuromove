@@ -17,7 +17,7 @@ import { resolve } from 'node:path';
 // любые запросы (`connect-src 'none'`), чужие скрипты, отправку форм и встраивание объектов.
 // Web Serial и Web Bluetooth политикой не управляются — датчики работают. Только для сборок:
 // сервер разработки Vite держит связь через WebSocket и вставляет свои скрипты.
-function contentPolicy(scriptSrc: string): string {
+function contentPolicy(scriptSrc: string, connect: "'none'" | "'self'" = "'none'"): string {
   return [
     "default-src 'none'",
     `script-src ${scriptSrc}`,
@@ -25,7 +25,7 @@ function contentPolicy(scriptSrc: string): string {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
-    "connect-src 'none'",
+    `connect-src ${connect}`,
     "object-src 'none'",
     "base-uri 'none'",
     "form-action 'none'",
@@ -43,7 +43,8 @@ function sitePolicy(): Plugin {
   return {
     name: 'neuromove-site-policy',
     apply: 'build',
-    transformIndexHtml: { order: 'post', handler: (html) => withPolicy(html, contentPolicy("'self'")) },
+    // connect-src 'self': only this site's own /api (team cloud sync, off by default). No third party.
+    transformIndexHtml: { order: 'post', handler: (html) => withPolicy(html, contentPolicy("'self'", "'self'")) },
   };
 }
 
@@ -112,7 +113,7 @@ export default defineConfig(({ mode }) => {
       ? { outDir: 'dist-demo', assetsInlineLimit: 100_000_000, cssCodeSplit: false, emptyOutDir: true }
       : { outDir: 'dist', emptyOutDir: true, chunkSizeWarningLimit: 900 },
     test: {
-      include: ['src/**/*.test.ts'],
+      include: ['src/**/*.test.ts', 'server/**/*.test.ts'],
       environment: 'node',
     },
   };

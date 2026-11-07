@@ -44,6 +44,7 @@ export const ru = {
   },
 
   nav: {
+    research: 'Исследования',
     overview: 'Главная',
     patients: 'Пациенты',
     sessions: 'Сеансы',

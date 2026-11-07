@@ -36,9 +36,22 @@ describe('маршруты', () => {
   });
 
   it('адреса прежнего сайта ведут на стартовую, портал — в приложение', () => {
-    for (const page of ['technology', 'product', 'research', 'company', 'contact', 'privacy']) {
+    for (const page of ['technology', 'product', 'company', 'contact', 'privacy']) {
       expect(parseHash(`#/${page}`)).toEqual({ name: 'welcome' });
     }
     expect(parseHash('#/portal')).toEqual({ name: 'overview' });
+  });
+
+  it('research module routes round-trip', () => {
+    for (const r of [
+      { name: 'research' },
+      { name: 'researchProtocols' },
+      { name: 'researchDatasets' },
+      { name: 'researchNew', protocolKey: null },
+      { name: 'researchNew', protocolKey: 'prot_1@2' },
+      { name: 'researchSession', id: 'vs_abc' },
+    ] as const) {
+      expect(parseHash(href(r))).toEqual(r);
+    }
   });
 });
