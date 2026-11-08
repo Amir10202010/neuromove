@@ -1,6 +1,7 @@
 import { Bluetooth, Cable, FileUp, FlaskConical, PlugZap, Usb } from 'lucide-react';
 import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { href, navigate } from '../../app/router';
+import { FigureLook } from '../../figures/look';
 import { BodyMap } from '../../charts/BodyMap';
 import { MoveIcon } from '../../charts/MoveFigures';
 import { EXERCISE_IDS, type ExerciseId } from '../../core/exercises';
@@ -152,7 +153,9 @@ export function SessionSetupPage({ patientId, protocol }: { patientId: string | 
     );
   }
 
+  // Значки плана — мальчик или девочка по выбранному пациенту
   return (
+    <FigureLook sex={patient?.sex}>
     <div className="page">
       <PageHeader title={t('setup.title')} />
 
@@ -447,5 +450,6 @@ export function SessionSetupPage({ patientId, protocol }: { patientId: string | 
         </aside>
       </div>
     </div>
+    </FigureLook>
   );
 }

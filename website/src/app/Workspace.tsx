@@ -23,6 +23,9 @@ import { ProtocolStudio } from '../features/research/ProtocolStudio';
 import { ValidationSetup } from '../features/research/ValidationSetup';
 import { ValidationSessionPage } from '../features/research/ValidationSessionPage';
 import { DatasetsPage } from '../features/research/DatasetsPage';
+import { FigureLook } from '../figures/look';
+import { useAppStore } from '../state/appStore';
+import { useSessionStore } from '../state/sessionStore';
 import { RehabDashboard } from '../features/rehab/RehabDashboard';
 import { ParticipantRehabPage } from '../features/rehab/ParticipantRehabPage';
 import { ActivityLibraryPage } from '../features/rehab/ActivityLibraryPage';
@@ -78,7 +81,21 @@ function Page({ route }: { route: Route }) {
   }
 }
 
+/** Пол пациента открытого экрана — рисунки показывают мальчика или девочку (figures/look.tsx). */
+function useRouteSex(route: Route) {
+  const patients = useAppStore((s) => s.patients);
+  const sessions = useAppStore((s) => s.sessions);
+  const runPatient = useSessionStore((s) => s.controller?.setup.patientId ?? null);
+  let id: string | null = null;
+  if (route.name === 'patient' || route.name === 'family') id = route.id;
+  else if (route.name === 'sessionNew') id = route.patientId;
+  else if (route.name === 'sessionRun') id = runPatient;
+  else if (route.name === 'session' || route.name === 'sessionPrint') id = sessions.find((s) => s.id === route.id)?.patientId ?? null;
+  return id ? patients.find((p) => p.id === id)?.sex ?? null : null;
+}
+
 export default function Workspace({ route }: { route: Route }) {
+  const sex = useRouteSex(route);
   let content;
   if (route.name === 'onboarding') content = <OnboardingPage />;
   else if (route.name === 'sessionPrint') content = <PrintReportPage id={route.id} />;
@@ -98,9 +115,9 @@ export default function Workspace({ route }: { route: Route }) {
     );
 
   return (
-    <>
+    <FigureLook sex={sex}>
       {content}
       <RecoveryDialog />
-    </>
+    </FigureLook>
   );
 }

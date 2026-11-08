@@ -488,6 +488,10 @@ export const ru = {
   },
 
   patientForm: {
+    sex: 'Пол',
+    sexUnset: 'Не указан',
+    sexMale: 'Мальчик',
+    sexFemale: 'Девочка',
     titleNew: 'Новый пациент',
     titleEdit: 'Изменить: {code}',
     code: 'Имя',

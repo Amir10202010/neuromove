@@ -4,7 +4,8 @@
 // фигура вздрагивает, шкала начинает заново: причина и следствие на глазах.
 
 import { frontParts, type FrontPodKey } from './body';
-import { FIG, Hair, InkLayer, SensorPod, type PodState } from './Ink';
+import { FIG, Hair, type PodState } from './Ink';
+import { FrontFigure } from './scenes';
 
 const TICKS = 60;
 
@@ -58,14 +59,7 @@ export function CalibrationFigure({
       {/* Отвесная линия — «сидим прямо» */}
       <Hair d={`M${o.x},${o.y - R + 16}L${o.x},${center.y + 74}`} color={FIG.muted} dash="2 4" />
       <g key={attempt} className="calib__body">
-        <InkLayer d={p.stool} />
-        <InkLayer d={p.body} />
-        <InkLayer d={p.arms.right} />
-        <InkLayer d={p.arms.left} />
-        {(Object.keys(p.pods) as FrontPodKey[]).map((k) => {
-          const q = p.pods[k];
-          return <SensorPod key={k} d={q.d} strap={q.strap} c={q.c} state={states[k]} ledR={2} pulseR={13} />;
-        })}
+        <FrontFigure p={p} pods={states} ledR={1.5} pulseR={13} />
       </g>
     </svg>
   );

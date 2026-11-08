@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { navigate } from '../../app/router';
-import type { AffectedSide, CpForm, Level, Patient, PatientStatus } from '../../data/models';
+import type { AffectedSide, CpForm, Level, Patient, PatientStatus, Sex } from '../../data/models';
 import { useI18n } from '../../i18n';
 import { newId } from '../../lib/ids';
 import { useAppStore, useWorkspaceData } from '../../state/appStore';
@@ -46,6 +46,7 @@ function PatientFormDialog({ onClose, patient }: { onClose: () => void; patient?
 
   const [code, setCode] = useState(() => patient?.code ?? '');
   const [birthYear, setBirthYear] = useState(patient?.birthYear ?? year - 8);
+  const [sex, setSex] = useState<Sex | ''>(patient?.sex ?? '');
   const [cpForm, setCpForm] = useState<CpForm>(patient?.cpForm ?? 'hemiplegia');
   const [side, setSide] = useState<AffectedSide>(patient?.affectedSide ?? 'right');
   const [gmfcs, setGmfcs] = useState<Level | 0>(patient?.gmfcs ?? 0);
@@ -84,6 +85,7 @@ function PatientFormDialog({ onClose, patient }: { onClose: () => void; patient?
       ...base,
       code: c,
       birthYear,
+      sex: sex === '' ? null : sex,
       cpForm,
       affectedSide: side,
       gmfcs: gmfcs === 0 ? null : gmfcs,
@@ -134,6 +136,13 @@ function PatientFormDialog({ onClose, patient }: { onClose: () => void; patient?
                 {y} · {t('common.yearsOld', { count: year - y })}
               </option>
             ))}
+          </select>
+        </Field>
+        <Field label={t('patientForm.sex')}>
+          <select className="select" value={sex} onChange={(e) => setSex(e.target.value as Sex | '')}>
+            <option value="">{t('patientForm.sexUnset')}</option>
+            <option value="male">{t('patientForm.sexMale')}</option>
+            <option value="female">{t('patientForm.sexFemale')}</option>
           </select>
         </Field>
         <Field label={t('patientForm.form')}>

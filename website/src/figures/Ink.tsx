@@ -1,7 +1,8 @@
 // Слои рисунков NeuroMove. Стиль — техническая иллюстрация: одна толщина контура на всех
 // рисунках, тело — светлая заливка с контуром тушью, сплошной цвет — только у того, что
-// измеряется (рука цветом стороны). Датчик — светлый корпус на тёмном ремешке, как на фото
-// концепта; светодиод говорит о состоянии.
+// измеряется (рука цветом стороны). Датчик — как корпус v3 из hardware/models/enclosure: светлая
+// крышка на основании с «ушками», через которые проходит тёмный ремешок; стрелка оси X на крышке,
+// светодиод говорит о состоянии.
 //
 // Контуры не масштабируются (vector-effect: non-scaling-stroke): 1,5 px на экране и у значка
 // 32 px в плане сеанса, и у фигуры на весь планшет. Поэтому рисунки разного размера выглядят
@@ -14,6 +15,17 @@ export const FIG = {
   fill: 'var(--fig-fill)',
   muted: 'var(--fig-muted)',
   ghost: 'var(--fig-ghost)',
+  /** Волосы — тон темнее кожи, без цвета: цвет на рисунке — только у измеряемой руки. */
+  hair: 'var(--fig-hair)',
+  /** Дальняя рука, то, что за телом. */
+  shade: 'var(--fig-shade)',
+  skin: 'var(--fig-skin)',
+  skinFar: 'var(--fig-skin-far)',
+  shirt: 'var(--fig-shirt)',
+  shirtFar: 'var(--fig-shirt-far)',
+  shorts: 'var(--fig-shorts)',
+  shoe: 'var(--fig-shoe)',
+  floor: 'var(--fig-floor)',
 };
 
 /** Толщина контура на экране, px. */
@@ -36,6 +48,7 @@ export function InkLayer({
   outlineRef,
   fillRef,
   className,
+  k,
 }: {
   d: string;
   fill?: string;
@@ -44,11 +57,13 @@ export function InkLayer({
   outlineRef?: Ref<SVGPathElement>;
   fillRef?: Ref<SVGPathElement>;
   className?: string;
+  /** Ключ слоя: живая фигурка находит слой по data-k и переставляет контур (scenes.applyLayers). */
+  k?: string;
 }) {
   return (
     <g opacity={opacity} className={className}>
-      <path ref={outlineRef} d={d} fill={ink} stroke={ink} strokeWidth={OUTLINE * 2} strokeLinejoin="round" vectorEffect={NS} />
-      <path ref={fillRef} d={d} fill={fill} />
+      <path ref={outlineRef} data-k={k} d={d} fill={ink} stroke={ink} strokeWidth={OUTLINE * 2} strokeLinejoin="round" vectorEffect={NS} />
+      <path ref={fillRef} data-k={k} d={d} fill={fill} />
     </g>
   );
 }
@@ -63,7 +78,9 @@ export function Hair({
   pathRef,
   className,
   opacity,
+  k,
 }: {
+  k?: string;
   d: string;
   color?: string;
   width?: number;
@@ -76,6 +93,7 @@ export function Hair({
   return (
     <path
       ref={pathRef}
+      data-k={k}
       d={d}
       fill="none"
       stroke={color}
@@ -110,18 +128,30 @@ const LED: Partial<Record<PodState, string>> = {
 export function SensorPod({
   d,
   strap,
+  base,
+  mark,
   c,
   state = 'on',
   led = true,
-  ledR = 1.7,
+  ledR = 1.25,
   pulseR = 11,
   podRef,
   strapRef,
+  baseRef,
+  markRef,
   ledRef,
   className,
+  k,
 }: {
+  /** Ключ датчика для живой фигурки: слои получают data-k «k:d», «k:strap» … «k:led». */
+  k?: string;
+  /** Крышка корпуса. */
   d: string;
   strap: string;
+  /** Основание с «ушками», через которые проходит ремешок. */
+  base?: string;
+  /** Стрелка оси X на крышке: к кисти, на груди — вниз. */
+  mark?: string;
   c: { x: number; y: number };
   state?: PodState;
   /** false — без светодиода: в отчётах датчик просто показывает, где он надет. */
@@ -130,6 +160,8 @@ export function SensorPod({
   pulseR?: number;
   podRef?: Ref<SVGPathElement>;
   strapRef?: Ref<SVGPathElement>;
+  baseRef?: Ref<SVGPathElement>;
+  markRef?: Ref<SVGPathElement>;
   ledRef?: Ref<SVGCircleElement>;
   className?: string;
 }) {
@@ -143,15 +175,31 @@ export function SensorPod({
       )}
       <path
         ref={strapRef}
+        data-k={k && `${k}:strap`}
         d={strap}
-        fill={dashed || lost ? FIG.fill : FIG.ink}
-        stroke={dashed || lost ? FIG.muted : 'none'}
+        fill={dashed || lost ? FIG.fill : 'var(--fig-strap)'}
+        stroke={dashed || lost ? FIG.muted : FIG.ink}
         strokeWidth={HAIR}
         strokeDasharray={dashed || lost ? '2 2' : undefined}
+        strokeLinejoin="round"
         vectorEffect={NS}
       />
+      {base !== undefined && !dashed && (
+        <path
+          ref={baseRef}
+          data-k={k && `${k}:base`}
+          d={base}
+          fill={dashed ? FIG.fill : 'var(--fig-pod-base)'}
+          stroke={dashed ? FIG.muted : FIG.ink}
+          strokeWidth={HAIR}
+          strokeDasharray={dashed ? '2 2' : undefined}
+          strokeLinejoin="round"
+          vectorEffect={NS}
+        />
+      )}
       <path
         ref={podRef}
+        data-k={k && `${k}:d`}
         d={d}
         fill={dashed ? FIG.fill : 'var(--fig-pod)'}
         stroke={dashed ? FIG.muted : FIG.ink}
@@ -160,7 +208,10 @@ export function SensorPod({
         strokeLinejoin="round"
         vectorEffect={NS}
       />
-      {color && <circle ref={ledRef} className="fig-pod__led" cx={c.x} cy={c.y} r={ledR} fill={color} />}
+      {mark !== undefined && (
+        <path ref={markRef} data-k={k && `${k}:mark`} d={mark} fill="none" stroke={FIG.muted} strokeWidth={HAIR} strokeLinecap="round" strokeLinejoin="round" vectorEffect={NS} />
+      )}
+      {color && <circle ref={ledRef} data-k={k && `${k}:led`} className="fig-pod__led" cx={c.x} cy={c.y} r={ledR} fill={color} />}
     </g>
   );
 }

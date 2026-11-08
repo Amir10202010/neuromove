@@ -56,6 +56,19 @@
   --fig-muted: #857f73;
   --fig-ghost: rgba(29, 33, 31, 0.12);
   --fig-sector: #ebe7de;
+  /* Человек на рисунках: кожа, тёмные волосы, белая футболка, тёмные шорты — как на референсе
+     стиля от 8 ноября 2026. Цвет стороны (--left, --right) — у рукава и руки, которую измеряем */
+  --fig-skin: #f0d3bd;
+  --fig-skin-far: #e2bea4;
+  --fig-hair: #2e2926;
+  --fig-shirt: #fdfdfb;
+  --fig-shirt-far: #ecebe6;
+  --fig-shorts: #30343b;
+  --fig-shoe: #ffffff;
+  --fig-floor: rgba(29, 33, 31, 0.07);
+  --fig-shade: #e6e1d6;
+  --fig-strap: #383d3a;
+  --fig-pod-base: #e8e4da;
   /* Текст цветом стороны — темнее отметок, чтобы читался (не ниже 4.5:1 на белом) */
   --left-text: #1d5aab;
   --right-text: #ad461b;

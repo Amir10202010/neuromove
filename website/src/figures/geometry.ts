@@ -164,3 +164,139 @@ export function tangent(deg: number, dir: Dir = 1, forward = true): number {
 
 /** Плавность «выезда»: быстро в начале, мягко в конце. */
 export const easeOut = (t: number) => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
+
+// ── Рисованные контуры ──────────────────────────────────────────────────────
+//
+// Части тела задаются точками контура в своей системе координат (u — поперёк сегмента,
+// v — вдоль него) и проводятся гладкой кривой. Система координат поворачивается вместе
+// с сегментом, поэтому форма руки, головы, корпуса одна и та же в любой позе.
+
+/** Точка контура: [u, v] или [u, v, 1] — излом (угол без сглаживания). */
+export type Pt = readonly [number, number] | readonly [number, number, 1];
+
+/** Перевод точки из своей системы координат в экранную. */
+export type Frame = (u: number, v: number) => P;
+
+/**
+ * Система координат сегмента: начало o, ось v — вдоль сегмента под углом deg
+ * (как у at: 0° — вниз), ось u — «вперёд» от сегмента (к большому пальцу у руки сбоку,
+ * наружу у руки спереди).
+ */
+export function segFrame(o: P, deg: number, dir: Dir = 1, scale = 1): Frame {
+  const s = Math.sin(rad(deg));
+  const c = Math.cos(rad(deg));
+  return (u, v) => ({ x: o.x + scale * (v * dir * s + u * dir * c), y: o.y + scale * (v * c - u * s) });
+}
+
+/**
+ * Система координат корпуса сбоку: начало — тазобедренный сустав, v — вверх по корпусу,
+ * u — вперёд; корпус отклонён назад на lean°.
+ */
+export function trunkFrame(o: P, lean: number, dir: Dir = 1): Frame {
+  const s = Math.sin(rad(lean));
+  const c = Math.cos(rad(lean));
+  return (u, v) => ({ x: o.x + dir * (u * c - v * s), y: o.y - u * s - v * c });
+}
+
+/** Система координат корпуса спереди: u — вправо по экрану, v — вверх; наклон вправо на lean°. */
+export function frontFrame(o: P, lean: number): Frame {
+  const s = Math.sin(rad(lean));
+  const c = Math.cos(rad(lean));
+  return (u, v) => ({ x: o.x + u * c + v * s, y: o.y + u * s - v * c });
+}
+
+/** Плоская система координат со сдвигом — для неподвижных частей (ноги, табурет). */
+export const shift =
+  (o: P, dir: Dir = 1): Frame =>
+  (u, v) => ({ x: o.x + dir * u, y: o.y + v });
+
+/**
+ * Замкнутый гладкий контур через точки. Касательные масштабируются по длинам соседних
+ * отрезков — кривая не «перелетает» там, где точки стоят тесно (нос, пальцы).
+ * Обход — против часовой стрелки на экране, как у capsule и roundedPoly: части одного
+ * слоя сливаются при заливке nonzero.
+ */
+export function smooth(pts: readonly Pt[], F: Frame, tension = 1): string {
+  let w = pts.map((p) => ({ ...F(p[0], p[1]), k: p.length === 3 }));
+  let area = 0;
+  for (let i = 0; i < w.length; i++) {
+    const a = w[i]!;
+    const b = w[(i + 1) % w.length]!;
+    area += a.x * b.y - b.x * a.y;
+  }
+  if (area > 0) w = w.reverse();
+  const n = w.length;
+  const g = (i: number) => w[((i % n) + n) % n]!;
+  const dist = (a: P, b: P) => Math.hypot(b.x - a.x, b.y - a.y) || 1e-6;
+  const tan = (i: number) => {
+    const p0 = g(i - 1);
+    const p2 = g(i + 1);
+    const d = dist(p0, g(i)) + dist(g(i), p2);
+    return { x: (p2.x - p0.x) / d, y: (p2.y - p0.y) / d };
+  };
+  let d = `M${f(g(0).x)},${f(g(0).y)}`;
+  for (let i = 0; i < n; i++) {
+    const p1 = g(i);
+    const p2 = g(i + 1);
+    const L = (dist(p1, p2) / 3) * tension;
+    const t1 = p1.k ? { x: 0, y: 0 } : tan(i);
+    const t2 = p2.k ? { x: 0, y: 0 } : tan(i + 1);
+    d +=
+      `C${f(p1.x + t1.x * L)},${f(p1.y + t1.y * L)} ` +
+      `${f(p2.x - t2.x * L)},${f(p2.y - t2.y * L)} ${f(p2.x)},${f(p2.y)}`;
+  }
+  return d + 'Z';
+}
+
+/** Открытая гладкая линия через точки — для штрихов внутри силуэта (ухо, колено). */
+export function stroke(pts: readonly Pt[], F: Frame): string {
+  const w = pts.map((p) => F(p[0], p[1]));
+  if (w.length < 2) return '';
+  const dist = (a: P, b: P) => Math.hypot(b.x - a.x, b.y - a.y) || 1e-6;
+  const tan = (i: number) => {
+    const p0 = w[Math.max(0, i - 1)]!;
+    const p2 = w[Math.min(w.length - 1, i + 1)]!;
+    const d = dist(p0, w[i]!) + dist(w[i]!, p2);
+    return { x: (p2.x - p0.x) / d, y: (p2.y - p0.y) / d };
+  };
+  let d = `M${f(w[0]!.x)},${f(w[0]!.y)}`;
+  for (let i = 0; i < w.length - 1; i++) {
+    const p1 = w[i]!;
+    const p2 = w[i + 1]!;
+    const L = dist(p1, p2) / 3;
+    const t1 = tan(i);
+    const t2 = tan(i + 1);
+    d += `C${f(p1.x + t1.x * L)},${f(p1.y + t1.y * L)} ${f(p2.x - t2.x * L)},${f(p2.y - t2.y * L)} ${f(p2.x)},${f(p2.y)}`;
+  }
+  return d;
+}
+
+/** Скруглённый прямоугольник в системе координат F: центр (cu, cv), размеры du × dv. */
+export function rectIn(F: Frame, cu: number, cv: number, du: number, dv: number, r: number): string {
+  return roundedPoly(
+    [
+      F(cu - du / 2, cv - dv / 2),
+      F(cu + du / 2, cv - dv / 2),
+      F(cu + du / 2, cv + dv / 2),
+      F(cu - du / 2, cv + dv / 2),
+    ],
+    r,
+  );
+}
+
+/**
+ * Ремешок вокруг сегмента: полоса поперёк оси шириной band, от края до края конечности
+ * (half — полутолщина в этом месте). Края чуть выгнуты — полоса обнимает цилиндр.
+ */
+export function band(F: Frame, cv: number, half: number, bandW: number, bow = 0.7): string {
+  const a = half + 0.9;
+  const h = bandW / 2;
+  const p = (u: number, v: number) => {
+    const q = F(u, v);
+    return `${f(q.x)},${f(q.y)}`;
+  };
+  return (
+    `M${p(-a, cv - h + bow * 0.35)}Q${p(0, cv - h + bow)} ${p(a, cv - h + bow * 0.35)}` +
+    `L${p(a, cv + h + bow * 0.35)}Q${p(0, cv + h + bow)} ${p(-a, cv + h + bow * 0.35)}Z`
+  );
+}

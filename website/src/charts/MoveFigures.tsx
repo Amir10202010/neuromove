@@ -17,7 +17,7 @@
 import { useEffect, useState } from 'react';
 import type { ExerciseId } from '../core/exercises';
 import type { Side } from '../devices/types';
-import { SIDE, sideShoulder } from '../figures/body';
+import { FRONT, handTop, SIDE, sideShoulder } from '../figures/body';
 import { arc, at, clamp, easeOut, tangent, wedge, type P } from '../figures/geometry';
 import { ArrowHead, FIG, Hair, InkLayer } from '../figures/Ink';
 import { FrontScene, SIDE_COLOR, SideScene, svgAttrs } from '../figures/scenes';
@@ -37,6 +37,8 @@ function frame(box: Box, h: number) {
 
 /** Длина руки от плеча до кончиков пальцев; шкала — чуть дальше. */
 const REACH = SIDE.upper + SIDE.fore + SIDE.hand + SIDE.handW / 2;
+/** Спереди рука короче (FRONT.arm) — шкала отведения идёт сразу за кистью. */
+const REACH_FRONT = REACH * FRONT.arm;
 
 /** Подпись в единицах рамки; вторая строка — под первой. */
 function Label({
@@ -197,22 +199,19 @@ export interface ArmValue {
   pro?: number | null;
 }
 
-/** Предплечье с торца: кулак большим пальцем вверх — нейтральное положение. */
-function Fist({ c, s = 1 }: { c: P; s?: number }) {
-  const { x, y } = c;
-  const fist =
-    `M${x - 12 * s},${y - 6 * s}Q${x - 12 * s},${y - 11 * s} ${x - 7 * s},${y - 11 * s}L${x + 7 * s},${y - 11 * s}` +
-    `Q${x + 12 * s},${y - 11 * s} ${x + 12 * s},${y - 6 * s}L${x + 12 * s},${y + 7 * s}Q${x + 12 * s},${y + 12 * s} ${x + 7 * s},${y + 12 * s}` +
-    `L${x - 7 * s},${y + 12 * s}Q${x - 12 * s},${y + 12 * s} ${x - 12 * s},${y + 7 * s}Z`;
-  const thumb =
-    `M${x - 1 * s},${y - 10 * s}L${x - 1 * s},${y - 17 * s}Q${x - 1 * s},${y - 21 * s} ${x - 5 * s},${y - 21 * s}` +
-    `Q${x - 9 * s},${y - 21 * s} ${x - 9 * s},${y - 17 * s}L${x - 9 * s},${y - 10 * s}Z`;
+/**
+ * Кисть сверху, предплечье уходит влево под рукав. palmUp — ладонью вверх: видна ладонь со складками,
+ * большой палец снизу; иначе ладонью вниз: тыл кисти, большой палец сверху. Поворот предплечья —
+ * это и есть переход между двумя этими положениями: большой палец переходит на другую сторону.
+ */
+function HandTop({ c, palmUp, s = 1, color, sleeveFrom }: { c: P; palmUp: boolean; s?: number; color: string; sleeveFrom?: number }) {
+  const h = handTop(c, s, palmUp ? -1 : 1, sleeveFrom);
   return (
     <>
-      <InkLayer d={thumb + fist} />
-      {[-4, 1, 6].map((dx) => (
-        <Hair key={dx} d={`M${x + dx * s},${y - 2 * s}L${x + dx * s},${y + 6 * s}`} />
-      ))}
+      <InkLayer d={h.fore} fill={FIG.skin} ink={palmUp ? color : FIG.ink} />
+      <InkLayer d={h.hand} fill={FIG.skin} ink={palmUp ? color : FIG.ink} />
+      <Hair d={h.fingers + (palmUp ? h.palm : h.back)} color={FIG.ink} opacity={0.5} />
+      <InkLayer d={h.sleeve} fill={color} ink={color} />
     </>
   );
 }
@@ -267,7 +266,9 @@ export function ArmsCompare({
             </g>
           );
         })}
-        <Fist c={{ x: o.x, y: o.y + 8 }} s={0.95} />
+        {/* Концы шкалы: слева — ладонью вниз, справа — ладонью вверх */}
+        <HandTop c={{ x: o.x - r + 4, y: o.y + 18 }} palmUp={false} s={0.62} color={SIDE_COLOR[main.side].main} />
+        <HandTop c={{ x: o.x + r - 18, y: o.y + 18 }} palmUp s={0.62} color={SIDE_COLOR[main.side].main} />
       </svg>
     );
   }
@@ -291,8 +292,8 @@ export function ArmsCompare({
             fills={{ right: fill('right'), left: fill('left') }}
             under={(p) => (
               <>
-                <RaiseScale s={p.shoulders.right} r={REACH + 6} dir={-1} />
-                <RaiseScale s={p.shoulders.left} r={REACH + 6} dir={1} />
+                <RaiseScale s={p.shoulders.right} r={REACH_FRONT + 6} dir={-1} />
+                <RaiseScale s={p.shoulders.left} r={REACH_FRONT + 6} dir={1} />
               </>
             )}
           />
@@ -415,16 +416,15 @@ export function TrunkLean({ now, side, label, ariaLabel, size }: { now: number; 
 export function MoveIcon({ exercise, side, size = 44, ariaLabel }: { exercise: ExerciseId; side: Side; size?: number; ariaLabel: string }) {
   const c = SIDE_COLOR[side];
   if (exercise === 'forearm_rotation') {
-    const o = { x: 30, y: 30 };
-    const r = 21;
-    const a0 = 122;
-    const a1 = 238;
+    // Поворот предплечья — две кисти: сверху ладонью вниз, снизу ладонью вверх, между ними
+    // стрелка туда и обратно. Большой палец переходит на другую сторону — это и есть поворот.
     return (
-      <svg {...svgAttrs([0, 0, 60, 60], size, ariaLabel)}>
-        <Hair d={arc(o, r, a0 + 6, a1 - 6)} color={c.main} width={2} />
-        <ArrowHead at={at(o, r, a0 + 4)} angle={tangent(a0 + 4, 1, false)} size={4.5} color={c.main} />
-        <ArrowHead at={at(o, r, a1 - 4)} angle={tangent(a1 - 4)} size={4.5} color={c.main} />
-        <Fist c={{ x: o.x, y: o.y + 9 }} s={0.78} />
+      <svg {...svgAttrs([0, 0, 62, 60], size, ariaLabel)}>
+        <HandTop c={{ x: 29, y: 16 }} palmUp={false} s={0.92} color={c.main} sleeveFrom={-40} />
+        <HandTop c={{ x: 29, y: 44 }} palmUp s={0.92} color={c.main} sleeveFrom={-40} />
+        <Hair d="M51.5,20.5Q60.5,30 51.5,39.5" color={c.main} width={2} />
+        <ArrowHead at={{ x: 51.5, y: 39.5 }} angle={140} size={4.2} color={c.main} />
+        <ArrowHead at={{ x: 51.5, y: 20.5 }} angle={-140} size={4.2} color={c.main} />
       </svg>
     );
   }
@@ -444,7 +444,7 @@ export function MoveIcon({ exercise, side, size = 44, ariaLabel }: { exercise: E
             fills={{ right: right ? c.main : FIG.fill, left: right ? FIG.fill : c.main }}
             over={(p) => {
               const sh = right ? p.shoulders.right : p.shoulders.left;
-              const rr = REACH + 6;
+              const rr = REACH_FRONT + 6;
               return (
                 <>
                   <Hair d={arc(sh, rr, 64, 120, dir)} color={c.main} width={1.8} dash="3 3" />

@@ -24,6 +24,9 @@ import { expectedRomFn } from '../../session/compare';
 import type { Alert, AffectedSide, CpForm, Goal, Level, Note, Patient, Session, WorkspaceData } from '../models';
 
 /** Меняется, когда меняется описание демо-пациентов, формулы, которыми посчитана их история, или тексты, записанные в неё, — тогда снимок пересобирается. 7 — новый расчёт локтя; 8 — виртуальный пациент без скачков позы (ложный «упор»); 9 — заметки и подпись специалиста без длинных тире и слова «демо», числа прежние; 10 — имена вместо кодов P01–P06, числа прежние. */
+/** Пол демо-пациентов — по имени: Алихан, Нурислам, Данияр — мальчики; Айша, Томирис, Амина — девочки. */
+const DEMO_SEX: Record<string, 'male' | 'female'> = { P01: 'male', P02: 'female', P03: 'male', P04: 'female', P05: 'male', P06: 'female' };
+
 export const DEMO_SEED_VERSION = 10;
 /** Зерно движений виртуальных пациентов: от него зависят все числа демо. Меняется, только когда числа должны стать другими. */
 const DEMO_MOTION_SEED = 8;
@@ -262,6 +265,7 @@ export async function generateDemoWorkspace(o: GenerateOptions): Promise<Workspa
       gmfcs: d.gmfcs,
       macs: d.macs,
       affectedSide: d.affected,
+      sex: DEMO_SEX[d.key] ?? null,
       status: 'active',
       courseStart: d.courseStartDay === null ? null : at(now, d.courseStartDay, '09:00').toISOString(),
       createdAt: at(now, d.courseStartDay ?? -2, '09:00').toISOString(),

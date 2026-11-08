@@ -491,6 +491,10 @@ export const kk: typeof ru = {
   },
 
   patientForm: {
+    sex: 'Жынысы',
+    sexUnset: 'Көрсетілмеген',
+    sexMale: 'Ұл',
+    sexFemale: 'Қыз',
     titleNew: 'Жаңа пациент',
     titleEdit: 'Өзгерту: {code}',
     code: 'Аты',

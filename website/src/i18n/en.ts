@@ -490,6 +490,10 @@ export const en: typeof ru = {
   },
 
   patientForm: {
+    sex: 'Sex',
+    sexUnset: 'Not specified',
+    sexMale: 'Boy',
+    sexFemale: 'Girl',
     titleNew: 'New patient',
     titleEdit: 'Edit: {code}',
     code: 'Name',

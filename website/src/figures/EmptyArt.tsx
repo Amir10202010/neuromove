@@ -8,7 +8,8 @@
 
 import { frontParts, sideParts, SIDE } from './body';
 import { arc, at } from './geometry';
-import { FIG, Hair, InkLayer, SensorPod } from './Ink';
+import { FIG, Hair, InkLayer } from './Ink';
+import { FrontFigure, SideFigure } from './scenes';
 
 export type EmptyKind = 'baseline' | 'patients' | 'sessions' | 'device' | 'lost';
 
@@ -34,11 +35,7 @@ export function EmptyArt({ kind, size = 132 }: { kind: EmptyKind; size?: number 
     return (
       <svg viewBox="22 -30 200 232" width={size} height={Math.round((size * 232) / 200)} className="empty-art" aria-hidden>
         <Scale s={p.shoulder} r={REACH + 8} />
-        <InkLayer d={p.stool} />
-        <InkLayer d={p.body} />
-        <InkLayer d={p.arm} />
-        <SensorPod d={p.pods.upper} strap={p.straps.upper} c={p.podCenters.upper} state="off" />
-        <SensorPod d={p.pods.fore} strap={p.straps.fore} c={p.podCenters.fore} state="off" />
+        <SideFigure p={p} nearFill={FIG.fill} pods={{ upper: 'off', fore: 'off' }} />
       </svg>
     );
   }
@@ -46,7 +43,7 @@ export function EmptyArt({ kind, size = 132 }: { kind: EmptyKind; size?: number 
     const p = frontParts({ x: 120, y: 178 }, { right: { upper: 6, fore: 8 }, left: { upper: 6, fore: 8 } }, { legs: true });
     return (
       <svg viewBox="40 30 160 228" width={size} height={Math.round((size * 228) / 160)} className="empty-art" aria-hidden>
-        <path d={p.body + p.arms.right + p.arms.left} fill={FIG.ghost} />
+        <path d={p.body + p.hair + p.shirt + p.arms.right + p.arms.left + p.sleeves.right + p.sleeves.left} fill={FIG.ghost} />
         <InkLayer d={p.stool} />
       </svg>
     );
@@ -55,13 +52,7 @@ export function EmptyArt({ kind, size = 132 }: { kind: EmptyKind; size?: number 
     const p = frontParts({ x: 120, y: 178 }, { right: { upper: 16, fore: 20 }, left: { upper: 16, fore: 20 } }, { legs: false });
     return (
       <svg viewBox="40 30 160 168" width={size} height={Math.round((size * 168) / 160)} className="empty-art" aria-hidden>
-        <InkLayer d={p.stool} />
-        <InkLayer d={p.body} />
-        <InkLayer d={p.arms.right} />
-        <InkLayer d={p.arms.left} />
-        {(Object.keys(p.pods) as (keyof typeof p.pods)[]).map((k) => (
-          <SensorPod key={k} d={p.pods[k].d} strap={p.pods[k].strap} c={p.pods[k].c} state="off" />
-        ))}
+        <FrontFigure p={p} pods={{ trunk: 'off', upper_r: 'off', upper_l: 'off', fore_r: 'off', fore_l: 'off' }} />
       </svg>
     );
   }

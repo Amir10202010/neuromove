@@ -31,6 +31,9 @@ export interface Goal {
   achievedAt: string | null;
 }
 
+/** Пол пациента — чтобы рисунки показывали мальчика или девочку. */
+export type Sex = 'male' | 'female';
+
 export interface Patient {
   id: string;
   workspace: Workspace;
@@ -40,6 +43,8 @@ export interface Patient {
    */
   code: string;
   birthYear: number;
+  /** Пол; нет — в старых записях и если не указан: рисунки показывают мальчика. */
+  sex?: Sex | null;
   cpForm: CpForm;
   /** GMFCS — крупная моторика; MACS — как ребёнок пользуется руками. */
   gmfcs: Level | null;

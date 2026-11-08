@@ -8,7 +8,8 @@
 
 import type { ConnectionPhase, Placement, SensorState } from '../devices/types';
 import { frontParts, type FrontPodKey } from '../figures/body';
-import { Callout, InkLayer, SensorPod, type PodState } from '../figures/Ink';
+import { Callout, type PodState } from '../figures/Ink';
+import { FrontFigure } from '../figures/scenes';
 import { useI18n } from '../i18n';
 
 const ALL: Placement[] = ['trunk', 'upper_r', 'upper_l', 'fore_r', 'fore_l'];
@@ -54,20 +55,16 @@ export function BodyMap({
   const label = ALL.map((p) => `${t(`device.placement.${p}`)}: ${state(p)?.online ? t('device.connected') : t('device.notConnected')}`).join(', ');
   return (
     <svg viewBox={vb.join(' ')} width={size} height={Math.round((size * vb[3]!) / vb[2]!)} role="img" aria-label={label} className="bodymap">
-      <InkLayer d={parts.stool} />
-      <InkLayer d={parts.body} />
-      <InkLayer d={parts.arms.right} />
-      <InkLayer d={parts.arms.left} />
-      {ALL.map((p) => {
-        const q = parts.pods[p as FrontPodKey];
-        const s = state(p);
-        return (
-          <g key={p}>
-            <SensorPod d={q.d} strap={q.strap} c={q.c} state={podState(s, need(p), phase)} ledR={2} pulseR={13} />
-            <title>{`${t(`device.placementLong.${p}`)}: ${s?.online ? `${t('device.connected')}${s.battery !== null ? `, ${s.battery}%` : ''}` : t('device.notConnected')}`}</title>
-          </g>
-        );
-      })}
+      <FrontFigure
+        p={parts}
+        pods={Object.fromEntries(ALL.map((p) => [p, podState(state(p), need(p), phase)]))}
+        ledR={1.5}
+        pulseR={13}
+        podTitle={(p) => {
+          const s = state(p);
+          return `${t(`device.placementLong.${p}`)}: ${s?.online ? `${t('device.connected')}${s.battery !== null ? `, ${s.battery}%` : ''}` : t('device.notConnected')}`;
+        }}
+      />
       {showLabels &&
         ALL.map((p) => {
           const q = parts.pods[p as FrontPodKey];
@@ -77,7 +74,9 @@ export function BodyMap({
           return (
             <Callout
               key={p}
-              from={q.c}
+              // Выноска начинается у края корпуса, а не в центре: светодиод состояния остаётся виден
+              from={p === 'trunk' ? { x: q.c.x + 4.6, y: q.c.y - 5.6 } : { x: q.c.x + (c.anchor === 'start' ? 4.4 : -4.4), y: q.c.y }}
+              dot={1.1}
               via={c.via}
               to={{ x: c.x, y: c.y ?? q.c.y + (c.dy ?? 0) }}
               text={t(`device.placement.${p}`)}
