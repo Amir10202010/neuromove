@@ -59,7 +59,6 @@ export function Hero({ actions }: { actions: LandingActions }) {
           <DemoButton actions={actions} label={t('landing.hero.cta')} />
           <SignInLink actions={actions} />
         </div>
-        <p className="lp-hero__note">{t('landing.hero.note')}</p>
       </div>
     </section>
   );

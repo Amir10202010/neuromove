@@ -1,6 +1,6 @@
-// Стартовая страница NeuroMove — история в семи сценах:
+// Стартовая страница NeuroMove — история в шести сценах:
 // первый экран → проблема → датчики → как это работает (разборная модель датчика) → тест вживую →
-// семьям (отчёт) → финал. Сквозная история — первый ребёнок демо (Алихан), и все его цифры —
+// финал (8 ноября 2026 сцена «Семьям» убрана по просьбе Амирхана). Сквозная история — первый ребёнок демо (Алихан), и все его цифры —
 // из данных приложения (story.ts), а не вписаны руками.
 //
 // 19 октября секции «Специалистам» (хронофотография движений) и «Проверка» (карточки проверки
@@ -22,7 +22,6 @@ import { LanguageSwitch } from '../../layout/LanguageSwitch';
 import { LogoMark } from '../../ui/Logo';
 import { DemoButton, SignInLink, scrollToId, useLandingActions, type LandingActions } from './actions';
 import { prefersReducedMotion, useLandingScroll } from './motion';
-import { Families } from './sections/Families';
 import { FinalCta } from './sections/FinalCta';
 import { Hero } from './sections/Hero';
 import { HowItWorks } from './sections/HowItWorks';
@@ -63,7 +62,6 @@ export function WelcomePage() {
         <Kit />
         <HowItWorks story={story} />
         <Product story={story} />
-        <Families story={story} />
         {/* Здесь будет видео — вместо «Специалистам» и «Проверки» (video/README.md) */}
         <FinalCta actions={actions} story={story} />
       </main>
@@ -106,9 +104,6 @@ function LandingNav({ bar, actions }: { bar: RefObject<HTMLElement | null>; acti
         <button type="button" onClick={() => scrollToId('lp-product')}>
           {t('landing.product.label')}
         </button>
-        <button type="button" onClick={() => scrollToId('lp-families')}>
-          {t('landing.nav.families')}
-        </button>
       </nav>
       <LanguageSwitch className="lp-lang" />
       <SignInLink actions={actions} short className="lp-nav__signin" />
@@ -117,7 +112,8 @@ function LandingNav({ bar, actions }: { bar: RefObject<HTMLElement | null>; acti
   );
 }
 
-/** Подвал — как в версии от 27 сентября: большая фраза и знак; ниже — оговорки и язык. */
+/** Подвал. 8 ноября 2026 упрощён (Амирхан: «намудрили»): без огромной фразы, второго меню
+ *  и второго переключателя языка — знак, разделы, кнопка демо и одна строка оговорок. */
 function LandingFooter({ actions }: { actions: LandingActions }) {
   const { t } = useI18n();
   return (
@@ -126,46 +122,24 @@ function LandingFooter({ actions }: { actions: LandingActions }) {
         <div className="lp-footer__top">
           <div className="lp-footer__brand">
             <span className="lp-footer__logo">
-              <LogoMark size={36} />
+              <LogoMark size={30} />
               <span>NeuroMove</span>
             </span>
             <p>{t('landing.footer.tagline')}</p>
           </div>
-          <div className="lp-footer__cols">
-            <div>
-              <p className="lp-footer__head">{t('landing.footer.colPage')}</p>
-              <button type="button" onClick={() => scrollToId('lp-kit')}>
-                {t('landing.kit.label')}
-              </button>
-              <button type="button" onClick={() => scrollToId('lp-how')}>
-                {t('landing.nav.how')}
-              </button>
-              <button type="button" onClick={() => scrollToId('lp-product')}>
-                {t('landing.product.label')}
-              </button>
-              <button type="button" onClick={() => scrollToId('lp-families')}>
-                {t('landing.nav.families')}
-              </button>
-            </div>
-            <div>
-              <p className="lp-footer__head">{t('landing.footer.colApp')}</p>
-              <button type="button" onClick={actions.startDemo}>
-                {t('landing.hero.cta')}
-              </button>
-              <button type="button" onClick={actions.explore}>
-                {t('landing.final.explore')}
-              </button>
-              <SignInLink actions={actions} short className="lp-footer__link" />
-            </div>
-          </div>
-        </div>
-        <div className="lp-footer__statement">
-          <p>
-            {t('landing.footer.statement1')}
-            <br />
-            <span>{t('landing.footer.statement2')}</span>
-          </p>
-          <LogoMark size={150} />
+          <nav className="lp-footer__links" aria-label={t('landing.footer.colPage')}>
+            <button type="button" onClick={() => scrollToId('lp-kit')}>
+              {t('landing.kit.label')}
+            </button>
+            <button type="button" onClick={() => scrollToId('lp-how')}>
+              {t('landing.nav.how')}
+            </button>
+            <button type="button" onClick={() => scrollToId('lp-product')}>
+              {t('landing.product.label')}
+            </button>
+            <SignInLink actions={actions} short className="lp-footer__link" />
+          </nav>
+          <DemoButton actions={actions} label={t('landing.nav.demo')} small />
         </div>
         <div className="lp-footer__bottom">
           <span>
@@ -174,7 +148,6 @@ function LandingFooter({ actions }: { actions: LandingActions }) {
           <p className="lp-footer__legal">
             {t('landing.footer.scales')} {t('app.disclaimer')} {t('landing.footer.demoNote')}
           </p>
-          <LanguageSwitch className="lp-lang" />
         </div>
       </div>
     </footer>

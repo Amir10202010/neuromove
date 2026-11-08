@@ -1,6 +1,9 @@
-// 2. Проблема. Не инфографика, а одна фраза, которая проявляется слово за словом при прокрутке,
-// и одно сравнение: как прогресс описывают сегодня — и как его описывает NeuroMove.
-// Цифра в сравнении — из истории демо-пациента P01; если истории нет, сравнения тоже нет.
+// 2. Проблема. Одна фраза, которая проявляется слово за словом при прокрутке, и одно сравнение
+// тихой строкой в две колонки: как прогресс описывают сегодня (словами) — и как его показывает
+// NeuroMove (градусами).
+// Цифры — из истории демо-пациента P01; если истории нет, сравнения тоже нет.
+//
+// 8 ноября 2026: сравнение было двумя цитатами на линиях и выглядело сыро (Амирхан) — потом плашка и огромная цифра — тоже не то; теперь строка в масштабе обычного текста.
 
 import { useI18n } from '../../../i18n';
 import { shownDelta } from '../../../session/story';
@@ -16,6 +19,7 @@ export function Problem({ story }: { story: PatientStory | null }) {
   // занято невидимым блоком той же формы: когда придут цифры, страница ниже не съедет (CLS)
   const pending = !story && !ready;
   const show = pending || (delta !== null && delta >= 3);
+  const shown = delta ?? 10;
   return (
     <section id="lp-problem" className="lp-problem lp-white" data-nav="white" aria-labelledby="lp-problem-title">
       <div className="lp-wrap">
@@ -27,19 +31,20 @@ export function Problem({ story }: { story: PatientStory | null }) {
         </p>
 
         {show && (
-          <div className="lp-contrast" data-reveal data-pending={pending || undefined} aria-hidden={pending || undefined}>
-            <div className="lp-contrast__side is-eye">
-              <p className="lp-label">{t('landing.problem.eyeLabel')}</p>
-              <p className="lp-contrast__quote">{t('landing.problem.eyeQuote')}</p>
+          <div className="lp-vs" data-reveal data-pending={pending || undefined} aria-hidden={pending || undefined}>
+            <div className="is-eye">
+              <p className="lp-vs__key">{t('landing.problem.eyeLabel')}</p>
+              <p className="lp-vs__val">{t('landing.problem.eyeQuote')}</p>
             </div>
-            <div className="lp-contrast__side is-nm">
-              <p className="lp-label">
+            <div className="is-nm">
+              <p className="lp-vs__key">
                 <span className="lp-dot" aria-hidden />
                 NeuroMove
               </p>
-              <p className="lp-contrast__quote">{t('landing.problem.nmQuote', { delta: delta ?? 10 })}</p>
+              <p className="lp-vs__val">
+                <b>+{shown}°</b> {t('landing.problem.nmSub')}
+              </p>
             </div>
-            <p className="lp-contrast__note">{t('landing.problem.note', { code: story?.code ?? '' })}</p>
           </div>
         )}
       </div>

@@ -96,7 +96,6 @@ export const en: typeof ru = {
       title: 'Every degree counts.',
       lead: 'NeuroMove measures how children with cerebral palsy move during rehabilitation sessions and shows the clinician and the family what has changed.',
       cta: 'Try the demo',
-      note: 'The demo runs on simulated sensors. The photo is a concept, not the real device.',
       figure: 'Concept photo: an arm with sensors on the upper arm and forearm; the elbow angle is drawn on top',
       angle: 'Elbow angle',
       sensorUpper: 'Sensor · upper arm',
@@ -108,8 +107,7 @@ export const en: typeof ru = {
       text: 'A child’s movement is mostly assessed by eye and with point-based scales. Scales tell you what a child can do, but not how many degrees higher the arm now rises.',
       eyeLabel: 'By eye',
       eyeQuote: '“The arm seems to rise a little better”',
-      nmQuote: '“{delta}° higher than at the start of the course”',
-      note: 'Example from the demo, simulated data',
+      nmSub: 'higher than at the start of the course',
     },
     kit: {
       label: 'Sensors',

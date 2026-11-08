@@ -23,7 +23,6 @@ export function Kit() {
         <div className="lp-kit__stage">
           <figure className="lp-kit__photo">
             <img src={sensorLarge} srcSet={`${sensorSmall} 768w, ${sensorLarge} 1536w`} sizes="100vw" width={1536} height={1024} alt={t('landing.kit.alt')} loading="lazy" decoding="async" />
-            <figcaption>{t('landing.kit.caption')}</figcaption>
           </figure>
           <div className="lp-kit__title">
             <p className="lp-label">{t('landing.kit.label')}</p>
