@@ -65,7 +65,7 @@ export function WelcomePage() {
         {/* Здесь будет видео — вместо «Специалистам» и «Проверки» (video/README.md) */}
         <FinalCta actions={actions} story={story} />
       </main>
-      <LandingFooter actions={actions} />
+      <LandingFooter />
     </div>
   );
 }
@@ -112,34 +112,21 @@ function LandingNav({ bar, actions }: { bar: RefObject<HTMLElement | null>; acti
   );
 }
 
-/** Подвал. 8 ноября 2026 упрощён (Амирхан: «намудрили»): без огромной фразы, второго меню
- *  и второго переключателя языка — знак, разделы, кнопка демо и одна строка оговорок. */
-function LandingFooter({ actions }: { actions: LandingActions }) {
+/** Подвал. 8 ноября 2026 упрощён (Амирхан: «намудрили», потом «слишком огромный и повторяется»):
+ *  фраза «У каждого движения своя история» среднего размера, один знак справа, строка оговорок.
+ *  Без второго меню, второго переключателя языка и повторов знака и названия. */
+function LandingFooter() {
   const { t } = useI18n();
   return (
     <footer className="lp-footer lp-white" data-nav="white">
       <div className="lp-wrap">
-        <div className="lp-footer__top">
-          <div className="lp-footer__brand">
-            <span className="lp-footer__logo">
-              <LogoMark size={30} />
-              <span>NeuroMove</span>
-            </span>
-            <p>{t('landing.footer.tagline')}</p>
-          </div>
-          <nav className="lp-footer__links" aria-label={t('landing.footer.colPage')}>
-            <button type="button" onClick={() => scrollToId('lp-kit')}>
-              {t('landing.kit.label')}
-            </button>
-            <button type="button" onClick={() => scrollToId('lp-how')}>
-              {t('landing.nav.how')}
-            </button>
-            <button type="button" onClick={() => scrollToId('lp-product')}>
-              {t('landing.product.label')}
-            </button>
-            <SignInLink actions={actions} short className="lp-footer__link" />
-          </nav>
-          <DemoButton actions={actions} label={t('landing.nav.demo')} small />
+        <div className="lp-footer__statement">
+          <p>
+            {t('landing.footer.statement1')}
+            <br />
+            <span>{t('landing.footer.statement2')}</span>
+          </p>
+          <LogoMark size={44} />
         </div>
         <div className="lp-footer__bottom">
           <span>

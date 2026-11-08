@@ -1769,57 +1769,35 @@ body:has(.lp) {
 .lp-footer {
   position: relative;
   z-index: 1;
-  padding: clamp(40px, 5vw, 64px) 0 0;
-  border-top: 1px solid var(--lp-rule);
+  padding: clamp(48px, 6vw, 80px) 0 0;
 }
-.lp-footer__top {
+.lp-footer__statement {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 24px 48px;
+  gap: 24px;
 }
-.lp-footer__logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font: 600 20px 'Inter Variable', var(--lp-font);
-  letter-spacing: -0.04em;
+.lp-footer__statement p {
+  font-size: clamp(30px, 4vw, 56px);
+  line-height: 1.04;
+  letter-spacing: -0.05em;
+  font-weight: 300;
 }
-.lp-footer__brand p {
-  margin-top: 8px;
-  font-size: 14px;
-  color: var(--lp-muted);
+/* Вторая строка светлее, но крупный текст — не ниже 3:1 (WCAG AA): #8a8a91 на белом — 3,4:1 */
+.lp-footer__statement p span {
+  color: #8a8a91;
 }
-.lp-footer__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 28px;
-  margin-left: auto;
-}
-.lp-footer__links button,
-.lp-footer__link {
-  padding: 6px 0;
-  border: 0;
-  background: none;
-  color: var(--lp-fg);
-  font: 400 15px 'Inter Variable', var(--lp-font);
-  text-align: left;
-  cursor: pointer;
-  opacity: 0.8;
-}
-.lp-footer__links button:hover,
-.lp-footer__link:hover {
-  opacity: 1;
-  text-decoration: underline;
-  text-underline-offset: 4px;
+.lp-footer__statement .logo-mark {
+  flex: none;
+  margin-bottom: 0.3em;
 }
 .lp-footer__bottom {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
   gap: 8px 40px;
-  margin-top: clamp(32px, 4vw, 48px);
-  padding: 20px 0 32px;
+  margin-top: clamp(28px, 3.5vw, 44px);
+  padding: 18px 0 28px;
   border-top: 1px solid var(--lp-rule);
   font-size: 12px;
   color: var(--lp-faint);
@@ -1992,13 +1970,6 @@ body:has(.lp) {
     gap: 22px;
   }
 
-  .lp-footer__top {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .lp-footer__links {
-    margin-left: 0;
-  }
   .lp-footer__bottom {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -2107,9 +2078,6 @@ body:has(.lp) {
   .rs__foot {
     flex-direction: column;
     gap: 4px;
-  }
-  .lp-footer__links {
-    gap: 2px 22px;
   }
 }
 
