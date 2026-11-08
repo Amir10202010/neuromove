@@ -79,7 +79,7 @@ y_{k,r} = z_k + η_k + ε_{k,r},   η_k ~ N(0, σ_s²),   ε_{k,r} ~ N(0, σ_ε�
 
 **Wald SE.** Computed in free parameters from a numerical Hessian, for the design module (§9).
 
-**Parametric bootstrap** (stoffer1991), B = 200 by default.
+**Parametric bootstrap** (a parametric variant of stoffer1991, who resample the innovations), B = 200 by default.
 - Simulate session means from the MLE at the observed design, and draw σ_ε² ~ σ̂_ε² χ²_ν/ν.
 - Refit, starting from the MLE.
 - The replicates give:
@@ -168,7 +168,7 @@ The focus parameter depends on the model: weekly slope, τ, or retention half-li
 
 | Method | Decision | Reason |
 |---|---|---|
-| Fitting dual-rate models to assessment sessions | Rejected for current data | Not identifiable (E6, albert2018); no error signal |
+| Fitting dual-rate models to assessment sessions | Rejected for current data | Not identifiable (E6); no error signal. Applied only to stored practice trials, with deterministic dynamics, a simplification albert2018 found unreliable for hidden states; a stochastic EM fit is the next step |
 | Power-law learning curves | Not a candidate | Individual curves are exponential; power laws are averaging artefacts (heathcote2000) |
 | Bayesian hierarchical models | Deferred | With 1–6 participants priors would dominate; no justified population priors yet; revisit at ≥ 15 participants × ≥ 5 sessions |
 | Random train/test splits of sessions | Rejected | Leakage across time in one person's series (roberts2017) |

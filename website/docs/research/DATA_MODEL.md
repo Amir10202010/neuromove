@@ -83,7 +83,14 @@ IndexedDB schema **v4** (additive; `src/data/storage.test.ts` covers v3 → v4) 
 - indexes on workspace, kind and participantId;
 - records of two kinds: `learning_protocol` versions and frozen `analysis_run` records.
 
-Lab records are **local to the browser** in this version: there are no outbox ops and no server table yet. Frozen runs carry their own snapshot, configuration, component versions and SHA-256 hashes.
+Kinds: `learning_protocol`, `analysis_run`, `practice_trials` and `trial_recording`. Frozen runs carry their own snapshot, configuration, component versions and SHA-256 hashes.
+
+**PostgreSQL migration `0003_lab`** adds `nm_lab_records`:
+- typed columns: kind, participant, protocol id/version, status, content hash;
+- the exact payload;
+- an immutability trigger (protocol definitions, runs, trial sets and recording settings).
+
+Records sync as the entity `lab_record`. Clinic writes carry an outbox op in the same transaction; demo and simulated content are refused by browser and server alike.
 
 Details:
 - [../architecture/computational-motor-learning.md](../architecture/computational-motor-learning.md)

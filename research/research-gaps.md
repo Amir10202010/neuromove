@@ -3,9 +3,9 @@
 ## 1. What is established
 - Learning has to be inferred from retention and transfer, not from performance during practice (kantak2012, soderstrom2015).
 - Individual practice curves are exponential rather than power-law (heathcote2000).
-- Adaptation shows multiple time scales. Their parameters are identifiable only from dense, probing paradigms (smith2006, albert2018).
+- Adaptation shows multiple time scales (smith2006). Their hidden states are poorly estimated by deterministic least-squares fits (albert2018), and in our simulation (E6) they were identifiable only from dense, error-driven trials.
 - Dose-driven dynamical models with retention can describe recovery in robot therapy (casadio2012).
-- Smoothness from gyroscope angular speed (SPARC) is preferable to accelerometer jerk (melendez2021, balasubramanian2015).
+- SPARC is recommended over LDLJ (balasubramanian2015), and is appropriate on rotational (gyroscope) IMU kinematics but not on translational data (melendez2021).
 - Leakage-free, subject-wise evaluation is essential (saeb2017).
 
 ## 2. Where existing systems fall short

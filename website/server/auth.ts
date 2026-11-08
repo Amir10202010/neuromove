@@ -107,8 +107,9 @@ export function clearCookie(secure: boolean): string {
  */
 export function canWrite(role: Role, entity: string): boolean {
   if (role === 'observer') return false;
-  if (role === 'caregiver') return entity === 'rehab_record';
-  if (role === 'measurement_operator') return entity === 'trial' || entity === 'validation_session' || entity === 'rehab_record';
+  // Caregivers: rehab records, and lab practice-trial sets of their linked child (checked in the lab handler)
+  if (role === 'caregiver') return entity === 'rehab_record' || entity === 'lab_record';
+  if (role === 'measurement_operator') return entity === 'trial' || entity === 'validation_session' || entity === 'rehab_record' || entity === 'lab_record';
   return true;
 }
 

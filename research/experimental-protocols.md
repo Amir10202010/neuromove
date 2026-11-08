@@ -44,7 +44,7 @@ Study (rehab Study: ethics, enrolment, consent)
 
 ## 3. Template B — Feedback frequency and retention (controlled study, future)
 
-- Two arms are randomised by participant: 100 % versus faded or reduced feedback (winstein1990; sullivan2008 and burtner2014 for children).
+- Two arms are randomised by participant: 100 % versus faded or reduced feedback (winstein1990 in adults). **In children the expected direction differs:** reduced feedback harmed children's retention (sullivan2008), and children with hemiplegic CP behaved like typically developing children (burtner2014). The hypothesis must be stated without assuming the adult result.
 - The primary outcome is **retention-test** ROM error relative to a target, not acquisition performance.
 - **Requires** storing practice trials with the target and the feedback given. The live sensor feedback of child mode exists but does not store trials. This is a software change, not hardware; it is a roadmap item.
 - Once trials are stored, the trial-level dual-rate model becomes applicable. E6 says ≥ 200 dense trials with error-clamp-like probes are needed.

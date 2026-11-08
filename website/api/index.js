@@ -344,14 +344,209 @@ function clearCookie(secure) {
 }
 function canWrite(role, entity) {
   if (role === "observer") return false;
-  if (role === "caregiver") return entity === "rehab_record";
-  if (role === "measurement_operator") return entity === "trial" || entity === "validation_session" || entity === "rehab_record";
+  if (role === "caregiver") return entity === "rehab_record" || entity === "lab_record";
+  if (role === "measurement_operator") return entity === "trial" || entity === "validation_session" || entity === "rehab_record" || entity === "lab_record";
   return true;
 }
 async function linkedParticipants(db, p) {
   if (p.role !== "caregiver") return [];
   const rows = await db.query("select participant_id from nm_caregiver_links where team_id = $1 and user_id = $2 and revoked_at is null", [p.teamId, p.userId]);
   return rows.map((r) => r.participant_id);
+}
+
+// src/lab/hash.ts
+function canonicalJson2(v, sig) {
+  if (v === null || typeof v !== "object") {
+    if (typeof v === "number") {
+      if (!Number.isFinite(v)) return "null";
+      if (sig !== void 0) return JSON.stringify(v === 0 ? 0 : Number(v.toPrecision(sig)));
+    }
+    return JSON.stringify(v) ?? "null";
+  }
+  if (Array.isArray(v)) return `[${v.map((x) => canonicalJson2(x === void 0 ? null : x, sig)).join(",")}]`;
+  const o = v;
+  const keys = Object.keys(o).filter((k) => o[k] !== void 0).sort();
+  return `{${keys.map((k) => `${JSON.stringify(k)}:${canonicalJson2(o[k], sig)}`).join(",")}}`;
+}
+var K = new Uint32Array([
+  1116352408,
+  1899447441,
+  3049323471,
+  3921009573,
+  961987163,
+  1508970993,
+  2453635748,
+  2870763221,
+  3624381080,
+  310598401,
+  607225278,
+  1426881987,
+  1925078388,
+  2162078206,
+  2614888103,
+  3248222580,
+  3835390401,
+  4022224774,
+  264347078,
+  604807628,
+  770255983,
+  1249150122,
+  1555081692,
+  1996064986,
+  2554220882,
+  2821834349,
+  2952996808,
+  3210313671,
+  3336571891,
+  3584528711,
+  113926993,
+  338241895,
+  666307205,
+  773529912,
+  1294757372,
+  1396182291,
+  1695183700,
+  1986661051,
+  2177026350,
+  2456956037,
+  2730485921,
+  2820302411,
+  3259730800,
+  3345764771,
+  3516065817,
+  3600352804,
+  4094571909,
+  275423344,
+  430227734,
+  506948616,
+  659060556,
+  883997877,
+  958139571,
+  1322822218,
+  1537002063,
+  1747873779,
+  1955562222,
+  2024104815,
+  2227730452,
+  2361852424,
+  2428436474,
+  2756734187,
+  3204031479,
+  3329325298
+]);
+function utf8(s) {
+  return new TextEncoder().encode(s);
+}
+function sha256Hex(input) {
+  const msg = typeof input === "string" ? utf8(input) : input;
+  const l = msg.length;
+  const withOne = l + 1;
+  const total = Math.ceil((withOne + 8) / 64) * 64;
+  const buf = new Uint8Array(total);
+  buf.set(msg);
+  buf[l] = 128;
+  const bits = l * 8;
+  const view = new DataView(buf.buffer);
+  view.setUint32(total - 8, Math.floor(bits / 2 ** 32));
+  view.setUint32(total - 4, bits >>> 0);
+  const H = new Uint32Array([1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225]);
+  const W = new Uint32Array(64);
+  for (let off = 0; off < total; off += 64) {
+    for (let i = 0; i < 16; i++) W[i] = view.getUint32(off + 4 * i);
+    for (let i = 16; i < 64; i++) {
+      const w15 = W[i - 15];
+      const w2 = W[i - 2];
+      const s0 = (w15 >>> 7 | w15 << 25) ^ (w15 >>> 18 | w15 << 14) ^ w15 >>> 3;
+      const s1 = (w2 >>> 17 | w2 << 15) ^ (w2 >>> 19 | w2 << 13) ^ w2 >>> 10;
+      W[i] = W[i - 16] + s0 + W[i - 7] + s1 >>> 0;
+    }
+    let a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+    for (let i = 0; i < 64; i++) {
+      const S1 = (e >>> 6 | e << 26) ^ (e >>> 11 | e << 21) ^ (e >>> 25 | e << 7);
+      const ch = e & f ^ ~e & g;
+      const t1 = h + S1 + ch + K[i] + W[i] >>> 0;
+      const S0 = (a >>> 2 | a << 30) ^ (a >>> 13 | a << 19) ^ (a >>> 22 | a << 10);
+      const maj = a & b ^ a & c ^ b & c;
+      const t2 = S0 + maj >>> 0;
+      h = g;
+      g = f;
+      f = e;
+      e = d + t1 >>> 0;
+      d = c;
+      c = b;
+      b = a;
+      a = t1 + t2 >>> 0;
+    }
+    H[0] = H[0] + a >>> 0;
+    H[1] = H[1] + b >>> 0;
+    H[2] = H[2] + c >>> 0;
+    H[3] = H[3] + d >>> 0;
+    H[4] = H[4] + e >>> 0;
+    H[5] = H[5] + f >>> 0;
+    H[6] = H[6] + g >>> 0;
+    H[7] = H[7] + h >>> 0;
+  }
+  return [...H].map((x) => x.toString(16).padStart(8, "0")).join("");
+}
+var hashOf = (v) => sha256Hex(canonicalJson2(v));
+
+// src/lab/integrity.ts
+var RESULT_DIGITS = 8;
+var RESULT_HASH_SCHEME = 1;
+var resultsHash = (r) => sha256Hex(canonicalJson2(r.map((x) => ({ ...x, versions: void 0 })), RESULT_DIGITS));
+var LAB_KINDS = ["learning_protocol", "analysis_run", "practice_trials", "trial_recording"];
+var isObj = (x) => !!x && typeof x === "object" && !Array.isArray(x);
+var str2 = (x, max2 = 200) => typeof x === "string" && x.length > 0 && x.length <= max2;
+var iso = (x) => typeof x === "string" && !Number.isNaN(Date.parse(x));
+var num2 = (x) => typeof x === "number" && Number.isFinite(x);
+var numOrNull = (x) => x === null || num2(x);
+function labRecordProblem(x) {
+  if (!isObj(x)) return "not_an_object";
+  if (!str2(x.id, 120) || x.workspace !== "demo" && x.workspace !== "clinic") return "bad_shape";
+  switch (x.kind) {
+    case "learning_protocol": {
+      if (!str2(x.protocolId, 120) || !num2(x.version) || !isObj(x.def) || !str2(x.defHash, 64) || !iso(x.createdAt)) return "bad_shape";
+      if (!["draft", "frozen", "archived"].includes(String(x.status)) || x.participantId !== null) return "bad_shape";
+      return hashOf(x.def) === x.defHash ? null : "definition_hash_mismatch";
+    }
+    case "analysis_run": {
+      if (!str2(x.participantId, 120) || !Array.isArray(x.snapshot) || !Array.isArray(x.results) || !isObj(x.config) || !iso(x.createdAt)) return "bad_shape";
+      if (!str2(x.snapshotHash, 64) || !str2(x.configHash, 64) || !str2(x.resultHash, 64)) return "bad_shape";
+      if ((x.hashScheme ?? 1) !== RESULT_HASH_SCHEME) return "unknown_hash_scheme";
+      if (hashOf(x.snapshot) !== x.snapshotHash) return "snapshot_hash_mismatch";
+      if (hashOf(x.config) !== x.configHash) return "config_hash_mismatch";
+      return resultsHash(x.results) === x.resultHash ? null : "result_hash_mismatch";
+    }
+    case "practice_trials": {
+      if (!str2(x.participantId, 120) || !str2(x.exercise, 40) || !["left", "right"].includes(String(x.side)) || !iso(x.startedAt) || !iso(x.endedAt)) return "bad_shape";
+      if (!numOrNull(x.targetDeg) || !Array.isArray(x.trials) || !str2(x.algorithmVersion, 60) || typeof x.simulated !== "boolean") return "bad_shape";
+      if (x.trials.length > 2e3) return "too_many_trials";
+      for (const t of x.trials) {
+        if (!isObj(t) || !num2(t.index) || !num2(t.t) || !num2(t.peakDeg) || !numOrNull(t.errorDeg) || typeof t.valid !== "boolean") return "bad_shape";
+      }
+      return str2(x.contentHash, 64) && hashOf({ ...x, contentHash: void 0 }) === x.contentHash ? null : "bad_shape";
+    }
+    case "trial_recording": {
+      if (!str2(x.participantId, 120) || typeof x.enabled !== "boolean" || !iso(x.createdAt) || !(x.consentId === null || str2(x.consentId, 120))) return "bad_shape";
+      return null;
+    }
+    default:
+      return "unknown_kind";
+  }
+}
+function labTransitionProblem(prev, next) {
+  if (prev.kind !== next.kind) return "kind_changed";
+  if (prev.kind !== "learning_protocol") return canonicalJson2(prev) === canonicalJson2(next) ? null : "immutable";
+  if (prev.defHash !== next.defHash || canonicalJson2(prev.def) !== canonicalJson2(next.def) || prev.protocolId !== next.protocolId || prev.version !== next.version) return "definition_changed";
+  const from = String(prev.status);
+  const to = String(next.status);
+  const ok = from === to || from === "draft" && (to === "frozen" || to === "archived") || from === "frozen" && to === "archived";
+  return ok ? null : "invalid_status_change";
+}
+function labRecordSimulated(x) {
+  if (x.kind === "analysis_run") return x.simulated === true;
+  if (x.kind === "practice_trials") return x.simulated === true;
+  return false;
 }
 
 // server/migrations.ts
@@ -691,6 +886,46 @@ $$ language plpgsql;
 create or replace trigger nm_rehab_records_immutable before update on nm_rehab_records
   for each row execute function nm_rehab_immutable();
 `
+  },
+  {
+    id: "0003_lab",
+    sql: `
+-- Computational motor-learning lab. Typed columns for querying, the exact payload (with its own hashes) for the rest.
+create table if not exists nm_lab_records (
+  id text primary key,
+  team_id uuid not null references nm_teams(id),
+  kind text not null check (kind in (${LAB_KINDS.map((k) => `'${k}'`).join(", ")})),
+  participant_id text references nm_participants(id),
+  protocol_id text,
+  version integer check (version is null or version >= 1),
+  status text,
+  content_hash text,${RECORD_COLUMNS},
+  unique (protocol_id, version)
+);
+create index if not exists nm_lab_records_team_kind on nm_lab_records(team_id, kind);
+create index if not exists nm_lab_records_participant on nm_lab_records(participant_id);
+
+-- Historical integrity in the database itself, also against direct SQL: runs, practice-trial sets and
+-- recording settings never change; a protocol version keeps its definition and moves only forward in status.
+create or replace function nm_lab_immutable() returns trigger as $$
+begin
+  if new.kind <> old.kind or new.participant_id is distinct from old.participant_id or new.team_id <> old.team_id or new.deleted_at is not null then
+    raise exception 'lab record % identity is immutable', old.id using errcode = 'P0001';
+  end if;
+  if old.kind <> 'learning_protocol' and new.payload is distinct from old.payload then
+    raise exception 'lab record % (%) is immutable', old.id, old.kind using errcode = 'P0001';
+  end if;
+  if old.kind = 'learning_protocol' and (new.payload->'def' is distinct from old.payload->'def'
+      or new.payload->>'defHash' is distinct from old.payload->>'defHash'
+      or not (new.status = old.status or (old.status = 'draft' and new.status in ('frozen', 'archived')) or (old.status = 'frozen' and new.status = 'archived'))) then
+    raise exception 'lab protocol % definition is immutable', old.id using errcode = 'P0001';
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+create or replace trigger nm_lab_records_immutable before update on nm_lab_records
+  for each row execute function nm_lab_immutable();
+`
   }
 ];
 
@@ -829,34 +1064,34 @@ var ALGORITHM_VERSION = "nm-core 0.2.0";
 
 // src/research/validate.ts
 var obj2 = (x) => !!x && typeof x === "object" && !Array.isArray(x);
-var str2 = (x, max2 = 300) => typeof x === "string" && x.length <= max2;
-var nonEmpty2 = (x, max2 = 300) => str2(x, max2) && x.length > 0;
-var num2 = (x) => typeof x === "number" && Number.isFinite(x);
-var date3 = (x) => str2(x, 40) && Number.isFinite(Date.parse(x));
+var str3 = (x, max2 = 300) => typeof x === "string" && x.length <= max2;
+var nonEmpty2 = (x, max2 = 300) => str3(x, max2) && x.length > 0;
+var num3 = (x) => typeof x === "number" && Number.isFinite(x);
+var date3 = (x) => str3(x, 40) && Number.isFinite(Date.parse(x));
 var nullable = (x, f) => x === null || f(x);
 var oneOf3 = (x, xs) => xs.includes(x);
 var intIn2 = (x, lo, hi) => Number.isInteger(x) && x >= lo && x <= hi;
 function definition(d) {
   if (!obj2(d)) return false;
   const q = d.quality;
-  return nonEmpty2(d.name, 200) && str2(d.description, 2e3) && oneOf3(d.bodyRegion, ["upper_limb", "lower_limb", "trunk", "multi_segment", "custom"]) && str2(d.joint, 100) && oneOf3(d.exercise, EXERCISE_IDS) && oneOf3(d.side, ["left", "right"]) && str2(d.movementType, 200) && Array.isArray(d.measurementPoints) && d.measurementPoints.length > 0 && d.measurementPoints.length <= 20 && d.measurementPoints.every((p) => obj2(p) && nonEmpty2(p.id, 40) && oneOf3(p.kind, ["max_flexion", "max_extension", "neutral", "custom"]) && str2(p.label, 100)) && intIn2(d.repetitions, 1, 200) && intIn2(d.sets, 1, 20) && num2(d.restSec) && typeof d.goniometerRequired === "boolean" && oneOf3(d.captureMode, ["hold", "rep_peak"]) && num2(d.holdWindowSec) && obj2(q) && num2(q.maxWindowSdDeg) && num2(q.minWindowSamples) && num2(q.reviewAbsErrorDeg) && str2(d.operatorNotes, 4e3) && obj2(d.customFields) && Object.values(d.customFields).every((v) => str2(v, 1e3));
+  return nonEmpty2(d.name, 200) && str3(d.description, 2e3) && oneOf3(d.bodyRegion, ["upper_limb", "lower_limb", "trunk", "multi_segment", "custom"]) && str3(d.joint, 100) && oneOf3(d.exercise, EXERCISE_IDS) && oneOf3(d.side, ["left", "right"]) && str3(d.movementType, 200) && Array.isArray(d.measurementPoints) && d.measurementPoints.length > 0 && d.measurementPoints.length <= 20 && d.measurementPoints.every((p) => obj2(p) && nonEmpty2(p.id, 40) && oneOf3(p.kind, ["max_flexion", "max_extension", "neutral", "custom"]) && str3(p.label, 100)) && intIn2(d.repetitions, 1, 200) && intIn2(d.sets, 1, 20) && num3(d.restSec) && typeof d.goniometerRequired === "boolean" && oneOf3(d.captureMode, ["hold", "rep_peak"]) && num3(d.holdWindowSec) && obj2(q) && num3(q.maxWindowSdDeg) && num3(q.minWindowSamples) && num3(q.reviewAbsErrorDeg) && str3(d.operatorNotes, 4e3) && obj2(d.customFields) && Object.values(d.customFields).every((v) => str3(v, 1e3));
 }
 function validProtocolVersion(x) {
-  return obj2(x) && nonEmpty2(x.key, 120) && nonEmpty2(x.protocolId, 80) && intIn2(x.version, 1, 1e5) && x.key === `${x.protocolId}@${x.version}` && oneOf3(x.workspace, ["clinic", "demo"]) && definition(x.definition) && date3(x.createdAt) && str2(x.createdBy, 200) && typeof x.archived === "boolean";
+  return obj2(x) && nonEmpty2(x.key, 120) && nonEmpty2(x.protocolId, 80) && intIn2(x.version, 1, 1e5) && x.key === `${x.protocolId}@${x.version}` && oneOf3(x.workspace, ["clinic", "demo"]) && definition(x.definition) && date3(x.createdAt) && str3(x.createdBy, 200) && typeof x.archived === "boolean";
 }
 function device(d) {
-  return obj2(d) && oneOf3(d.kind, ["usb", "ble", "simulator", "replay"]) && str2(d.name, 200) && str2(d.firmware, 100) && str2(d.format, 100) && num2(d.rateHz) && typeof d.simulated === "boolean" && Array.isArray(d.sensors) && d.sensors.every((s) => obj2(s) && oneOf3(s.placement, ["trunk", "upper_l", "upper_r", "fore_l", "fore_r"]) && nullable(s.moduleId, (v) => str2(v, 20)));
+  return obj2(d) && oneOf3(d.kind, ["usb", "ble", "simulator", "replay"]) && str3(d.name, 200) && str3(d.firmware, 100) && str3(d.format, 100) && num3(d.rateHz) && typeof d.simulated === "boolean" && Array.isArray(d.sensors) && d.sensors.every((s) => obj2(s) && oneOf3(s.placement, ["trunk", "upper_l", "upper_r", "fore_l", "fore_r"]) && nullable(s.moduleId, (v) => str3(v, 20)));
 }
 function validValidationSession(x) {
-  return obj2(x) && nonEmpty2(x.id, 80) && oneOf3(x.workspace, ["clinic", "demo"]) && nonEmpty2(x.participantId, 80) && str2(x.operator, 200) && nonEmpty2(x.protocolKey, 120) && definition(x.protocol) && intIn2(x.protocolVersion, 1, 1e5) && device(x.device) && str2(x.algorithmVersion, 100) && str2(x.appVersion, 100) && date3(x.startedAt) && (x.endedAt === null || date3(x.endedAt)) && oneOf3(x.status, ["active", "completed", "abandoned"]) && (x.calibration === null || obj2(x.calibration) && date3(x.calibration.at) && num2(x.calibration.attempts) && obj2(x.calibration.poseDeg)) && (x.signal === null || obj2(x.signal) && num2(x.signal.received) && num2(x.signal.lost) && num2(x.signal.saturated) && num2(x.signal.percent)) && str2(x.notes, 4e3) && date3(x.createdAt) && date3(x.updatedAt);
+  return obj2(x) && nonEmpty2(x.id, 80) && oneOf3(x.workspace, ["clinic", "demo"]) && nonEmpty2(x.participantId, 80) && str3(x.operator, 200) && nonEmpty2(x.protocolKey, 120) && definition(x.protocol) && intIn2(x.protocolVersion, 1, 1e5) && device(x.device) && str3(x.algorithmVersion, 100) && str3(x.appVersion, 100) && date3(x.startedAt) && (x.endedAt === null || date3(x.endedAt)) && oneOf3(x.status, ["active", "completed", "abandoned"]) && (x.calibration === null || obj2(x.calibration) && date3(x.calibration.at) && num3(x.calibration.attempts) && obj2(x.calibration.poseDeg)) && (x.signal === null || obj2(x.signal) && num3(x.signal.received) && num3(x.signal.lost) && num3(x.signal.saturated) && num3(x.signal.percent)) && str3(x.notes, 4e3) && date3(x.createdAt) && date3(x.updatedAt);
 }
 function validTrial(x) {
   if (!obj2(x)) return false;
   const imu = x.imu;
-  const imuOk = imu === null || obj2(imu) && num2(imu.angleDeg) && Math.abs(imu.angleDeg) <= 400 && oneOf3(imu.method, ["hold", "rep_peak"]) && num2(imu.tFrom) && num2(imu.tTo) && intIn2(imu.samples, 0, 1e6) && num2(imu.windowSdDeg) && num2(imu.windowMinDeg) && num2(imu.windowMaxDeg) && date3(imu.capturedAt);
-  const refOk = x.referenceDeg === null || num2(x.referenceDeg) && x.referenceDeg >= -180 && x.referenceDeg <= 360;
+  const imuOk = imu === null || obj2(imu) && num3(imu.angleDeg) && Math.abs(imu.angleDeg) <= 400 && oneOf3(imu.method, ["hold", "rep_peak"]) && num3(imu.tFrom) && num3(imu.tTo) && intIn2(imu.samples, 0, 1e6) && num3(imu.windowSdDeg) && num3(imu.windowMinDeg) && num3(imu.windowMaxDeg) && date3(imu.capturedAt);
+  const refOk = x.referenceDeg === null || num3(x.referenceDeg) && x.referenceDeg >= -180 && x.referenceDeg <= 360;
   const pairOk = (x.status !== "valid" || imu !== null && x.referenceDeg !== null) && (x.status !== "pending_reference" || imu !== null && x.referenceDeg === null);
-  return nonEmpty2(x.id, 80) && oneOf3(x.workspace, ["clinic", "demo"]) && nonEmpty2(x.sessionId, 80) && nonEmpty2(x.participantId, 80) && intIn2(x.set, 1, 20) && intIn2(x.repetition, 1, 200) && nonEmpty2(x.pointId, 40) && intIn2(x.attempt, 1, 1e4) && oneOf3(x.status, ["pending_reference", "valid", "invalid", "skipped", "superseded"]) && imuOk && refOk && pairOk && (x.referenceAt === null || date3(x.referenceAt)) && str2(x.reason, 1e3) && str2(x.notes, 2e3) && str2(x.operator, 200) && date3(x.createdAt) && date3(x.updatedAt);
+  return nonEmpty2(x.id, 80) && oneOf3(x.workspace, ["clinic", "demo"]) && nonEmpty2(x.sessionId, 80) && nonEmpty2(x.participantId, 80) && intIn2(x.set, 1, 20) && intIn2(x.repetition, 1, 200) && nonEmpty2(x.pointId, 40) && intIn2(x.attempt, 1, 1e4) && oneOf3(x.status, ["pending_reference", "valid", "invalid", "skipped", "superseded"]) && imuOk && refOk && pairOk && (x.referenceAt === null || date3(x.referenceAt)) && str3(x.reason, 1e3) && str3(x.notes, 2e3) && str3(x.operator, 200) && date3(x.createdAt) && date3(x.updatedAt);
 }
 
 // src/research/stats.ts
@@ -1098,7 +1333,9 @@ var SYNC_ENTITIES = [
   "validation_session",
   "trial",
   // Functional Progression System: every rehab record kind travels as one entity (kind inside the payload)
-  "rehab_record"
+  "rehab_record",
+  // Computational motor-learning lab: protocols, frozen runs, practice trials, recording settings (kind inside)
+  "lab_record"
 ];
 var PUSH_BATCH = 50;
 
@@ -1395,6 +1632,39 @@ var HANDLERS = {
       );
     }
   },
+  lab_record: {
+    table: "nm_lab_records",
+    key: "id",
+    check(payload, entityId) {
+      const problem = labRecordProblem(payload);
+      if (problem) return problem === "unknown_kind" || problem === "not_an_object" || problem === "bad_shape" ? "invalid_payload" : problem;
+      const v = payload;
+      if (v.id !== entityId) return "id_mismatch";
+      if (v.workspace !== "clinic" || labRecordSimulated(v)) return "demo_data_not_accepted";
+      return null;
+    },
+    async write(ctx, v, rev, deleted, id2, current) {
+      const { t, p } = ctx;
+      if (deleted || !v) throw new Rejected("lab_records_are_never_deleted");
+      if (current) {
+        const problem = labTransitionProblem(current, v);
+        if (problem) throw new Rejected(problem);
+      }
+      const participant = typeof v.participantId === "string" ? v.participantId : null;
+      if (participant && !await sameTeam(t, "nm_participants", participant, p.teamId)) throw new Rejected("forbidden");
+      if (p.role === "caregiver") {
+        const linked = await linkedParticipants(t, p);
+        if (v.kind !== "practice_trials" || !participant || !linked.includes(participant)) throw new Rejected("forbidden");
+      }
+      const contentHash = v.defHash ?? v.resultHash ?? v.contentHash ?? null;
+      await t.query(
+        `insert into nm_lab_records (id, team_id, kind, participant_id, protocol_id, version, status, content_hash, rev, payload, created_by, updated_by)
+         values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $11)
+         on conflict (id) do update set status = $7, rev = $9, payload = $10, updated_at = now(), updated_by = $11`,
+        [id2, p.teamId, v.kind, participant, v.protocolId ?? null, v.version ?? null, v.status ?? null, contentHash, rev, v, p.userId]
+      );
+    }
+  },
   trial: {
     table: "nm_trials",
     key: "id",
@@ -1542,6 +1812,7 @@ async function caregiverFilter(db, p, changes) {
     if (ch.entity === "participant") return linked.includes(ch.entityId);
     if (ch.entity === "note") return v.kind === "summary" && linked.includes(String(v.patientId));
     if (ch.entity === "rehab_record") return caregiverMayRead(v, linked);
+    if (ch.entity === "lab_record") return (v.kind === "trial_recording" || v.kind === "practice_trials") && linked.includes(String(v.participantId));
     return false;
   });
 }

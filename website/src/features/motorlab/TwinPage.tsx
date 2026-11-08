@@ -19,6 +19,7 @@ import { TrajectoryChart } from './charts';
 import { digitsFor, fmt, Interval, METRIC_LABEL, MODEL_LABEL, PARAM_LABEL, Prov, SimulatedBanner, useLabData, useNames, Warnings, withUnit } from './common';
 import { useLT, type LKey, type LT } from './i18n';
 import { useLabStore } from './store';
+import { PracticePanel } from './PracticePanel';
 
 const TWIN_METRICS: LearningMetric[] = ['rom', 'peak_velocity', 'sparc', 'trunk', 'rep_duration'];
 
@@ -140,6 +141,7 @@ export function TwinPage({ id }: { id: string }) {
             <p className="mlmuted"><Prov kind="estimated" /> {lt('Current state = the selected model’s latent performance at the last included session.')} <Prov kind="predicted" /> {lt('Next-session interval includes parameter uncertainty, day-to-day and repetition variability.')}</p>
           </section>
           {a && s && <TaskDetail key={`${s.key}`} a={a} s={s} lt={lt} title={names.task(s.exercise, s.side)} />}
+          <PracticePanel participantId={id} workspace={ws} lt={lt} />
           {a && <Assistant analyses={twin.tasks.map((t) => t.analyses[0]!)} series={twin.tasks.map((t) => t.series[0]!)} focus={a.seriesKey} lt={lt} />}
         </>
       )}

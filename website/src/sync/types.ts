@@ -15,6 +15,8 @@ export const SYNC_ENTITIES = [
   'trial',
   // Functional Progression System: every rehab record kind travels as one entity (kind inside the payload)
   'rehab_record',
+  // Computational motor-learning lab: protocols, frozen runs, practice trials, recording settings (kind inside)
+  'lab_record',
 ] as const;
 export type SyncEntity = (typeof SYNC_ENTITIES)[number];
 

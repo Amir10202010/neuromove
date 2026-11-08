@@ -8,9 +8,9 @@ import { href } from '../../app/router';
 import { PageHeader } from '../../layout/PageHeader';
 import { buildParticipantSeries } from '../../lab/dataset';
 import { LAB_ENGINE_VERSION } from '../../lab/version';
-import { LinkButton } from '../../ui/Button';
 import { EmptyState } from '../../ui/EmptyState';
 import { SimulatedBanner, useLabData } from './common';
+import { ReliabilitySection } from './ReliabilitySection';
 import { useLT } from './i18n';
 import { useLabRecords } from './store';
 
@@ -103,6 +103,7 @@ export function LabOverviewPage() {
         )}
         <p className="mlmuted">{lt('Counts for the range-of-motion series. "Model-ready" = series with at least 5 included sessions, the minimum for the dose-driven and exponential models.')}</p>
       </section>
+      <ReliabilitySection />
     </div>
   );
 }
@@ -116,17 +117,3 @@ function Tile({ icon, title, text, to }: { icon: React.ReactNode; title: string;
   );
 }
 
-/** Entry card on the Research home page. */
-export function LabEntry() {
-  const lt = useLT();
-  return (
-    <section className="card card__body mlrow">
-      <Network aria-hidden />
-      <div style={{ flex: '1 1 240px', minWidth: 0 }}>
-        <strong>{lt('Motor learning lab')}</strong>
-        <p className="mlmuted">{lt('Learning trajectories, model comparison, uncertainty, performance vs learning.')}</p>
-      </div>
-      <LinkButton href={href({ name: 'labOverview' })}>{lt('Open')}</LinkButton>
-    </section>
-  );
-}

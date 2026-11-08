@@ -16,6 +16,7 @@ import { canWrite, linkedParticipants, sha256, type Principal } from './auth';
 import { IMMUTABLE_KINDS, type RehabRecord } from '../src/rehab/model';
 import { caregiverMayRead, canWriteRehab } from '../src/rehab/policy';
 import { checkTransition, validRehabRecord } from '../src/rehab/validate';
+import { labRecordProblem, labRecordSimulated, labTransitionProblem } from '../src/lab/integrity';
 import { sqlCode, type Db } from './db';
 import { CURSOR_TTL_S, type Redis } from './redis';
 
@@ -283,6 +284,43 @@ const HANDLERS: Record<SyncEntity, Handler> = {
       );
     },
   },
+  lab_record: {
+    table: 'nm_lab_records',
+    key: 'id',
+    check(payload, entityId) {
+      // Same shape AND hash rules as the browser (src/lab/integrity.ts): an edited protocol definition or an
+      // altered snapshot/configuration/result of a frozen run is refused here.
+      const problem = labRecordProblem(payload);
+      if (problem) return problem === 'unknown_kind' || problem === 'not_an_object' || problem === 'bad_shape' ? 'invalid_payload' : problem;
+      const v = payload as Record<string, unknown>;
+      if (v.id !== entityId) return 'id_mismatch';
+      if (v.workspace !== 'clinic' || labRecordSimulated(v)) return 'demo_data_not_accepted';
+      return null;
+    },
+    async write(ctx, v, rev, deleted, id, current) {
+      const { t, p } = ctx;
+      // Lab history (protocol versions, frozen runs, practice trials, recording decisions) is never deleted
+      if (deleted || !v) throw new Rejected('lab_records_are_never_deleted');
+      if (current) {
+        const problem = labTransitionProblem(current as Record<string, unknown>, v);
+        if (problem) throw new Rejected(problem);
+      }
+      const participant = typeof v.participantId === 'string' ? v.participantId : null;
+      if (participant && !(await sameTeam(t, 'nm_participants', participant, p.teamId))) throw new Rejected('forbidden');
+      // A caregiver account may only add practice-trial sets of a child it is linked to (server view of links)
+      if (p.role === 'caregiver') {
+        const linked = await linkedParticipants(t, p);
+        if (v.kind !== 'practice_trials' || !participant || !linked.includes(participant)) throw new Rejected('forbidden');
+      }
+      const contentHash = (v.defHash ?? v.resultHash ?? v.contentHash ?? null) as string | null;
+      await t.query(
+        `insert into nm_lab_records (id, team_id, kind, participant_id, protocol_id, version, status, content_hash, rev, payload, created_by, updated_by)
+         values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $11)
+         on conflict (id) do update set status = $7, rev = $9, payload = $10, updated_at = now(), updated_by = $11`,
+        [id, p.teamId, v.kind, participant, (v.protocolId as string | undefined) ?? null, (v.version as number | undefined) ?? null, (v.status as string | undefined) ?? null, contentHash, rev, v, p.userId],
+      );
+    },
+  },
   trial: {
     table: 'nm_trials',
     key: 'id',
@@ -445,6 +483,8 @@ async function caregiverFilter(db: Db, p: Principal, changes: PullChange[]): Pro
     if (ch.entity === 'participant') return linked.includes(ch.entityId);
     if (ch.entity === 'note') return v.kind === 'summary' && linked.includes(String(v.patientId));
     if (ch.entity === 'rehab_record') return caregiverMayRead(v as unknown as RehabRecord, linked);
+    // The family tablet needs to know whether trials are recorded for its child — nothing else from the lab
+    if (ch.entity === 'lab_record') return (v.kind === 'trial_recording' || v.kind === 'practice_trials') && linked.includes(String(v.participantId));
     return false;
   });
 }

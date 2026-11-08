@@ -121,20 +121,27 @@ Everything runs on real data with identical code:
   - A slow learning curve's time constant is unidentifiable at 8 sessions (E4).
   - Forgetting is unidentifiable on regular schedules (E5).
 - **Dose comes from caregiver reports**, or is an explicit assumption.
-- **Lab records are local to one browser.** No team sync or server table yet.
-- **No trial-level practice data are stored,** so multi-rate learning models cannot be applied.
 - **Only Chromium was tested.** Cross-engine floating-point differences are tolerated by 8-digit hashing, but untested.
-- **Kazakh strings fall back to Russian** for the lab, as for the research module.
-- **The literature review is targeted, not systematic.** Full texts were not re-read in this session; metadata were verified.
+- **The literature review is targeted, not systematic.** Claims were checked against abstracts, and two key full texts were read (see the addendum below).
+
+## 9a. Addendum — second pass, 8 November (the open items)
+
+| Item | Status |
+|---|---|
+| **Reliability of metrics in children** | **Still not established.** It needs real children measured twice. Implemented instead: `lab/reliability.ts` computes ICC(A,1) with 95 % CI, SEM and MDC95 per movement × side × metric from the first two included sessions ≤ N days apart with **no practice recorded between them**. It reports how many pairs were excluded and why, and says "insufficient" below 10 participants (Koo & Li). Shown on the Lab overview. Recovery test: true ICC ≈ 0.96, SEM ≈ 3 recovered from 40 synthetic participants. |
+| **Team sync of lab records** | **Done.** Entity `lab_record`, migration `0003_lab`, shared hash-checking validator, DB immutability trigger, caregiver limits. `server/lab.test.ts`: 4 tests on PGlite. Not run against a live PostgreSQL, like the rest of the server. |
+| **Stored practice trials** | **Done, consent-gated.** Child-mode practice saves each repetition's peak, target and validity, only when a professional enabled recording and (clinic) an active study consent exists; the adult sees a notice. The Twin page fits no-learning / single-rate / fast + slow trial models with profile intervals. **No real practice trials exist yet.** The fast + slow fit uses deterministic dynamics, which `albert2018` found unreliable for hidden states: exploratory until a stochastic EM fit is added. |
+| **Kazakh** | **Done for the lab** (all 555 strings, type-enforced). Written without a native-speaker review: terminology needs one before clinical or publication use. |
+| **Validation of this pass** | `vitest run`: **444 passed in 37 files** (+14: server lab sync, practice trials, reliability). Playwright lab, rehab (child practice) and layout/accessibility suites: **13 passed** on a fresh build. `tsc` and `eslint` are clean for all code of this work; at the time of writing, a separate in-progress module in the same folder (`src/lab/coord`) had one unused-variable error, which is not part of this work. |
+| **Full-paper check** | **Done at abstract level for 82/85 sources; full text for 2.** 9 claims corrected, including one unsupported claim (`burtner2014`) and the `albert2018` method caveat. See [claim-verification.md](claim-verification.md). |
 
 ## 10. Next research milestones
 
 1. **Reliability and agreement study** (Template C): MDC per metric. This is the prerequisite for any change claim.
 2. **Template A pilot**: 12 weekly sessions × 5 repetitions, a designated no-practice retention delay and a practice log. Freeze the protocol first.
 3. **Software**:
-   - sync lab records (server table, migration, outbox entity);
-   - store practice trials with target and feedback (enables dual-rate models and Q5, Q8);
+   - stochastic state-space (EM) fit for practice trials, after albert2018;
    - prospective forecast-coverage table;
-   - Kazakh translation review.
+   - native-speaker review of the Kazakh strings.
 4. **Group analysis** in R or Python from the exports. A hierarchical model once ≥ 15 participants × ≥ 5 sessions exist.
 5. **Representation research** only after the readiness gates are met (foundation-model-roadmap.md).

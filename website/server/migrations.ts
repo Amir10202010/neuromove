@@ -14,11 +14,15 @@
 //   changes (ordered change feed for pull), idempotency (op ledger), audit_events (who/what/when)
 // Every synced row keeps the exact client payload (jsonb) next to typed, indexed columns.
 //
+// 0003_lab (computational motor-learning lab):
+//   teams ─< lab_records (protocol versions, frozen analysis runs, practice-trial sets, recording settings);
+//   runs, trial sets and settings are immutable, a protocol may change only its status — enforced by a trigger
 // 0002_rehab (Functional Progression System):
 //   teams ─< rehab_records (ten kinds, one table; immutable kinds enforced by trigger)
 //   users ─< caregiver_links >─ participants  (caregivers see only the children they are linked to)
 
 import { IMMUTABLE_KINDS, REHAB_KINDS } from '../src/rehab/model';
+import { LAB_KINDS } from '../src/lab/integrity';
 
 export interface Migration {
   id: string;
@@ -361,6 +365,46 @@ end;
 $$ language plpgsql;
 create or replace trigger nm_rehab_records_immutable before update on nm_rehab_records
   for each row execute function nm_rehab_immutable();
+`,
+  },
+  {
+    id: '0003_lab',
+    sql: `
+-- Computational motor-learning lab. Typed columns for querying, the exact payload (with its own hashes) for the rest.
+create table if not exists nm_lab_records (
+  id text primary key,
+  team_id uuid not null references nm_teams(id),
+  kind text not null check (kind in (${LAB_KINDS.map((k) => `'${k}'`).join(', ')})),
+  participant_id text references nm_participants(id),
+  protocol_id text,
+  version integer check (version is null or version >= 1),
+  status text,
+  content_hash text,${RECORD_COLUMNS},
+  unique (protocol_id, version)
+);
+create index if not exists nm_lab_records_team_kind on nm_lab_records(team_id, kind);
+create index if not exists nm_lab_records_participant on nm_lab_records(participant_id);
+
+-- Historical integrity in the database itself, also against direct SQL: runs, practice-trial sets and
+-- recording settings never change; a protocol version keeps its definition and moves only forward in status.
+create or replace function nm_lab_immutable() returns trigger as $$
+begin
+  if new.kind <> old.kind or new.participant_id is distinct from old.participant_id or new.team_id <> old.team_id or new.deleted_at is not null then
+    raise exception 'lab record % identity is immutable', old.id using errcode = 'P0001';
+  end if;
+  if old.kind <> 'learning_protocol' and new.payload is distinct from old.payload then
+    raise exception 'lab record % (%) is immutable', old.id, old.kind using errcode = 'P0001';
+  end if;
+  if old.kind = 'learning_protocol' and (new.payload->'def' is distinct from old.payload->'def'
+      or new.payload->>'defHash' is distinct from old.payload->>'defHash'
+      or not (new.status = old.status or (old.status = 'draft' and new.status in ('frozen', 'archived')) or (old.status = 'frozen' and new.status = 'archived'))) then
+    raise exception 'lab protocol % definition is immutable', old.id using errcode = 'P0001';
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+create or replace trigger nm_lab_records_immutable before update on nm_lab_records
+  for each row execute function nm_lab_immutable();
 `,
   },
 ];

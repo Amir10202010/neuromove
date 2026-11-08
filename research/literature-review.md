@@ -12,8 +12,13 @@ NeuroMove Computational Motor Learning Lab · 8 November 2026 · keys refer to [
 5. One candidate was dropped because it could not be verified: a "digital twin in cardiology" review.
 6. For two book-chapter or consensus records, Crossref holds no author list: `kitago2013` and `rosenbaum2007`. Their authors in the bibliography are not Crossref-verified.
 
+**Claim check (second pass, same day).**
+- Every attributed claim was checked against the source's own text: abstracts for 82 of 85 entries, plus full texts where the abstract could not settle the claim.
+- 9 claims were corrected, including one a source does not support (`burtner2014`) and one concerning the estimation method NeuroMove uses (`albert2018`).
+- Per-source verdicts are in [claim-verification.md](claim-verification.md).
+
 **What was not done.**
-- Full texts were **not re-read** in this session. The findings attributed below are summaries of well-known results. Check them against the full text before quoting them externally.
+- Most sources were checked at the **abstract** level only. Only `melendez2021` and `balasubramanian2015` were read in full, and `bland1986` and `salmoni1984` could not be checked. Quote nothing externally without reading the full text.
 - No systematic search protocol (PRISMA) was run, and no risk-of-bias assessment was made.
 - This is a **targeted narrative review** that supports design decisions. It is not a systematic review.
 - 78 sources are cited, more than the 30–50 the mandate asked for. Not all are equally central. [`evidence-matrix.md`](evidence-matrix.md) marks the ones that carry a design decision.
@@ -44,9 +49,12 @@ Practice conditions that depress performance during acquisition can improve rete
 - It shows within-session ("online") and between-session ("offline") components (`reis2009`), including rapid offline gains during rest periods (`bonstrup2019`).
 - Reviews: `krakauer2019`, `kitago2013`.
 
-**Identifiability is the binding constraint.** Albert & Shadmehr (`albert2018`) show that fast/slow parameters are reliably estimated only from paradigms that probe them. That means dense trial-by-trial data with an error signal, and ideally error-clamp or reversal phases.
+**Estimating the hidden processes is the binding constraint.**
+- Albert & Shadmehr (`albert2018`) found that fitting a *deterministic* fast/slow model by least squares often gives unrealistic estimates of the hidden states.
+- Behaviour was better explained when error-based learning and movement production were both treated as *stochastic* processes, estimated with an EM algorithm.
+- **NeuroMove's dual-rate fit is the least-squares kind they criticise** (measurement noise only). Its estimates are therefore conditional on that simplification. A stochastic state-space fit by EM is the next step before any trial-level result is interpreted (model-validation.md §5).
 
-Our simulation E6 reproduces this:
+That fast/slow rates also need dense trial-by-trial data with an error signal is our own simulation result (E6), not a claim taken from `albert2018`:
 
 | Design | All four rates identifiable |
 |---|---|
@@ -74,7 +82,7 @@ Motor variability is not only noise. Its temporal structure relates to learning 
 - Schweighofer et al. (`schweighofer2018`) dissociate learning from recovery with models.
 - Reinkensmeyer et al. (`reinkensmeyer2016`) set out the agenda for computational neurorehabilitation.
 
-Practice dose in therapy is low and variable (`lang2009`), and dose–response relationships are an open question (`lohse2014`). Experience-dependent plasticity principles (`kleim2008`) motivate modelling dose explicitly.
+Practice dose in therapy is low and variable (`lang2009`). In adults after stroke, a meta-analysis found that more scheduled therapy time predicts greater improvement (`lohse2014`); the shape of that relationship, and whether it holds for children, remain open. Experience-dependent plasticity principles (`kleim2008`) motivate modelling dose explicitly.
 
 **Design consequence.** NeuroMove's mechanistic candidate is a single-rate *learning–retention* model, after `casadio2012`. Practice dose drives it; the dose comes from practice records or, when there are none, from an explicit assumption.
 
@@ -105,7 +113,7 @@ The platform therefore reports retention evidence only when the schedule can car
 - **Position** from double integration drifts quadratically.
 - **Joint angles** depend on sensor-to-segment alignment.
 
-**Evidence on accuracy.** Systematic reviews report good validity and reliability for joint angles in many settings, with errors that depend strongly on method, joint and task (`poitras2019`, `picerno2017`). Upper-body wearable rehabilitation systems are reviewed in `wang2017`, and everyday-life applications in `rast2020`.
+**Evidence on accuracy.** A systematic review judged IMUs a valid tool for whole-body range of motion. Validity was higher for simple tasks and for lower-limb joints, and there were too few reliability studies for firm conclusions (`poitras2019`). A methodological review covers lower-limb approaches (`picerno2017`). Upper-limb accuracy in children is therefore not established by the literature either. Upper-body wearable rehabilitation systems are reviewed in `wang2017`, and everyday-life applications in `rast2020`.
 
 **Design consequence.** NeuroMove computes no position and no heading, and every metric states its validity condition ([measurement-model.md](measurement-model.md)). The device's agreement with a goniometer is **measured by the existing validation module, not assumed**.
 
@@ -113,11 +121,11 @@ The platform therefore reports retention evidence only when the schedule can car
 
 **Smoothness.** Balasubramanian et al. analysed smoothness metrics:
 - `balasubramanian2012` proposes SPARC.
-- `balasubramanian2015` compares metrics and recommends SPARC and log-dimensionless jerk under conditions.
-- Melendez-Calderon et al. (`melendez2021`) show that IMU-based smoothness needs care. Accelerometer-based jerk is contaminated by gravity, and angular-velocity SPARC is preferred.
+- `balasubramanian2015` reviews smoothness measures and, because of serious problems with log-dimensionless jerk (LDLJ), recommends SPARC over LDLJ.
+- Melendez-Calderon et al. (`melendez2021`) show that SPARC and LDLJ are inappropriate for *translational* IMU data, but both are good candidates for *rotational* kinematics measured by IMUs. An acceleration-based variant (LDLJ-A) depends on the accuracy of the orientation estimate. The appropriate method depends on movement type and orientation accuracy.
 - Submovement counts track recovery (`rohrer2002`).
 
-**Consensus recommendations** for kinematic assessment of upper-limb quality favour a small set of metrics: movement time, smoothness, peak velocity and trunk displacement (`kwakkel2019`). A systematic review shows great heterogeneity in metrics (`schwarz2019`).
+**Consensus recommendations** for standardised kinematic assessment of upper-limb quality after stroke specify protocols: 2D planar reaching, finger individuation, grip strength, precision grip and a 3D drinking task (`kwakkel2019`, abstract; the full text, which lists the metrics, was not accessible). In **children with hemiplegic CP**, the most frequently reported differences are longer movement durations, slower movement speed and reduced trajectory straightness, with increased trunk flexion compensating for reduced elbow extension and supination (`jaspers2009`). That paediatric evidence is what supports NeuroMove's choice of duration, speed and trunk metrics. A systematic review shows great heterogeneity in metrics (`schwarz2019`).
 
 **Compensation.** Trunk recruitment during reaching is the classic compensation (`cirstea2000`), and recovery must be distinguished from compensation (`levin2009`).
 
@@ -139,7 +147,7 @@ The platform therefore reports retention evidence only when the schedule can car
 **State-space models.**
 - Kalman filtering and smoothing: `kalman1960`, `durbin2012`.
 - Maximum likelihood, including EM: `shumway1982`.
-- Parametric bootstrap for state-space models: `stoffer1991`.
+- Bootstrap for the precision of state-space ML estimates: `stoffer1991` (they resample the innovations; NeuroMove uses a parametric variant).
 
 **Identifiability.** Profile likelihood separates structural from practical non-identifiability (`raue2009`). NeuroMove reports every interpretable parameter with a profile interval and flags open ones.
 
@@ -191,7 +199,7 @@ The platform therefore reports retention evidence only when the schedule can car
 
 **Upper-limb quantitative measurement in hemiplegic CP** is reviewed by Jaspers et al. (`jaspers2009`).
 
-**Motor learning in children** differs from adults, for example in feedback frequency effects (`sullivan2008`). It differs again in children with hemiplegic CP (`burtner2014`, `robert2017`).
+**Motor learning in children** differs from adults in feedback frequency effects (`sullivan2008`). Reduced feedback improved adults' retention consistency, but children who practised with reduced feedback retained *less* accurately than children with 100 % feedback. Children with hemiplegic CP used feedback *similarly* to typically developing children (100 % feedback was never worse), with lower accuracy (`burtner2014`). A review found no consistent guidance on feedback modality or frequency for children (`robert2017`). **The adult "reduced feedback is better" result must not be assumed for children.**
 
 **Research with minors.** It requires guardian permission and child assent, with special protections (`diekema2006`). The existing Functional Progression System already enforces ethics approval and guardian permission for study enrolment.
 

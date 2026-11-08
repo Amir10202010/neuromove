@@ -72,17 +72,37 @@ flowchart TB
 - It adds one store, `lab` (keyPath `id`; indexes workspace, kind, participantId), for `learning_protocol` versions and `analysis_run` records.
 - Earlier stores are untouched; `src/data/storage.test.ts` tests v3 → v4.
 
-**Lab records are local to the browser in this version.** They are not part of team sync: no outbox ops, no server table. Reasons:
-- frozen runs are derived data, reproducible from their own snapshot;
-- adding a synced entity requires a server migration, validators and the API bundle, which is the next step;
-- the UI says "stored on this device".
+**Record kinds in `lab`:**
 
-**Write path.**
-1. A pure builder runs (`makeVersion`, `createRun`).
-2. `putResearch('lab', …)` writes the record.
-3. Only then does the in-memory state change.
+| Kind | Purpose |
+|---|---|
+| `learning_protocol` | study protocol versions |
+| `analysis_run` | frozen analyses |
+| `practice_trials` | one sitting of child-mode practice: each repetition's peak, target and validity |
+| `trial_recording` | a professional's decision to record practice trials for a participant (append-only; newest wins) |
 
-A protocol version may change only its status (draft → frozen → archived, `canTransition`); a frozen definition never changes.
+**Team sync (added 8 November, second pass).** Lab records travel as the sync entity `lab_record`, stored server-side in `nm_lab_records` (migration `0003_lab`).
+
+- **One shared validator.** `src/lab/integrity.ts` is dependency-light and runs in the browser, on pulled changes and on the server. It checks shape **and hashes**:
+  - a protocol whose definition no longer matches `defHash` is refused;
+  - so is a run whose snapshot, configuration or results no longer match their hashes;
+  - so is a practice-trial set whose `contentHash` is wrong.
+- **Immutability, also against direct SQL.** A trigger enforces that runs, trial sets and recording settings never change, and that a protocol keeps its definition and moves only draft → frozen → archived. Records are never deleted.
+- **Demo and simulated content never reach the server.** Both browser and server refuse them.
+- **Caregiver accounts** may push only `practice_trials` of a linked child, and pull only that child's `trial_recording` and `practice_trials`. Everything else in the lab is withheld.
+- **Tests:** `server/lab.test.ts` (PGlite), `src/lab/practice.test.ts`.
+
+**Write path** (`features/motorlab/store.ts`; for practice trials, `lab/practice.ts`, used by child mode):
+1. A pure builder runs (`makeVersion`, `createRun`, `trialSetFromEngine`).
+2. The integrity check runs, plus the transition rule for updates.
+3. The record and, in the clinic workspace, its outbox op are written in **one** IndexedDB transaction.
+4. Only then does the in-memory state change.
+
+**Practice-trial recording.** It is consent-gated (`trialRecordingStatus`). In the clinic it requires both:
+- the newest `trial_recording` setting is enabled;
+- an active study consent for the participant exists.
+
+The adult on the child's device sees "Practice trials are recorded for the study — not a clinical measurement". The Twin page shows the switch and fits trial-level models (`fitTargetedPractice`): no learning, single-rate, and fast + slow.
 
 ## 4. Privacy and AI boundary
 

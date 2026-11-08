@@ -14,7 +14,7 @@ import { LinkButton } from '../../ui/Button';
 import { EmptyState } from '../../ui/EmptyState';
 import { useRT, fmtDeg } from './i18n';
 import { SaveStatus } from './SaveStatus';
-import { LabEntry } from '../motorlab/LabOverviewPage';
+import { LabEntry } from '../motorlab/LabEntry';
 
 export function ResearchPage() {
   const rt = useRT();

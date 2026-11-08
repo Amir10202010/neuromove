@@ -101,7 +101,7 @@ These are software checks against simulated ground truth, **not** a validation o
 | trunk_lag | lag (±0.5 s) maximising the cross-correlation of tilt rate and inclination rate | ≥ 50 samples and r ≥ 0.5 |
 
 **Not computed:**
-- accelerometer-based jerk metrics, because gravity contaminates them (melendez2021);
+- accelerometer-based jerk metrics: SPARC/LDLJ are inappropriate for translational IMU data and the acceleration variant depends on orientation accuracy (melendez2021);
 - angular acceleration from the 20 Hz trace;
 - elbow inter-segment kinematics in the lab layer, because the existing pipeline's calibrated elbow angle is used for elbow tasks.
 

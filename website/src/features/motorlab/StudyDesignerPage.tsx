@@ -114,7 +114,7 @@ export function StudyDesignerPage() {
         </div>
         <div className="mlrow">
           <Button icon={<Plus />} onClick={() => { setBase(null); setDef(emptyProtocol()); setPlan(null); setMsg(null); }}>{lt('New protocol')}</Button>
-          <span className="mlmuted">{lt('Protocols are stored on this device (not yet part of team sync).')}</span>
+          <span className="mlmuted">{lt('Protocols are saved on this device and shared with the team when cloud sync is on (clinic workspace only).')}</span>
         </div>
       </section>
 

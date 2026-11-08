@@ -1,9 +1,10 @@
-// Strings of the motor-learning lab. Keys are the English text; Russian is required for every key (a missing
-// translation is a build error, because LKey = keyof RU). Kazakh falls back to Russian, as in the research module —
-// Kazakh scientific terminology needs a native reviewer.
+// Strings of the motor-learning lab. Keys are the English text; Russian and Kazakh are required for every key (a
+// missing translation is a build error: LKey = keyof RU, and i18n-kk.ts is a Record<LKey, string>). The Kazakh
+// scientific terminology still needs a native-speaker review (see i18n-kk.ts).
 
 import { useMemo } from 'react';
 import { useAppStore } from '../../state/appStore';
+import { KK } from './i18n-kk';
 
 const RU = {
   '"No change" must stay a candidate model.': '«Без изменений» должна оставаться моделью-кандидатом.',
@@ -275,7 +276,7 @@ const RU = {
   'Processing comparison': 'Сравнение обработки',
   'Protocol definition': 'Определение протокола',
   Protocols: 'Протоколы',
-  'Protocols are stored on this device (not yet part of team sync).': 'Протоколы хранятся на этом устройстве (пока не входят в командную синхронизацию).',
+  'Protocols are saved on this device and shared with the team when cloud sync is on (clinic workspace only).': 'Протоколы сохраняются на этом устройстве и передаются команде, когда включена облачная синхронизация (только пространство клиники).',
   Provenance: 'Происхождение',
   'Quality / exclusion': 'Качество / исключение',
   Question: 'Вопрос',
@@ -558,6 +559,43 @@ const RU = {
   '{sessions} session(s) failed a quality rule and are excluded from model fitting (see evidence).': 'Сеансов с нарушением правил качества: {sessions}; они исключены из подгонки (см. доказательства).',
   '{tests} designated retention test(s) and {delayed} other delayed observation(s).': 'Назначенных тестов сохранения: {tests}; других отсроченных наблюдений: {delayed}.',
   '|a| at rest, g': '|a| в покое, g',
+  'Practice trials': 'Попытки занятий',
+  'Recording is on': 'Запись включена',
+  'Recording is off': 'Запись выключена',
+  'When on, every repetition of child-mode practice with live feedback is stored with its target: a research record, not a clinical measurement. The adult on the device sees that recording is on.': 'Когда запись включена, каждый повтор детского занятия с подсказкой датчиков сохраняется вместе с целью: это исследовательская запись, а не клиническое измерение. Взрослый у устройства видит, что запись идёт.',
+  'Needs an active study consent for this participant (Rehabilitation → Studies).': 'Нужно действующее согласие на участие в исследовании (Реабилитация → Исследования).',
+  'The consent is no longer active: nothing is recorded.': 'Согласие больше не действует: ничего не записывается.',
+  'Stop recording': 'Остановить запись',
+  'Record practice trials': 'Записывать попытки занятий',
+  'No practice trials stored for this participant.': 'Для этого участника нет сохранённых попыток занятий.',
+  'sittings': 'занятий',
+  'trials with a target': 'попыток с целью',
+  'valid': 'пригодных',
+  'Peak angle per practice trial': 'Пиковый угол в каждой попытке',
+  'Trial': 'Попытка',
+  'Rate parameters (95 % profile)': 'Параметры скорости (профиль 95 %)',
+  'No learning': 'Без научения',
+  'Single-rate learning': 'Научение с одной скоростью',
+  'Fast + slow learning': 'Быстрое + медленное научение',
+  'Sittings are concatenated in time order; forgetting between sittings is not modelled. Adaptation models applied to range of motion are exploratory: range is limited by impairment, not only by error correction.': 'Занятия соединены по порядку времени; забывание между занятиями не моделируется. Модели адаптации для объёма движения — поисковые: объём ограничен нарушением, а не только исправлением ошибки.',
+  'Fewer than {n} valid trials: only "no learning" is fitted.': 'Меньше {n} пригодных попыток: подгоняется только модель «без научения».',
+  'Measurement reliability (test–retest)': 'Надёжность измерения (тест — ретест)',
+  'Computed from this workspace: the first two included sessions of each participant at most the chosen number of days apart, with no practice recorded between them. ICC(A,1), SEM and MDC95 appear only when such pairs exist. This is the estimate later protocols can use as the external MDC.':
+    'Считается по этому пространству: первые два включённых сеанса каждого участника не дальше выбранного числа дней друг от друга и без записанных занятий между ними. ICC(A,1), SEM и MDC95 появляются, только когда такие пары есть. Эту оценку следующие протоколы могут использовать как внешний MDC.',
+  'Longest test–retest interval, days': 'Наибольший интервал тест — ретест, дней',
+  'Also use pairs with unknown practice in between': 'Учитывать и пары, где занятия между сеансами неизвестны',
+  Pairs: 'Пары',
+  Sufficiency: 'Достаточность',
+  'Excluded pairs': 'Исключённые пары',
+  'practice recorded': 'были занятия',
+  'practice unknown': 'занятия неизвестны',
+  'too far apart': 'слишком далеко',
+  'Reliability of these IMU metrics in children is not established until real test–retest data reach adequate size. Simulated sessions in the demo are not evidence.':
+    'Надёжность этих показателей IMU у детей не установлена, пока реальных данных тест — ретест не наберётся достаточно. Смоделированные сеансы демо доказательством не являются.',
+  'no data': 'нет данных',
+  'insufficient (< 10 participants)': 'недостаточно (< 10 участников)',
+  'limited (10–29)': 'ограниченно (10–29)',
+  'adequate (≥ 30)': 'достаточно (≥ 30)',
 } as const;
 
 export type LKey = keyof typeof RU;
@@ -569,7 +607,7 @@ function interpolate(s: string, params?: Record<string, string | number>): strin
 
 export function useLT(): LT {
   const locale = useAppStore((s) => s.settings.locale);
-  return useMemo<LT>(() => (key, params) => interpolate(locale === 'en' ? key : RU[key] ?? key, params), [locale]);
+  return useMemo<LT>(() => (key, params) => interpolate(locale === 'en' ? key : locale === 'kk' ? (KK[key] ?? RU[key] ?? key) : (RU[key] ?? key), params), [locale]);
 }
 
 /** Every key, for the completeness test. */

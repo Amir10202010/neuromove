@@ -11,7 +11,8 @@
 import type { Workspace } from '../data/models';
 import { analyzeSeries, type AnalysisConfig, type SeriesAnalysis } from './analysis';
 import type { LearningSeries } from './dataset';
-import { canonicalJson, hashOf, sha256Hex } from './hash';
+import { hashOf } from './hash';
+import { RESULT_HASH_SCHEME, resultsHash } from './integrity';
 import type { LearningProtocolVersion } from './protocol';
 import { LAB_ENGINE_VERSION, LAB_VERSIONS } from './version';
 
@@ -39,19 +40,8 @@ export interface AnalysisRun {
   simulated: boolean;
 }
 
-/**
- * Results are hashed through canonical JSON with numbers rounded to 8 significant digits: non-finite numbers
- * become null (as in any JSON export) and last-bit floating-point differences between JavaScript engines do not
- * count as a different result. A real algorithm change moves numbers far more than 1e-8 relative.
- */
-export const RESULT_DIGITS = 8;
-/**
- * Hash scheme 1: canonical JSON of the results WITHOUT the per-series version labels (versions are compared
- * separately), numbers at 8 significant digits. Stored in every run so that a future scheme cannot make an old run
- * look tampered.
- */
-export const RESULT_HASH_SCHEME = 1;
-export const resultsHash = (r: readonly SeriesAnalysis[]): string => sha256Hex(canonicalJson(r.map((x) => ({ ...x, versions: undefined })), RESULT_DIGITS));
+// Result hashing lives in integrity.ts (shared with the server validator).
+export { RESULT_DIGITS, RESULT_HASH_SCHEME, resultsHash } from './integrity';
 
 export function createRun(o: {
   id: string;

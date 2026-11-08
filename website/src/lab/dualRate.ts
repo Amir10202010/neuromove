@@ -137,3 +137,144 @@ export function smithParadigm(o: { baseline?: number; adapt?: number; reverse?: 
   const clamp = [...Array(b + a + r).fill(false), ...Array(c).fill(true)];
   return { p, clamp };
 }
+
+// ── Targeted practice (child-mode practice trials) ─────────────────────────────────────────────
+//
+// Practice trials have a target T(n) and a measured peak y(n). The output starts at the child's own level c, so the
+// learning state is a deviation from it:  z(n) = c + x(n),  e(n) = T(n) − z(n),  y(n) = z(n) + v(n).
+//   no_learning   x ≡ 0                                   (c, σ)
+//   single_rate   x(n+1) = A·x(n) + B·e(n)                (A, B, c, σ)
+//   dual_rate     fast + slow processes as above          (A_f, A_s, B_f, B_s, c, σ)
+// Invalid trials advance the dynamics (the child still practised) but are not observed. Sittings are concatenated
+// in time order; forgetting between sittings is NOT modelled (stated in every result).
+// This is an exploratory application of adaptation models to range of motion: range is limited by impairment,
+// not only by error correction. The comparison with "no learning" and the identifiability check decide what is shown.
+
+export interface TargetedTrial {
+  target: number;
+  /** Measured peak, or null when the trial failed quality checks. */
+  y: number | null;
+}
+
+export type PracticeModel = 'no_learning' | 'single_rate' | 'dual_rate';
+
+export interface PracticeModelFit {
+  model: PracticeModel;
+  k: number;
+  nll: number;
+  aicc: number;
+  /** Natural parameters by name. */
+  params: Record<string, number>;
+  /** Profile intervals for the rate parameters (dual and single rate). */
+  profiles: Record<string, { lo: number; hi: number; open: boolean }>;
+  identifiable: boolean;
+}
+
+export interface TargetedPracticeResult {
+  trials: number;
+  observed: number;
+  fits: PracticeModelFit[];
+  selected: PracticeModel;
+  /** Model-predicted output on every trial for the selected model. */
+  predicted: number[];
+  notes: ('sittings_concatenated' | 'too_few_trials' | 'no_target')[];
+}
+
+/** Minimum observed trials before any learning model is fitted (E6: dense data are needed for the dual-rate model). */
+export const MIN_PRACTICE_TRIALS = 30;
+
+function practiceOutput(model: PracticeModel, q: Record<string, number>, trials: readonly TargetedTrial[]): number[] {
+  const c = q.c as number;
+  let xf = 0;
+  let xs = 0;
+  const out: number[] = [];
+  for (const tr of trials) {
+    const z = c + xf + xs;
+    out.push(z);
+    const e = tr.target - z;
+    if (model === 'single_rate') xs = (q.A as number) * xs + (q.B as number) * e;
+    else if (model === 'dual_rate') {
+      xf = (q.Af as number) * xf + (q.Bf as number) * e;
+      xs = (q.As as number) * xs + (q.Bs as number) * e;
+    }
+  }
+  return out;
+}
+
+function decode(model: PracticeModel, u: readonly number[]): Record<string, number> {
+  if (model === 'no_learning') return { c: u[0] as number, sigma: Math.exp(u[1] as number) };
+  if (model === 'single_rate') return { A: sig(u[0] as number), B: sig(u[1] as number), c: u[2] as number, sigma: Math.exp(u[3] as number) };
+  const As = sig(u[0] as number);
+  const Bf = sig(u[2] as number);
+  return { As, Af: As * sig(u[1] as number), Bf, Bs: Bf * sig(u[3] as number), c: u[4] as number, sigma: Math.exp(u[5] as number) };
+}
+
+function practiceNLL(model: PracticeModel, u: readonly number[], trials: readonly TargetedTrial[]): number {
+  const q = decode(model, u);
+  const z = practiceOutput(model, q, trials);
+  const v = (q.sigma as number) ** 2;
+  let nll = 0;
+  trials.forEach((tr, i) => {
+    if (tr.y === null) return;
+    const e = tr.y - (z[i] as number);
+    nll += 0.5 * (LOG_2PI + Math.log(v) + (e * e) / v);
+  });
+  return nll;
+}
+
+export function fitTargetedPractice(trials: readonly TargetedTrial[], o: { profiles?: boolean } = {}): TargetedPracticeResult | null {
+  const obs = trials.filter((t) => t.y !== null).map((t) => t.y as number);
+  if (!obs.length) return null;
+  const notes: TargetedPracticeResult['notes'] = ['sittings_concatenated'];
+  const c0 = obs.slice(0, 3).reduce((a, b) => a + b, 0) / Math.min(3, obs.length);
+  const sd0 = Math.max(1, Math.sqrt(obs.reduce((a, v) => a + (v - c0) ** 2, 0) / Math.max(1, obs.length - 1)));
+  const n = obs.length;
+  const models: PracticeModel[] = n >= MIN_PRACTICE_TRIALS ? ['no_learning', 'single_rate', 'dual_rate'] : ['no_learning'];
+  if (n < MIN_PRACTICE_TRIALS) notes.push('too_few_trials');
+  const fits: PracticeModelFit[] = [];
+  for (const m of models) {
+    const starts: number[][] =
+      m === 'no_learning'
+        ? [[c0, Math.log(sd0)]]
+        : m === 'single_rate'
+          ? [[logit(0.95), logit(0.05), c0, Math.log(sd0)], [logit(0.99), logit(0.2), c0, Math.log(sd0)]]
+          : STARTS.map((s) => [logit(s.As), logit(s.Af / s.As), logit(s.Bf), logit(s.Bs / s.Bf), c0, Math.log(sd0)]);
+    const f = (u: number[]) => practiceNLL(m, u, trials);
+    const r = minimize(f, starts, { maxIterations: 4000 });
+    const k = starts[0]!.length;
+    const aic = 2 * k + 2 * r.fx;
+    const params = decode(m, r.x);
+    const profiles: PracticeModelFit['profiles'] = {};
+    const rateKeys = m === 'single_rate' ? ['A', 'B'] : m === 'dual_rate' ? ['Af', 'As', 'Bf', 'Bs'] : [];
+    if (o.profiles !== false) {
+      const thr = r.fx + CHI2_1_95 / 2;
+      for (const key of rateKeys) {
+        const inside: number[] = [];
+        const grid = Array.from({ length: 31 }, (_, i) => 0.001 + (0.9989 * i) / 30);
+        for (const g of grid) {
+          const h = (w: number[]) => f(w) + 1e4 * (((decode(m, w)[key] as number) - g) / 0.01) ** 2;
+          const rr = minimize(h, [r.x], { maxIterations: 1500 });
+          if (Math.abs((decode(m, rr.x)[key] as number) - g) < 0.01 && f(rr.x) <= thr) inside.push(g);
+        }
+        const lo = inside.length ? Math.min(...inside) : (params[key] as number);
+        const hi = inside.length ? Math.max(...inside) : (params[key] as number);
+        profiles[key] = { lo, hi, open: inside.length > 0 && (lo <= grid[1]! || hi >= grid[grid.length - 2]! || hi - lo > 0.5) };
+      }
+    }
+    fits.push({
+      model: m,
+      k,
+      nll: r.fx,
+      aicc: n - k - 1 > 0 ? aic + (2 * k * (k + 1)) / (n - k - 1) : Infinity,
+      params,
+      profiles,
+      identifiable: rateKeys.every((key) => profiles[key] && !profiles[key]!.open),
+    });
+  }
+  // Same conservative rule as the session models: within ΔAICc ≤ 2 prefer identifiable, then fewer parameters
+  const best = Math.min(...fits.map((x) => x.aicc));
+  const near = fits.filter((x) => x.aicc - best <= 2);
+  const pool = near.filter((x) => x.model === 'no_learning' || x.identifiable);
+  const chosen = (pool.length ? pool : near).sort((a, b) => a.k - b.k)[0]!;
+  return { trials: trials.length, observed: n, fits, selected: chosen.model, predicted: practiceOutput(chosen.model, chosen.params, trials), notes };
+}

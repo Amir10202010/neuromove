@@ -5,7 +5,7 @@
 // whether the sensors are delivering data. In the demo the simulator is used and labelled.
 
 import { Activity, CircleCheck, CircleX, X } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { EXERCISES, type ExerciseId } from '../../core/exercises';
 import type { Patient } from '../../data/models';
 import type { DeviceKind, Side } from '../../devices/types';
@@ -17,6 +17,11 @@ import { ConnectPanel } from '../session/ConnectPanel';
 import { controllerFor, release, retain } from '../research/controllers';
 import { exerciseLabel, useXT } from './common';
 import { useI18n } from '../../i18n';
+import { isLabRecord, trialRecordingStatus, type LabRecord } from '../../lab/records';
+import { storeTrialSet, trialSetFromEngine } from '../../lab/practice';
+import type { ConsentRecord } from '../../rehab/model';
+import { useRehabStore } from '../../rehab/store';
+import { scheduleSync } from '../../sync/engine';
 
 export interface LiveTarget {
   exercise: ExerciseId;
@@ -85,6 +90,41 @@ function LiveRun({ patient, target, kind, onClose, reduceMotion }: { patient: Pa
   }, [key]);
   const state = useControllerState(controller);
   const snap = useEngineSnapshot(controller.engine);
+  // Practice-trial recording for research: only when a professional enabled it for this child AND (clinic) an
+  // active consent exists. The adult sees the notice below; nothing is recorded otherwise.
+  const rehabRecords = useRehabStore((s) => s.records);
+  const [labRecords, setLabRecords] = useState<LabRecord[] | null>(null);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const startedAt = useRef(new Date());
+  useEffect(() => {
+    const st = useAppStore.getState().storage();
+    if (!st) return;
+    let alive = true;
+    void st.getAllResearch('lab').then((all) => {
+      if (alive) setLabRecords(all.filter(isLabRecord));
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+  const consents = rehabRecords.filter((r): r is ConsentRecord => r.kind === 'consent');
+  const recording = labRecords ? trialRecordingStatus(patient.id, patient.workspace, labRecords, consents) : null;
+  const stop = async () => {
+    const engine = controller.engine;
+    const st = useAppStore.getState().storage();
+    if (recording?.enabled && engine && st) {
+      const set = trialSetFromEngine({ result: engine.result(), workspace: patient.workspace, participantId: patient.id, exercise: target.exercise, side: target.side, targetDeg: target.targetDeg, startedAt: startedAt.current, endedAt: new Date(), consentId: recording.consent?.id ?? null, simulated: kind === 'simulator' || state?.device.info?.simulated === true });
+      if (set) {
+        const ok = await storeTrialSet(st, set).catch(() => false);
+        if (!ok) {
+          setSaveFailed(true);
+          return;
+        }
+        if (set.workspace === 'clinic') scheduleSync();
+      }
+    }
+    onClose();
+  };
   const { angle, best } = useLiveAngle(controller);
   const simulated = kind === 'simulator' || state?.device.info?.simulated === true;
 
@@ -95,7 +135,9 @@ function LiveRun({ patient, target, kind, onClose, reduceMotion }: { patient: Pa
         <Activity aria-hidden className="rh-inline-icon" /> {xt('Live practice feedback — not saved as a measurement')}
         {simulated && <span className="badge badge--demo">{xt('simulator')}</span>}
       </span>
-      <button type="button" className="child-btn child-btn--stop rh-live__close" onClick={onClose}>
+      {recording?.enabled && <span className="rh-live__label" role="note">{xt('Practice trials are recorded for the study — not a clinical measurement')}</span>}
+      {saveFailed && <span className="rh-live__bad" role="alert">{xt('Practice trials were not saved.')}</span>}
+      <button type="button" className="child-btn child-btn--stop rh-live__close" onClick={() => void stop()}>
         <X aria-hidden /> {xt('Stop sensors')}
       </button>
     </div>

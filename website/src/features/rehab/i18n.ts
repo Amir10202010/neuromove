@@ -1069,6 +1069,8 @@ Object.assign(RU, {
   'At your target line': 'На твоей линии цели',
   'Your target line: {t}°': 'Твоя линия цели: {t}°',
   'Move as the therapist showed you.': 'Двигайся так, как показал специалист.',
+  'Practice trials are recorded for the study — not a clinical measurement': 'Попытки занятия записываются для исследования — это не клиническое измерение',
+  'Practice trials were not saved.': 'Попытки занятия не сохранились.',
 });
 
 Object.assign(KK, {
@@ -1091,6 +1093,8 @@ Object.assign(KK, {
   'At your target line': 'Мақсат сызығыңда',
   'Your target line: {t}°': 'Мақсат сызығың: {t}°',
   'Move as the therapist showed you.': 'Маман көрсеткендей қозғал.',
+  'Practice trials are recorded for the study — not a clinical measurement': 'Жаттығу әрекеттері зерттеу үшін жазылады — бұл клиникалық өлшем емес',
+  'Practice trials were not saved.': 'Жаттығу әрекеттері сақталмады.',
   Close: 'Жабу',
   left: 'сол',
   right: 'оң',
