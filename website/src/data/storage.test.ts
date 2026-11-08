@@ -56,16 +56,30 @@ describe('хранилище IndexedDB', () => {
     expect(loaded.sessions).toEqual([{ id: 's1', workspace: 'clinic', patientId: 'p1' }]);
     expect(await storage.listOutbox()).toEqual([]);
     expect(await storage.getAllResearch('trials')).toEqual([]);
-    // And a future v3 step on top of upgradeSchema still works
-    const v3 = await openDB('nm-test', 3, {
+    expect(await storage.getAllResearch('rehab')).toEqual([]);
+    // And a future v4 step on top of upgradeSchema still works
+    const v4 = await openDB('nm-test', 4, {
       upgrade: (db, old) => {
         upgradeSchema(db, old);
-        if (old < 3) db.createObjectStore('v3-only');
+        if (old < 4) db.createObjectStore('v4-only');
       },
     });
-    expect([...v3.objectStoreNames]).toContain('v3-only');
-    expect([...v3.objectStoreNames]).toContain('outbox');
-    v3.close();
+    expect([...v4.objectStoreNames]).toContain('v4-only');
+    expect([...v4.objectStoreNames]).toContain('outbox');
+    expect([...v4.objectStoreNames]).toContain('rehab');
+    v4.close();
+  });
+
+  it('v2 → v3 is additive: validation records and the outbox survive, the rehab store appears', async () => {
+    const v2 = await openDB('neuromove', 2, { upgrade: (db, old) => upgradeSchema(db, old, 2) });
+    await v2.put('trials', { id: 't1', sessionId: 'vs1', workspace: 'clinic' });
+    await v2.put('outbox', { opId: 'op-1', entity: 'trial', entityId: 't1', entityKey: 'trial:t1', state: 'pending' });
+    expect([...v2.objectStoreNames]).not.toContain('rehab');
+    v2.close();
+    const storage = await openStorage();
+    expect(await storage.getAllResearch('trials')).toEqual([{ id: 't1', sessionId: 'vs1', workspace: 'clinic' }]);
+    expect((await storage.listOutbox()).map((o) => o.opId)).toEqual(['op-1']);
+    expect(await storage.getAllResearch('rehab')).toEqual([]);
   });
 });
 

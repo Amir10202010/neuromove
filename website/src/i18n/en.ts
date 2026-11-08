@@ -47,6 +47,7 @@ export const en: typeof ru = {
 
   nav: {
     research: 'Research',
+    rehab: 'Rehabilitation',
     overview: 'Home',
     patients: 'Patients',
     sessions: 'Sessions',

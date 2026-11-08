@@ -9,18 +9,22 @@
 //   - rate limits on login, bootstrap, push (Upstash when configured, else per instance)
 //   - no-store caching, nosniff
 
-import { createSession, clearCookie, hashPassword, passwordProblem, principalFromToken, readCookie, revokeSession, ROLES, safeEqual, sessionCookie, verifyPassword, type Principal, type Role } from './auth';
+import { linkedParticipants, createSession, clearCookie, hashPassword, passwordProblem, principalFromToken, readCookie, revokeSession, ROLES, safeEqual, sessionCookie, verifyPassword, type Principal, type Role } from './auth';
 import type { Db } from './db';
 import { pendingMigrations } from './migrate';
 import type { Redis } from './redis';
 import { pull, push, type IncomingOp } from './sync';
 import { putRawChunk, listRawChunks } from './storage';
 import { PUSH_BATCH } from '../src/sync/types';
+import { aiEnabled, DEFAULT_GEMINI_MODEL, draftSummary, DraftError, geminiKeys, type FetchFn } from './ai';
+import { SUMMARY_LANGUAGES, validFactsPayload, type SummaryLanguage } from '../src/rehab/summary';
 
 export interface Deps {
   db: Db | null;
   redis: Redis;
   env: Record<string, string | undefined>;
+  /** fetch for optional AI summaries (tests inject a fake; production uses the global fetch). */
+  aiFetch?: FetchFn;
 }
 
 const MAX_BODY = 4 * 1024 * 1024;
@@ -85,7 +89,7 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
         dbState = 'error';
       }
     }
-    return json(200, { ok: dbState === 'ok' && pending.length === 0, database: dbState, pendingMigrations: pending, redis: redis.configured ? 'configured' : 'not_configured', signup: env.NEUROMOVE_SETUP_CODE ? 'setup_code' : 'disabled' });
+    return json(200, { ok: dbState === 'ok' && pending.length === 0, database: dbState, pendingMigrations: pending, redis: redis.configured ? 'configured' : 'not_configured', signup: env.NEUROMOVE_SETUP_CODE ? 'setup_code' : 'disabled', aiSummaries: aiEnabled(env) ? 'enabled' : 'disabled' });
   }
 
   if (!db) return err(503, 'database_not_configured');
@@ -154,7 +158,10 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
 
   if (!p) return err(401, 'unauthenticated');
 
-  if (route === 'auth/me' && method === 'GET') return json(200, { account: account(p) });
+  if (route === 'auth/me' && method === 'GET') return json(200, { account: { ...account(p), participantIds: await linkedParticipants(db, p) } });
+
+  // Caregiver accounts reach only auth and sync. Team lists, raw data, audit and dataset registry are staff-only.
+  if (p.role === 'caregiver' && !route.startsWith('sync/')) return err(403, 'forbidden_role');
 
   // ── Team ───────────────────────────────────────────────────────────────────────────────────
   if (route === 'team/members' && method === 'GET') {
@@ -166,7 +173,7 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
     const b = await body<{ email?: string; displayName?: string; role?: Role; password?: string }>(req);
     if (b instanceof Response) return b;
     const email = b.email?.trim().toLowerCase();
-    if (!isEmail(email) || !b.role || !ROLES.includes(b.role) || !b.displayName?.trim()) return err(400, 'invalid_input');
+    if (!isEmail(email) || !b.role || !ROLES.includes(b.role) || b.role === 'caregiver' || !b.displayName?.trim()) return err(400, 'invalid_input'); // caregivers: team/caregivers (links required)
     const existing = (await db.query<{ id: string }>('select id from nm_users where email = $1', [email]))[0];
     let userId = existing?.id;
     if (!userId) {
@@ -178,6 +185,69 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
     await db.query('insert into nm_memberships (team_id, user_id, role) values ($1, $2, $3) on conflict (team_id, user_id) do update set role = $3', [p.teamId, userId, b.role]);
     await db.query("insert into nm_audit_events (team_id, user_id, action, details) values ($1, $2, 'member_upsert', $3)", [p.teamId, p.userId, { email, role: b.role }]);
     return json(200, { ok: true });
+  }
+
+  // ── Caregiver accounts (admin only): create/link a caregiver to specific children ────────────
+  if (route === 'team/caregivers' && method === 'GET') {
+    if (p.role !== 'admin') return err(403, 'admin_only');
+    const rows = await db.query(
+      `select u.id, u.email, u.display_name, l.participant_id, l.created_at, l.revoked_at from nm_caregiver_links l join nm_users u on u.id = l.user_id where l.team_id = $1 order by l.created_at`,
+      [p.teamId],
+    );
+    return json(200, { links: rows });
+  }
+  if (route === 'team/caregivers' && method === 'POST') {
+    if (p.role !== 'admin') return err(403, 'admin_only');
+    const b = await body<{ email?: string; displayName?: string; password?: string; participantIds?: string[]; revoke?: boolean }>(req);
+    if (b instanceof Response) return b;
+    const email = b.email?.trim().toLowerCase();
+    if (!isEmail(email) || !b.displayName?.trim() || !Array.isArray(b.participantIds) || !b.participantIds.length || b.participantIds.length > 20 || !b.participantIds.every((x) => typeof x === 'string' && x.length <= 120)) return err(400, 'invalid_input');
+    const owned = await db.query<{ id: string }>('select id from nm_participants where team_id = $1 and id = any($2) and deleted_at is null', [p.teamId, b.participantIds]);
+    if (owned.length !== new Set(b.participantIds).size) return err(400, 'unknown_participant');
+    const existing = (await db.query<{ id: string }>('select id from nm_users where email = $1', [email]))[0];
+    let userId = existing?.id;
+    if (userId) {
+      const m = (await db.query<{ role: string }>('select role from nm_memberships where team_id = $1 and user_id = $2', [p.teamId, userId]))[0];
+      // A staff account is never silently downgraded into a caregiver account
+      if (m && m.role !== 'caregiver') return err(409, 'account_is_staff');
+    } else {
+      if (typeof b.password !== 'string') return err(400, 'password_required');
+      const pw = passwordProblem(b.password);
+      if (pw) return err(400, pw);
+      userId = (await db.query<{ id: string }>('insert into nm_users (email, display_name, password_hash) values ($1, $2, $3) returning id', [email, b.displayName.trim(), await hashPassword(b.password)]))[0]!.id;
+    }
+    await db.tx(async (t) => {
+      await t.query("insert into nm_memberships (team_id, user_id, role) values ($1, $2, 'caregiver') on conflict (team_id, user_id) do nothing", [p.teamId, userId]);
+      for (const pid of b.participantIds!)
+        await t.query(
+          b.revoke
+            ? 'update nm_caregiver_links set revoked_at = now() where team_id = $1 and user_id = $2 and participant_id = $3'
+            : 'insert into nm_caregiver_links (team_id, user_id, participant_id, created_by) values ($1, $2, $3, $4) on conflict (team_id, user_id, participant_id) do update set revoked_at = null',
+          b.revoke ? [p.teamId, userId, pid] : [p.teamId, userId, pid, p.userId],
+        );
+      await t.query('insert into nm_audit_events (team_id, user_id, action, details) values ($1, $2, $3, $4)', [p.teamId, p.userId, b.revoke ? 'caregiver_unlink' : 'caregiver_link', { email, participantIds: b.participantIds }]);
+    });
+    return json(200, { ok: true });
+  }
+
+  // ── Optional AI-drafted summaries (staff only, explicit operator opt-in) ───────────────────
+  if (route === 'ai/summary' && method === 'POST') {
+    if (p.role !== 'admin' && p.role !== 'session_operator') return err(403, 'professional_only');
+    if (!aiEnabled(env)) return err(503, 'ai_not_configured');
+    const b = await body<{ facts?: unknown; language?: string }>(req);
+    if (b instanceof Response) return b;
+    if (!validFactsPayload(b.facts) || !(b.language && b.language in SUMMARY_LANGUAGES)) return err(400, 'invalid_input');
+    if (await limited(redis, `ai:${p.userId}`, 20, 3600)) return err(429, 'rate_limited');
+    try {
+      const r = await draftSummary(deps.aiFetch ?? (fetch as unknown as FetchFn), geminiKeys(env), b.facts, b.language as SummaryLanguage, env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL);
+      // Counts only: the facts, the draft and the keys are not stored on the server
+      await db.query("insert into nm_audit_events (team_id, user_id, action, details) values ($1, $2, 'ai_summary', $3)", [p.teamId, p.userId, { facts: b.facts.length, model: r.model, keyIndex: r.keyIndex, flagged: r.draft.flagged }]);
+      return json(200, r);
+    } catch (e) {
+      if (e instanceof DraftError) return err(502, `ai_${e.message}`);
+      console.error('[api] ai summary failed', e instanceof Error ? e.name : 'error');
+      return err(502, 'ai_unavailable');
+    }
   }
 
   // ── Sync ───────────────────────────────────────────────────────────────────────────────────

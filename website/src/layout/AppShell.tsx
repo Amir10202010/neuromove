@@ -3,7 +3,7 @@
 // и «Настройки» — ниже, отдельно: нужны не каждый день. Кто работает и в каком
 // пространстве (демо или клиника) — одна строка внизу панели.
 
-import { ChartNoAxesCombined, Cpu, FlaskConical, History, House, Menu, MonitorPlay, Plus, RotateCcw, Settings, UsersRound, WifiOff } from 'lucide-react';
+import { ChartNoAxesCombined, Cpu, FlaskConical, HeartHandshake, History, House, Menu, MonitorPlay, Plus, RotateCcw, Settings, UsersRound, WifiOff } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { href, navigate, useRoute, type Route } from '../app/router';
 import { DemoGuide } from '../features/demo/DemoGuide';
@@ -28,6 +28,7 @@ const NAV_MAIN: NavDef[] = [
   { route: { name: 'patients' }, match: ['patients', 'patient', 'family'], label: 'nav.patients', icon: <UsersRound aria-hidden /> },
   { route: { name: 'sessions' }, match: ['sessions', 'session', 'sessionPrint'], label: 'nav.sessions', icon: <History aria-hidden /> },
   { route: { name: 'analytics' }, match: ['analytics'], label: 'nav.analytics', icon: <ChartNoAxesCombined aria-hidden /> },
+  { route: { name: 'rehab' }, match: ['rehab', 'rehabParticipant', 'rehabActivities', 'rehabStudies'], label: 'nav.rehab', icon: <HeartHandshake aria-hidden /> },
   { route: { name: 'research' }, match: ['research', 'researchProtocols', 'researchNew', 'researchSession', 'researchDatasets'], label: 'nav.research', icon: <FlaskConical aria-hidden /> },
 ];
 const NAV_MORE: NavDef[] = [

@@ -16,6 +16,7 @@ import { Button } from '../../ui/Button';
 import { Field } from '../../ui/Field';
 import { ConfirmDialog } from '../../ui/Modal';
 import { SyncPanel } from '../research/SyncPanel';
+import { CaregiverAccounts } from '../rehab/CaregiverAccounts';
 
 export function SettingsPage() {
   const { t, f } = useI18n();
@@ -92,6 +93,7 @@ export function SettingsPage() {
       </section>
 
       <SyncPanel />
+      <CaregiverAccounts />
 
       <section className="card">
         <div className="card__header">

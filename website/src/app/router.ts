@@ -25,7 +25,17 @@ export type Route =
   | { name: 'researchNew'; protocolKey: string | null }
   | { name: 'researchSession'; id: string }
   | { name: 'researchDatasets' }
+  | { name: 'rehab' }
+  | { name: 'rehabParticipant'; id: string; tab: RehabTab; review: string | null }
+  | { name: 'rehabActivities' }
+  | { name: 'rehabStudies' }
+  | { name: 'familyHome'; id: string }
+  | { name: 'childPlay'; id: string }
   | { name: 'notFound' };
+
+/** Tabs of a participant's rehabilitation page. */
+export const REHAB_TABS = ['overview', 'goals', 'program', 'timeline', 'movement', 'assessments', 'family', 'review'] as const;
+export type RehabTab = (typeof REHAB_TABS)[number];
 
 export function parseHash(hash: string): Route {
   const raw = hash.replace(/^#/, '') || '/';
@@ -74,6 +84,21 @@ export function parseHash(hash: string): Route {
       if (b === 'new' && !c) return { name: 'researchNew', protocolKey: q.get('protocol') };
       if (b === 'sessions' && c) return { name: 'researchSession', id: c };
       return { name: 'notFound' };
+    // Functional Progression System: professional workspace, family workspace, child practice
+    case 'rehab': {
+      if (!b) return { name: 'rehab' };
+      if (b === 'activities' && !c) return { name: 'rehabActivities' };
+      if (b === 'studies' && !c) return { name: 'rehabStudies' };
+      if (b === 'p' && c && parts.length === 3) {
+        const tab = q.get('tab') ?? 'overview';
+        return { name: 'rehabParticipant', id: c, tab: (REHAB_TABS as readonly string[]).includes(tab) ? (tab as RehabTab) : 'overview', review: q.get('review') };
+      }
+      return { name: 'notFound' };
+    }
+    case 'home':
+      return b && parts.length === 2 ? { name: 'familyHome', id: b } : { name: 'notFound' };
+    case 'play':
+      return b && parts.length === 2 ? { name: 'childPlay', id: b } : { name: 'notFound' };
     // Лаборатория рисунков — только в режиме разработки (App.tsx), в сборке это «не найдено»
     case 'lab':
       return { name: 'lab' };
@@ -130,6 +155,23 @@ export function href(r: Route): string {
       return `#/research/new${r.protocolKey ? `?protocol=${e(r.protocolKey)}` : ''}`;
     case 'researchSession':
       return `#/research/sessions/${e(r.id)}`;
+    case 'rehab':
+      return '#/rehab';
+    case 'rehabActivities':
+      return '#/rehab/activities';
+    case 'rehabStudies':
+      return '#/rehab/studies';
+    case 'rehabParticipant': {
+      const q = new URLSearchParams();
+      if (r.tab !== 'overview') q.set('tab', r.tab);
+      if (r.review) q.set('review', r.review);
+      const qs = q.toString();
+      return `#/rehab/p/${e(r.id)}${qs ? `?${qs}` : ''}`;
+    }
+    case 'familyHome':
+      return `#/home/${e(r.id)}`;
+    case 'childPlay':
+      return `#/play/${e(r.id)}`;
     case 'notFound':
       return '#/404';
   }

@@ -11,6 +11,7 @@
 import { openDB, type IDBPDatabase } from 'idb';
 import type { Placement, RawFrame } from '../devices/types';
 import type { ProtocolVersion, Trial, ValidationSession } from '../research/model';
+import type { RehabRecord } from '../rehab/model';
 import type { OutboxOp, SyncStateRow } from '../sync/types';
 import type { Alert, Note, Patient, Session, Workspace, WorkspaceData } from './models';
 
@@ -21,12 +22,13 @@ export interface StoredData extends WorkspaceData {
   meta: Record<string, unknown>;
 }
 
-/** Research stores added in schema v2 (validation studies). */
-export type ResearchStore = 'protocols' | 'vsessions' | 'trials';
+/** Research stores added in schema v2 (validation studies) and v3 (rehabilitation records, one store for all kinds). */
+export type ResearchStore = 'protocols' | 'vsessions' | 'trials' | 'rehab';
 export interface ResearchRecords {
   protocols: ProtocolVersion;
   vsessions: ValidationSession;
   trials: Trial;
+  rehab: RehabRecord;
 }
 
 export interface DataStorage {
@@ -45,6 +47,7 @@ export interface DataStorage {
    */
   replaceWorkspace(ws: Workspace, data: WorkspaceData, preserve?: ReadonlySet<string>): Promise<void>;
   setMeta(key: string, value: unknown): Promise<void>;
+  getMeta(key: string): Promise<unknown>;
   putRaw(sessionId: string, frames: readonly RawFrame[]): Promise<void>;
   getRaw(sessionId: string): Promise<RawFrame[] | null>;
   removeRaw(sessionId: string): Promise<void>;
@@ -52,6 +55,8 @@ export interface DataStorage {
   /** Several records of one store and their outbox ops in ONE transaction (all or nothing). */
   putResearchBatch<S extends ResearchStore>(store: S, values: readonly ResearchRecords[S][], ops: readonly OutboxOp[]): Promise<void>;
   getAllResearch<S extends ResearchStore>(store: S): Promise<ResearchRecords[S][]>;
+  /** Demo housekeeping only (re-seeding the demo workspace). Clinic records are never removed. */
+  removeResearch(store: ResearchStore, keys: readonly string[]): Promise<void>;
   /** Очередь синхронизации: новая правка сущности сливается с ещё не подтверждённой (с новым opId). */
   enqueue(op: OutboxOp): Promise<void>;
   listOutbox(): Promise<OutboxOp[]>;
@@ -76,7 +81,7 @@ interface RawChunk {
 }
 
 const DB_NAME = 'neuromove';
-export const DB_VERSION = 2;
+export const DB_VERSION = 3;
 const COLLECTIONS: CollectionName[] = ['patients', 'sessions', 'notes', 'alerts'];
 const CHUNK = 1000;
 
@@ -196,6 +201,16 @@ class IdbStorage implements DataStorage {
     await this.db.put('meta', { key, value });
   }
 
+  async getMeta(key: string): Promise<unknown> {
+    return ((await this.db.get('meta', key)) as { value: unknown } | undefined)?.value;
+  }
+
+  async removeResearch(store: ResearchStore, keys: readonly string[]): Promise<void> {
+    const tx = this.db.transaction(store, 'readwrite');
+    for (const k of keys) await tx.store.delete(k);
+    await tx.done;
+  }
+
   async putRaw(sessionId: string, frames: readonly RawFrame[]): Promise<void> {
     const tx = this.db.transaction('raw', 'readwrite');
     for (let i = 0; i * CHUNK < frames.length; i++) {
@@ -284,7 +299,7 @@ class MemoryStorage implements DataStorage {
   };
   private meta: Record<string, unknown> = {};
   private raw = new Map<string, RawFrame[]>();
-  private research: { [S in ResearchStore]: Map<string, ResearchRecords[S]> } = { protocols: new Map(), vsessions: new Map(), trials: new Map() };
+  private research: { [S in ResearchStore]: Map<string, ResearchRecords[S]> } = { protocols: new Map(), vsessions: new Map(), trials: new Map(), rehab: new Map() };
   private outbox: OutboxOp[] = [];
   private seq = 0;
   private syncState = new Map<string, SyncStateRow>();
@@ -314,6 +329,12 @@ class MemoryStorage implements DataStorage {
   }
   async setMeta(key: string, value: unknown): Promise<void> {
     this.meta[key] = value;
+  }
+  async getMeta(key: string): Promise<unknown> {
+    return this.meta[key];
+  }
+  async removeResearch(store: ResearchStore, keys: readonly string[]): Promise<void> {
+    for (const k of keys) this.research[store].delete(k);
   }
   async putRaw(id: string, frames: readonly RawFrame[]): Promise<void> {
     this.raw.set(id, [...frames]);
@@ -375,7 +396,7 @@ const OPEN_TIMEOUT_MS = 5000;
  * новая версия упала бы на «хранилище уже есть», и приложение тихо ушло бы работать в память —
  * человек увидел бы пустой список пациентов.
  */
-export function upgradeSchema(db: IDBPDatabase, oldVersion: number): void {
+export function upgradeSchema(db: IDBPDatabase, oldVersion: number, newVersion: number = DB_VERSION): void {
   if (oldVersion < 1) {
     for (const name of COLLECTIONS) {
       const store = db.createObjectStore(name, { keyPath: 'id' });
@@ -386,7 +407,7 @@ export function upgradeSchema(db: IDBPDatabase, oldVersion: number): void {
     db.createObjectStore('raw', { keyPath: 'key' }).createIndex('sessionId', 'sessionId');
   }
   // v2 (8 Nov 2026): validation studies + sync outbox. Purely additive — no v1 store is touched.
-  if (oldVersion < 2) {
+  if (oldVersion < 2 && newVersion >= 2) {
     const protocols = db.createObjectStore('protocols', { keyPath: 'key' });
     protocols.createIndex('workspace', 'workspace');
     protocols.createIndex('protocolId', 'protocolId');
@@ -401,7 +422,15 @@ export function upgradeSchema(db: IDBPDatabase, oldVersion: number): void {
     outbox.createIndex('entityKey', 'entityKey');
     db.createObjectStore('syncstate', { keyPath: 'key' });
   }
-  // Версия 3 и дальше — здесь: if (oldVersion < 3) { … }, с тестом в storage.test.ts
+  // v3 (8 Nov 2026): Functional Progression System — ONE store for every rehab record kind (profile, goal,
+  // activity, program, practice, review, assessment, study, consent, incident). Additive.
+  if (oldVersion < 3 && newVersion >= 3) {
+    const rehab = db.createObjectStore('rehab', { keyPath: 'id' });
+    rehab.createIndex('workspace', 'workspace');
+    rehab.createIndex('kind', 'kind');
+    rehab.createIndex('participantId', 'participantId');
+  }
+  // Версия 4 и дальше — здесь: if (oldVersion < 4) { … }, с тестом в storage.test.ts
 }
 
 export async function openStorage(): Promise<DataStorage> {

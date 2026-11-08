@@ -45,6 +45,7 @@ export const ru = {
 
   nav: {
     research: 'Исследования',
+    rehab: 'Реабилитация',
     overview: 'Главная',
     patients: 'Пациенты',
     sessions: 'Сеансы',

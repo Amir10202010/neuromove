@@ -5,8 +5,10 @@
 import { createHash, randomBytes, scrypt as scryptCb, timingSafeEqual } from 'node:crypto';
 import type { Db } from './db';
 
-export type Role = 'admin' | 'session_operator' | 'measurement_operator' | 'observer';
-export const ROLES: readonly Role[] = ['admin', 'session_operator', 'measurement_operator', 'observer'];
+import { TEAM_ROLES, type TeamRole } from '../src/rehab/policy';
+
+export type Role = TeamRole;
+export const ROLES: readonly Role[] = TEAM_ROLES;
 
 export interface Principal {
   userId: string;
@@ -98,9 +100,21 @@ export function clearCookie(secure: boolean): string {
   return `${COOKIE}=; Path=/api; HttpOnly; SameSite=Strict; Max-Age=0${secure ? '; Secure' : ''}`;
 }
 
-/** Who may write what. Observers are read-only; measurement operators record trials only. */
+/**
+ * Who may write which entity at all. Observers are read-only; measurement operators record trials and
+ * (within rehab records) measurement entries; caregivers write rehab records only. The per-record rules
+ * (linked child, report kinds) are in src/rehab/policy.ts and checked by the rehab_record handler.
+ */
 export function canWrite(role: Role, entity: string): boolean {
   if (role === 'observer') return false;
-  if (role === 'measurement_operator') return entity === 'trial' || entity === 'validation_session';
+  if (role === 'caregiver') return entity === 'rehab_record';
+  if (role === 'measurement_operator') return entity === 'trial' || entity === 'validation_session' || entity === 'rehab_record';
   return true;
+}
+
+/** Participants a caregiver account is linked to (never trusted from the client). */
+export async function linkedParticipants(db: Db, p: Principal): Promise<string[]> {
+  if (p.role !== 'caregiver') return [];
+  const rows = await db.query<{ participant_id: string }>('select participant_id from nm_caregiver_links where team_id = $1 and user_id = $2 and revoked_at is null', [p.teamId, p.userId]);
+  return rows.map((r) => r.participant_id);
 }

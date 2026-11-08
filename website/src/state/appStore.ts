@@ -15,6 +15,7 @@ import { evaluateSession } from '../session/alerts';
 import { ENTITY_OF_COLLECTION, makeOp } from '../sync/ops';
 import { remoteListeners, scheduleSync, setRawSource, useSyncStore, type SyncConfig } from '../sync/engine';
 import type { PullChange } from '../sync/types';
+import { validRehabRecord } from '../rehab/validate';
 
 export type ToastKind = 'good' | 'info' | 'warn' | 'critical';
 export interface Toast {
@@ -191,7 +192,7 @@ export const useAppStore = create<State & Actions>((set, get) => {
    * written to their stores and announced to the research store.
    */
   const COLLECTION_OF: Record<string, CollectionName> = { participant: 'patients', rehab_session: 'sessions', note: 'notes', alert: 'alerts' };
-  const RESEARCH_OF: Record<string, 'protocols' | 'vsessions' | 'trials'> = { protocol_version: 'protocols', validation_session: 'vsessions', trial: 'trials' };
+  const RESEARCH_OF: Record<string, 'protocols' | 'vsessions' | 'trials' | 'rehab'> = { protocol_version: 'protocols', validation_session: 'vsessions', trial: 'trials', rehab_record: 'rehab' };
   const applyRemote = async (ch: PullChange) => {
     if (!storage) return;
     const c = COLLECTION_OF[ch.entity];
@@ -212,6 +213,8 @@ export const useAppStore = create<State & Actions>((set, get) => {
     }
     const r = RESEARCH_OF[ch.entity];
     if (r && ch.payload && !ch.deleted) {
+      // Rehab records pass the shared validator before they touch the disk (the server validated them too)
+      if (r === 'rehab' && !validRehabRecord(ch.payload)) return;
       await storage.putResearchBatch(r, [ch.payload as never], []);
       for (const l of remoteListeners) l(ch);
     }

@@ -63,6 +63,14 @@ function routeTitle(route: Route, t: TFunction, codeOf: (id: string) => string |
       case 'researchSession':
       case 'researchDatasets':
         return t('nav.research');
+      case 'rehab':
+      case 'rehabActivities':
+      case 'rehabStudies':
+        return t('nav.rehab');
+      case 'rehabParticipant':
+      case 'familyHome':
+      case 'childPlay':
+        return codeOf(route.id) ?? t('nav.rehab');
       case 'notFound':
         return t('errors.notFoundTitle');
     }

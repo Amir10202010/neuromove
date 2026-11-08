@@ -8,6 +8,12 @@ import { waitReady } from './helpers';
 const WIDTHS = [320, 375, 390, 430, 768, 1024, 1440];
 const ROUTES = [
   '#/',
+  // Functional Progression System
+  '#/rehab',
+  '#/rehab/p/demo-p01?tab=program',
+  '#/rehab/p/demo-p01?tab=review',
+  '#/home/demo-p01',
+  '#/play/demo-p01',
   '#/overview',
   '#/patients',
   '#/patients/demo-p01',
@@ -63,7 +69,7 @@ test('нет горизонтальной прокрутки на ширинах
   expect(problems).toEqual([]);
 });
 
-const AXE_ROUTES = ['#/', '#/overview', '#/patients/demo-p01', '#/session/new?patient=demo-p01', '#/sessions/demo-p01-s9', '#/analytics', '#/devices', '#/settings', '#/onboarding'];
+const AXE_ROUTES = ['#/', '#/overview', '#/patients/demo-p01', '#/session/new?patient=demo-p01', '#/sessions/demo-p01-s9', '#/analytics', '#/devices', '#/settings', '#/onboarding', '#/rehab', '#/rehab/p/demo-p01?tab=goals', '#/rehab/p/demo-p01?tab=movement', '#/rehab/p/demo-p01?tab=review', '#/rehab/activities', '#/home/demo-p01', '#/play/demo-p01'];
 
 test('доступность: нет серьёзных и критичных нарушений WCAG 2.1 AA и автоматических правил 2.2 AA', async ({ page }) => {
   test.setTimeout(180_000);

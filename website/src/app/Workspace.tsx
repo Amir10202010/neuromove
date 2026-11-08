@@ -23,6 +23,13 @@ import { ProtocolStudio } from '../features/research/ProtocolStudio';
 import { ValidationSetup } from '../features/research/ValidationSetup';
 import { ValidationSessionPage } from '../features/research/ValidationSessionPage';
 import { DatasetsPage } from '../features/research/DatasetsPage';
+import { RehabDashboard } from '../features/rehab/RehabDashboard';
+import { ParticipantRehabPage } from '../features/rehab/ParticipantRehabPage';
+import { ActivityLibraryPage } from '../features/rehab/ActivityLibraryPage';
+import { StudiesPage } from '../features/rehab/StudiesPage';
+import { FamilyHomePage } from '../features/rehab/FamilyHomePage';
+import { ChildPlayPage } from '../features/rehab/ChildPlayPage';
+import { CaregiverGate } from '../features/rehab/CaregiverGate';
 import { ErrorBoundary } from './ErrorBoundary';
 import type { Route } from './router';
 
@@ -58,6 +65,14 @@ function Page({ route }: { route: Route }) {
       return <ValidationSessionPage id={route.id} />;
     case 'researchDatasets':
       return <DatasetsPage />;
+    case 'rehab':
+      return <RehabDashboard />;
+    case 'rehabParticipant':
+      return <ParticipantRehabPage id={route.id} tab={route.tab} reviewId={route.review} />;
+    case 'rehabActivities':
+      return <ActivityLibraryPage />;
+    case 'rehabStudies':
+      return <StudiesPage />;
     default:
       return <NotFoundPage />;
   }
@@ -68,13 +83,18 @@ export default function Workspace({ route }: { route: Route }) {
   if (route.name === 'onboarding') content = <OnboardingPage />;
   else if (route.name === 'sessionPrint') content = <PrintReportPage id={route.id} />;
   else if (route.name === 'family') content = <FamilyReportPage id={route.id} />;
+  // Family and child screens: their own calm shell, no professional navigation (shared tablets)
+  else if (route.name === 'familyHome') content = <ErrorBoundary resetKey={JSON.stringify(route)}><FamilyHomePage id={route.id} /></ErrorBoundary>;
+  else if (route.name === 'childPlay') content = <ErrorBoundary resetKey={JSON.stringify(route)}><ChildPlayPage id={route.id} /></ErrorBoundary>;
   else
     content = (
-      <AppShell>
-        <ErrorBoundary resetKey={JSON.stringify(route)}>
-          <Page route={route} />
-        </ErrorBoundary>
-      </AppShell>
+      <CaregiverGate>
+        <AppShell>
+          <ErrorBoundary resetKey={JSON.stringify(route)}>
+            <Page route={route} />
+          </ErrorBoundary>
+        </AppShell>
+      </CaregiverGate>
     );
 
   return (

@@ -39,7 +39,241 @@ async function databaseFromEnv(env = process.env) {
 
 // server/auth.ts
 import { createHash, randomBytes, scrypt as scryptCb, timingSafeEqual } from "node:crypto";
-var ROLES = ["admin", "session_operator", "measurement_operator", "observer"];
+
+// src/core/exercises.ts
+var EXERCISE_IDS = [
+  "shoulder_flexion",
+  "shoulder_abduction",
+  "elbow_flexion",
+  "forearm_rotation"
+];
+var EXERCISES = {
+  shoulder_flexion: {
+    id: "shoulder_flexion",
+    angle: "elevation",
+    reps: "single",
+    trunk: true,
+    check: "none",
+    positioning: false,
+    expectedRom: 140,
+    gauge: { min: 0, max: 180 }
+  },
+  shoulder_abduction: {
+    id: "shoulder_abduction",
+    angle: "elevation",
+    reps: "single",
+    trunk: true,
+    check: "none",
+    positioning: false,
+    expectedRom: 130,
+    gauge: { min: 0, max: 180 }
+  },
+  elbow_flexion: {
+    id: "elbow_flexion",
+    angle: "elbow",
+    reps: "single",
+    trunk: false,
+    check: "upper_lift",
+    positioning: false,
+    expectedRom: 125,
+    gauge: { min: 0, max: 160 }
+  },
+  forearm_rotation: {
+    id: "forearm_rotation",
+    angle: "rotation",
+    reps: "bidirectional",
+    trunk: false,
+    check: "forearm_level",
+    positioning: true,
+    expectedRom: 120,
+    gauge: { min: -90, max: 90 }
+  }
+};
+
+// src/rehab/icf.ts
+var ICF_CATALOG = [
+  { code: "b710", component: "b", title: "Mobility of joint functions" },
+  { code: "b735", component: "b", title: "Muscle tone functions" },
+  { code: "b755", component: "b", title: "Involuntary movement reaction functions" },
+  { code: "b760", component: "b", title: "Control of voluntary movement functions" },
+  { code: "d410", component: "d", title: "Changing basic body position" },
+  { code: "d415", component: "d", title: "Maintaining a body position" },
+  { code: "d430", component: "d", title: "Lifting and carrying objects" },
+  { code: "d440", component: "d", title: "Fine hand use" },
+  { code: "d445", component: "d", title: "Hand and arm use" },
+  { code: "d450", component: "d", title: "Walking" },
+  { code: "d460", component: "d", title: "Moving around in different locations" },
+  { code: "d520", component: "d", title: "Caring for body parts" },
+  { code: "d540", component: "d", title: "Dressing" },
+  { code: "d550", component: "d", title: "Eating" },
+  { code: "d560", component: "d", title: "Drinking" },
+  { code: "d820", component: "d", title: "School education" },
+  { code: "d880", component: "d", title: "Engagement in play" }
+];
+var ICF_CODES = ICF_CATALOG.map((c) => c.code);
+var BY_CODE = new Map(ICF_CATALOG.map((c) => [c.code, c]));
+
+// src/rehab/model.ts
+var REHAB_KINDS = ["profile", "goal", "activity", "program", "practice", "review", "assessment", "study", "consent", "incident"];
+var IMMUTABLE_KINDS = ["activity", "program", "review", "assessment", "practice"];
+var AUTHOR_ROLES = ["professional", "caregiver", "researcher"];
+var GOAL_CATEGORIES = ["reaching", "object_manipulation", "bilateral_hand_use", "maintaining_position", "movement_coordination", "functional_mobility", "balance", "daily_activity", "other"];
+var AGE_BANDS = ["early", "middle", "teen"];
+var CHILD_THEMES = ["garden", "space", "ocean", "plain"];
+var CLASSIFICATION_SYSTEMS = ["GMFCS", "MACS", "CFCS", "other"];
+var GOAL_STATUSES = ["not_started", "in_progress", "needs_review", "achieved", "paused"];
+var GOAL_MEASUREMENT_KINDS = ["gas", "copm", "observation", "caregiver_report", "imu", "other"];
+var GOAL_EVENT_TYPES = ["created", "edited", "status", "progress_note", "gas_rating", "family_input"];
+var ACTIVITY_STATUSES = ["draft", "experimental", "clinician_approved"];
+var MOVEMENT_DOMAINS = ["upper_limb_range", "reaching", "grasp_release", "bimanual", "posture_trunk", "mobility", "balance", "coordination", "other"];
+var ACTIVITY_MEASUREMENTS = ["imu_session", "completion_only", "observation", "count", "timed"];
+var STEP_ICONS = ["sit", "stand", "reach", "grasp", "two_hands", "lift", "turn", "hold", "rest", "breathe", "cup", "ball", "blocks", "star"];
+var MODULE_TYPES = ["assessment", "supervised", "home", "review", "reassessment"];
+var PROGRAM_STATUSES = ["active", "paused", "completed"];
+var COMPLETIONS = ["completed", "partial", "not_completed", "stopped"];
+var BARRIERS = ["time", "child_tired", "child_unwell", "child_declined", "unclear_instructions", "equipment", "other"];
+var PRACTICE_SOURCES = ["caregiver_report", "professional_entry", "child_mode"];
+var REVIEW_DECISIONS = ["continue", "modify_program", "pause_program", "reassess", "refer", "noted"];
+var OBSERVATION_RESPONSES = ["agree", "disagree", "not_relevant", "needs_more_data"];
+var INSTRUMENTS = ["gas", "copm", "gmfm66", "gmfm88", "other"];
+var TIMEPOINTS = ["baseline", "interim", "follow_up", "discharge"];
+var STUDY_STATUSES = ["planning", "approved", "recruiting", "active", "closed"];
+var EVALUATION_DOMAINS = ["feasibility", "usability", "engagement", "measurement_quality", "longitudinal"];
+var INCIDENT_CATEGORIES = ["safety", "deviation", "technical"];
+var INCIDENT_TYPES = ["pain", "discomfort", "fatigue", "unusual_response", "fall_or_injury", "session_stopped", "protocol_deviation", "sensor_failure", "software_failure", "other"];
+
+// src/rehab/validate.ts
+var obj = (x) => !!x && typeof x === "object" && !Array.isArray(x);
+var str = (x, max2 = 300) => typeof x === "string" && x.length <= max2;
+var nonEmpty = (x, max2 = 300) => str(x, max2) && x.trim().length > 0;
+var num = (x) => typeof x === "number" && Number.isFinite(x);
+var date = (x) => str(x, 40) && Number.isFinite(Date.parse(x));
+var nDate = (x) => x === null || date(x);
+var nNum = (x, lo = -1e9, hi = 1e9) => x === null || num(x) && x >= lo && x <= hi;
+var oneOf = (x, xs) => xs.includes(x);
+var intIn = (x, lo, hi) => Number.isInteger(x) && x >= lo && x <= hi;
+var arr = (x, max2, f) => Array.isArray(x) && x.length <= max2 && x.every(f);
+var bool = (x) => typeof x === "boolean";
+var id = (x) => nonEmpty(x, 120) && /^[\w@.:-]+$/.test(x);
+var nId = (x) => x === null || id(x);
+var SHORT = 300;
+var TEXT = 4e3;
+var LONG = 2e4;
+function base(x) {
+  return id(x.id) && oneOf(x.kind, REHAB_KINDS) && oneOf(x.workspace, ["clinic", "demo"]) && nId(x.participantId) && date(x.createdAt) && str(x.createdBy, 200) && oneOf(x.createdByRole, AUTHOR_ROLES);
+}
+var child = (c) => obj(c) && oneOf(c.ageBand, AGE_BANDS) && oneOf(c.theme, CHILD_THEMES) && bool(c.story) && oneOf(c.textSize, ["normal", "large", "xlarge"]) && bool(c.reduceMotion) && bool(c.sound) && bool(c.showMeasurements);
+var goalEvent = (e) => obj(e) && date(e.at) && str(e.by, 200) && oneOf(e.byRole, AUTHOR_ROLES) && oneOf(e.type, GOAL_EVENT_TYPES) && str(e.note, TEXT) && (e.status === void 0 || oneOf(e.status, GOAL_STATUSES)) && (e.gas === void 0 || oneOf(e.gas, [-2, -1, 0, 1, 2])) && (e.fields === void 0 || arr(e.fields, 30, (f) => str(f, 60)));
+var evidence = (e) => obj(e) && oneOf(e.ref, ["session", ...REHAB_KINDS]) && id(e.id) && str(e.label, SHORT) && (e.value === void 0 || num(e.value) || str(e.value, SHORT)) && (e.unit === void 0 || str(e.unit, 20));
+var observation = (o) => obj(o) && nonEmpty(o.id, 200) && nonEmpty(o.ruleId, 80) && intIn(o.ruleVersion, 1, 1e3) && oneOf(o.category, ["safety", "data_quality", "adherence", "reported", "measurement", "goal", "schedule"]) && oneOf(o.severity, ["info", "review"]) && obj(o.params) && Object.values(o.params).every((v) => num(v) || str(v, SHORT)) && arr(o.evidence, 200, evidence);
+var assignment = (a) => obj(a) && id(a.id) && id(a.activityKey) && oneOf(a.setting, ["clinic", "home"]) && nNum(a.frequencyPerWeek, 0, 50) && nNum(a.durationMin, 0, 600) && str(a.dosageNote, TEXT) && str(a.caregiverNote, TEXT) && arr(a.goalIds, 50, id) && nNum(a.feedbackTargetDeg, -180, 360);
+var programDef = (d) => obj(d) && nonEmpty(d.name, 200) && str(d.description, TEXT) && str(d.responsible, 200) && arr(d.goalIds, 50, id) && oneOf(d.domain, MOVEMENT_DOMAINS) && nDate(d.startDate) && nDate(d.reviewDate) && nNum(d.plannedWeeks, 0, 520) && nNum(d.plannedSessions, 0, 5e3) && str(d.sessionStructure, TEXT) && str(d.measurementRequirements, TEXT) && arr(d.modules, 30, (m) => obj(m) && id(m.id) && oneOf(m.type, MODULE_TYPES) && str(m.title, 200) && str(m.notes, TEXT) && arr(m.assignments, 50, assignment)) && arr(d.checkpoints, 50, (c) => obj(c) && id(c.id) && date(c.date) && str(c.label, 200)) && str(d.notes, LONG) && oneOf(d.status, PROGRAM_STATUSES);
+var activityDef = (d) => obj(d) && nonEmpty(d.name, 200) && str(d.description, TEXT) && arr(d.goalCategories, 20, (c) => oneOf(c, GOAL_CATEGORIES)) && oneOf(d.domain, MOVEMENT_DOMAINS) && str(d.setup, TEXT) && str(d.professionalInstructions, LONG) && str(d.caregiverInstructions, LONG) && arr(d.steps, 20, (s) => obj(s) && oneOf(s.icon, STEP_ICONS) && str(s.text, SHORT)) && bool(d.homeSuitable) && obj(d.measurement) && oneOf(d.measurement.kind, ACTIVITY_MEASUREMENTS) && (d.measurement.exercise === null || oneOf(d.measurement.exercise, EXERCISE_IDS)) && str(d.measurement.detail, TEXT) && str(d.completionCriteria, TEXT) && str(d.safetyNotes, TEXT) && arr(d.evidenceRefs, 30, (r) => str(r, 500)) && oneOf(d.language, ["ru", "kk", "en"]);
+var VALIDATORS = {
+  profile: (x) => id(x.participantId) && str(x.assignedProfessional, 200) && arr(x.domains, 20, (c) => oneOf(c, GOAL_CATEGORIES)) && oneOf(x.caregiverParticipation, ["not_set", "none", "occasional", "regular"]) && arr(x.classifications, 20, (c) => obj(c) && oneOf(c.system, CLASSIFICATION_SYSTEMS) && str(c.label, 100) && str(c.level, 40) && str(c.enteredBy, 200) && date(c.at)) && str(x.assessmentSummary, LONG) && arr(x.baselineSessionIds, 20, id) && child(x.child) && date(x.updatedAt) && str(x.updatedBy, 200),
+  goal: (x) => id(x.participantId) && oneOf(x.category, GOAL_CATEGORIES) && nonEmpty(x.description, TEXT) && str(x.whyItMatters, TEXT) && str(x.baseline, TEXT) && str(x.target, TEXT) && obj(x.measurement) && oneOf(x.measurement.kind, GOAL_MEASUREMENT_KINDS) && str(x.measurement.detail, TEXT) && (x.measurement.exercise === null || oneOf(x.measurement.exercise, EXERCISE_IDS)) && (x.measurement.side === null || oneOf(x.measurement.side, ["left", "right"])) && str(x.responsible, 200) && nDate(x.reviewDate) && oneOf(x.status, GOAL_STATUSES) && arr(x.contributors, 3, (c) => oneOf(c, ["professional", "family", "child"])) && (x.icf === void 0 || arr(x.icf, 12, (c) => oneOf(c, ICF_CODES))) && arr(x.history, 2e3, goalEvent) && x.history.length > 0 && date(x.updatedAt),
+  activity: (x) => x.participantId === null && id(x.seriesId) && intIn(x.version, 1, 1e5) && x.id === `${x.seriesId}@${x.version}` && oneOf(x.status, ACTIVITY_STATUSES) && activityDef(x.def) && str(x.changeNote, TEXT),
+  program: (x) => id(x.seriesId) && intIn(x.version, 1, 1e5) && x.id === `${x.seriesId}@${x.version}` && bool(x.template) && // A template belongs to nobody; an individual program belongs to exactly one participant
+  (x.template ? x.participantId === null : id(x.participantId)) && programDef(x.def) && str(x.changeReason, TEXT) && (x.version === 1 || nonEmpty(x.changeReason, TEXT)) && nId(x.basedOnReviewId) && nId(x.previousKey),
+  practice: (x) => id(x.participantId) && nId(x.programKey) && nId(x.assignmentId) && nId(x.activityKey) && oneOf(x.setting, ["home", "clinic"]) && date(x.date) && oneOf(x.source, PRACTICE_SOURCES) && (x.completion === null || oneOf(x.completion, COMPLETIONS)) && bool(x.difficulty) && bool(x.breakRequested) && (x.fatigue === null || oneOf(x.fatigue, [0, 1, 2, 3])) && (x.discomfort === null || oneOf(x.discomfort, ["none", "some", "pain"])) && arr(x.barriers, BARRIERS.length, (b) => oneOf(b, BARRIERS)) && nNum(x.durationMin, 0, 600) && str(x.observation, TEXT) && nId(x.sensorSessionId) && // Only a professional links a sensor session: a caregiver report is never presented as a measurement
+  (x.sensorSessionId === null || x.source === "professional_entry") && nId(x.supersedes),
+  review: (x) => id(x.participantId) && oneOf(x.type, ["progress_review", "acknowledgement"]) && nId(x.programKey) && nDate(x.periodFrom) && date(x.periodTo) && arr(x.observations, 100, observation) && arr(x.responses, 100, (r) => obj(r) && nonEmpty(r.observationId, 200) && oneOf(r.response, OBSERVATION_RESPONSES) && str(r.note, TEXT)) && oneOf(x.decision, REVIEW_DECISIONS) && str(x.reasoning, LONG) && // A progress review records the professional's reasoning; an acknowledgement may be a click
+  (x.type === "acknowledgement" || nonEmpty(x.reasoning, LONG)) && arr(x.goalUpdates, 50, (g) => obj(g) && id(g.goalId) && oneOf(g.status, GOAL_STATUSES)) && arr(x.acknowledged, 1e3, id) && str(x.algorithmVersion, 100),
+  assessment: (x) => id(x.participantId) && oneOf(x.instrument, INSTRUMENTS) && nonEmpty(x.instrumentName, 200) && str(x.instrumentVersion, 100) && str(x.scoringMethod, TEXT) && nonEmpty(x.examiner, 200) && date(x.date) && oneOf(x.timepoint, TIMEPOINTS) && nId(x.studyId) && arr(x.items, 200, (i) => obj(i) && nonEmpty(i.key, 120) && str(i.label, SHORT) && nNum(i.value) && nNum(i.value2) && nNum(i.weight, 0, 100)) && arr(x.totals, 50, (t) => obj(t) && nonEmpty(t.key, 80) && num(t.value)) && (x.instrument !== "gas" || x.items.every((i) => i.value === null || oneOf(i.value, [-2, -1, 0, 1, 2]))) && (x.instrument !== "copm" || x.items.every((i) => nNum(i.value, 1, 10) && nNum(i.value2, 1, 10))) && str(x.notes, LONG) && nId(x.supersedes),
+  study: (x) => x.participantId === null && nonEmpty(x.title, 300) && nonEmpty(x.shortCode, 20) && /^[A-Za-z0-9-]+$/.test(x.shortCode) && obj(x.ethics) && str(x.ethics.committee, SHORT) && str(x.ethics.reference, SHORT) && nDate(x.ethics.approvedOn) && oneOf(x.status, STUDY_STATUSES) && // A study cannot be recruiting or active without a recorded ethics approval
+  (!["recruiting", "active"].includes(x.status) || x.ethics.approvedOn !== null) && str(x.protocolSummary, LONG) && arr(x.domains, EVALUATION_DOMAINS.length, (d) => oneOf(d, EVALUATION_DOMAINS)) && nDate(x.startDate) && nDate(x.endDate) && arr(x.programTemplateKeys, 50, id) && date(x.updatedAt),
+  consent: (x) => id(x.participantId) && id(x.studyId) && nonEmpty(x.pseudonym, 40) && /^[A-Za-z0-9-]+$/.test(x.pseudonym) && obj(x.guardianPermission) && bool(x.guardianPermission.obtained) && nDate(x.guardianPermission.date) && str(x.guardianPermission.formVersion, 100) && oneOf(x.childAssent, ["obtained", "not_applicable", "declined", "not_yet"]) && bool(x.exportAllowed) && oneOf(x.status, ["active", "withdrawn"]) && nDate(x.withdrawnAt) && (x.withdrawalScope === null || oneOf(x.withdrawalScope, ["stop_collection", "remove_data"])) && (x.status === "active" ? x.withdrawnAt === null : x.withdrawnAt !== null),
+  incident: (x) => id(x.participantId) && oneOf(x.category, INCIDENT_CATEGORIES) && oneOf(x.type, INCIDENT_TYPES) && date(x.occurredAt) && str(x.description, TEXT) && str(x.actionTaken, TEXT) && nId(x.relatedPracticeId) && nId(x.relatedSessionId) && nId(x.studyId) && (x.review === null || obj(x.review) && date(x.review.at) && nonEmpty(x.review.by, 200) && nonEmpty(x.review.outcome, TEXT) && str(x.review.followUp, TEXT))
+};
+function validRehabRecord(x) {
+  if (!obj(x) || !base(x)) return false;
+  const v = VALIDATORS[x.kind];
+  try {
+    return !!v && v(x);
+  } catch {
+    return false;
+  }
+}
+function canonicalJson(x) {
+  if (Array.isArray(x)) return `[${x.map(canonicalJson).join(",")}]`;
+  if (x && typeof x === "object")
+    return `{${Object.keys(x).sort().filter((k) => x[k] !== void 0).map((k) => `${JSON.stringify(k)}:${canonicalJson(x[k])}`).join(",")}}`;
+  return JSON.stringify(x);
+}
+var same = (a, b) => canonicalJson(a) === canonicalJson(b);
+var without = (x, keys) => Object.fromEntries(Object.entries(x).filter(([k]) => !keys.includes(k)));
+function checkTransition(prev, next) {
+  if (same(prev, next)) return null;
+  if (prev.kind !== next.kind) return "kind_changed";
+  if (IMMUTABLE_KINDS.includes(prev.kind)) return "immutable";
+  if (prev.workspace !== next.workspace || prev.participantId !== next.participantId || prev.createdAt !== next.createdAt || prev.createdBy !== next.createdBy || prev.createdByRole !== next.createdByRole) return "identity_changed";
+  if (prev.kind === "goal" && next.kind === "goal") {
+    if (next.history.length < prev.history.length || !same(prev.history, next.history.slice(0, prev.history.length))) return "history_rewritten";
+  }
+  if (prev.kind === "incident" && next.kind === "incident") {
+    if (prev.review !== null || !same(without(prev, ["review"]), without(next, ["review"]))) return "incident_changed";
+  }
+  if (prev.kind === "consent" && next.kind === "consent") {
+    const fixed = ["status", "withdrawnAt", "withdrawalScope", "exportAllowed"];
+    if (prev.status !== "active" || next.status !== "withdrawn" || !same(without(prev, fixed), without(next, fixed))) return "consent_changed";
+  }
+  return null;
+}
+
+// src/rehab/policy.ts
+var TEAM_ROLES = ["admin", "session_operator", "measurement_operator", "observer", "caregiver"];
+var isProfessional = (r) => r === "admin" || r === "session_operator";
+function canWriteRehab(actor, next, prev) {
+  const { role } = actor;
+  if (role === "observer") return "read_only_role";
+  if (isProfessional(role)) {
+    if (!prev && next.createdByRole === "caregiver" && next.kind !== "practice" && next.kind !== "incident") return "author_role_mismatch";
+    return null;
+  }
+  if (role === "measurement_operator") {
+    if (next.kind === "practice" && next.source === "professional_entry" && !prev) return null;
+    if (next.kind === "incident" && next.category === "technical" && !prev) return null;
+    return "professional_only";
+  }
+  if (!next.participantId || !actor.participantIds.includes(next.participantId)) return "not_linked";
+  if (next.kind === "practice") {
+    if (prev) return "caregiver_scope";
+    if (next.createdByRole !== "caregiver" || next.source !== "caregiver_report" && next.source !== "child_mode" || next.sensorSessionId !== null) return "caregiver_scope";
+    return null;
+  }
+  if (next.kind === "incident") {
+    if (prev) return "caregiver_scope";
+    if (next.createdByRole !== "caregiver" || next.category !== "safety" || next.review !== null) return "caregiver_scope";
+    return null;
+  }
+  if (next.kind === "goal" && prev && prev.kind === "goal") {
+    const added = next.history.slice(prev.history.length);
+    const { history: _h1, updatedAt: _u1, contributors: _c1, ...a } = prev;
+    const { history: _h2, updatedAt: _u2, contributors: _c2, ...b } = next;
+    if (added.length !== 1 || added[0]?.type !== "family_input" || added[0]?.byRole !== "caregiver") return "caregiver_scope";
+    if (canonicalJson(a) !== canonicalJson(b)) return "caregiver_scope";
+    return null;
+  }
+  return "professional_only";
+}
+function caregiverMayRead(r, linked) {
+  switch (r.kind) {
+    case "activity":
+      return r.status !== "draft";
+    case "profile":
+    case "goal":
+    case "program":
+    case "practice":
+      return !!r.participantId && linked.includes(r.participantId) && !(r.kind === "program" && r.template);
+    case "incident":
+      return linked.includes(r.participantId) && r.createdByRole === "caregiver";
+    default:
+      return false;
+  }
+}
+
+// server/auth.ts
+var ROLES = TEAM_ROLES;
 var SCRYPT = { N: 16384, r: 8, p: 1, keylen: 64 };
 var SESSION_DAYS = 30;
 var COOKIE = "nm_session";
@@ -110,8 +344,14 @@ function clearCookie(secure) {
 }
 function canWrite(role, entity) {
   if (role === "observer") return false;
-  if (role === "measurement_operator") return entity === "trial" || entity === "validation_session";
+  if (role === "caregiver") return entity === "rehab_record";
+  if (role === "measurement_operator") return entity === "trial" || entity === "validation_session" || entity === "rehab_record";
   return true;
+}
+async function linkedParticipants(db, p) {
+  if (p.role !== "caregiver") return [];
+  const rows = await db.query("select participant_id from nm_caregiver_links where team_id = $1 and user_id = $2 and revoked_at is null", [p.teamId, p.userId]);
+  return rows.map((r) => r.participant_id);
 }
 
 // server/migrations.ts
@@ -399,6 +639,58 @@ create table if not exists nm_audit_events (
 create index if not exists nm_audit_team on nm_audit_events(team_id, at);
 create index if not exists nm_audit_entity on nm_audit_events(entity, entity_id);
 `
+  },
+  {
+    id: "0002_rehab",
+    sql: `
+-- Caregiver accounts: a fifth role. The check constraint is replaced by a wider one (no data touched).
+alter table nm_memberships drop constraint if exists nm_memberships_role_check;
+alter table nm_memberships add constraint nm_memberships_role_check check (role in ('admin', 'session_operator', 'measurement_operator', 'observer', 'caregiver'));
+
+-- Which children a caregiver account may see. Revoking sets revoked_at; rows are never deleted.
+create table if not exists nm_caregiver_links (
+  team_id uuid not null references nm_teams(id),
+  user_id uuid not null references nm_users(id),
+  participant_id text not null references nm_participants(id),
+  created_at timestamptz not null default now(),
+  created_by uuid references nm_users(id),
+  revoked_at timestamptz,
+  primary key (team_id, user_id, participant_id)
+);
+
+-- Every rehab record kind in one table: typed columns for querying, the exact payload for everything else.
+create table if not exists nm_rehab_records (
+  id text primary key,
+  team_id uuid not null references nm_teams(id),
+  kind text not null check (kind in (${REHAB_KINDS.map((k) => `'${k}'`).join(", ")})),
+  participant_id text references nm_participants(id),
+  series_id text,
+  version integer check (version is null or version >= 1),
+  status text,
+  occurred_at timestamptz,
+  author_role text not null check (author_role in ('professional', 'caregiver', 'researcher')),${RECORD_COLUMNS},
+  unique (series_id, version)
+);
+create index if not exists nm_rehab_records_team_kind on nm_rehab_records(team_id, kind);
+create index if not exists nm_rehab_records_participant on nm_rehab_records(participant_id);
+
+-- Historical integrity in the database itself: program/activity versions, reviews, assessments and
+-- practice reports never change and are never deleted after the first write \u2014 not even by direct SQL.
+create or replace function nm_rehab_immutable() returns trigger as $$
+begin
+  if old.kind in (${IMMUTABLE_KINDS.map((k) => `'${k}'`).join(", ")})
+     and (new.payload is distinct from old.payload or new.deleted_at is not null or new.kind <> old.kind) then
+    raise exception 'rehab record % (%) is immutable', old.id, old.kind using errcode = 'P0001';
+  end if;
+  if new.kind <> old.kind or new.participant_id is distinct from old.participant_id or new.team_id <> old.team_id then
+    raise exception 'rehab record % identity is immutable', old.id using errcode = 'P0001';
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+create or replace trigger nm_rehab_records_immutable before update on nm_rehab_records
+  for each row execute function nm_rehab_immutable();
+`
   }
 ];
 
@@ -424,61 +716,11 @@ async function pendingMigrations(db) {
   try {
     const rows = await db.query("select id from nm_schema_migrations");
     const done = new Set(rows.map((r) => r.id));
-    return MIGRATIONS.map((m) => m.id).filter((id) => !done.has(id));
+    return MIGRATIONS.map((m) => m.id).filter((id2) => !done.has(id2));
   } catch {
     return MIGRATIONS.map((m) => m.id);
   }
 }
-
-// src/core/exercises.ts
-var EXERCISE_IDS = [
-  "shoulder_flexion",
-  "shoulder_abduction",
-  "elbow_flexion",
-  "forearm_rotation"
-];
-var EXERCISES = {
-  shoulder_flexion: {
-    id: "shoulder_flexion",
-    angle: "elevation",
-    reps: "single",
-    trunk: true,
-    check: "none",
-    positioning: false,
-    expectedRom: 140,
-    gauge: { min: 0, max: 180 }
-  },
-  shoulder_abduction: {
-    id: "shoulder_abduction",
-    angle: "elevation",
-    reps: "single",
-    trunk: true,
-    check: "none",
-    positioning: false,
-    expectedRom: 130,
-    gauge: { min: 0, max: 180 }
-  },
-  elbow_flexion: {
-    id: "elbow_flexion",
-    angle: "elbow",
-    reps: "single",
-    trunk: false,
-    check: "upper_lift",
-    positioning: false,
-    expectedRom: 125,
-    gauge: { min: 0, max: 160 }
-  },
-  forearm_rotation: {
-    id: "forearm_rotation",
-    angle: "rotation",
-    reps: "bidirectional",
-    trunk: false,
-    check: "forearm_level",
-    positioning: true,
-    expectedRom: 120,
-    gauge: { min: -90, max: 90 }
-  }
-};
 
 // src/core/protocols.ts
 var PROTOCOL_IDS = ["upper_standard", "upper_quick", "elbow_endurance", "custom", "single"];
@@ -529,28 +771,28 @@ var calPose = (x) => x === void 0 || object(x) && Object.entries(x).every(([k, v
 var moduleIds = (x) => x === void 0 || object(x) && Object.entries(x).every(([k, v]) => ["trunk", "upper_l", "upper_r", "fore_l", "fore_r"].includes(k) && typeof v === "string" && /^([0-9A-F]{8}|none)$/.test(v));
 var number = (x) => typeof x === "number" && Number.isFinite(x);
 var nullableNumber = (x) => x === null || number(x);
-var date = (x) => text(x) && Number.isFinite(Date.parse(x));
-var nullableDate = (x) => x === null || date(x);
+var date2 = (x) => text(x) && Number.isFinite(Date.parse(x));
+var nullableDate = (x) => x === null || date2(x);
 var array = (x, valid) => Array.isArray(x) && x.every(valid);
-var oneOf = (x, options) => options.includes(x);
-var side = (x) => oneOf(x, ["left", "right"]);
+var oneOf2 = (x, options) => options.includes(x);
+var side = (x) => oneOf2(x, ["left", "right"]);
 var exercise = (x) => text(x) && Object.hasOwn(EXERCISES, x);
-var protocol = (x) => oneOf(x, PROTOCOL_IDS);
-var level = (x) => x === null || oneOf(x, [1, 2, 3, 4, 5]);
+var protocol = (x) => oneOf2(x, PROTOCOL_IDS);
+var level = (x) => x === null || oneOf2(x, [1, 2, 3, 4, 5]);
 var numericFields = (x, keys) => keys.every((k) => nullableNumber(x[k]));
-var goal = (x) => object(x) && text(x.id) && exercise(x.exercise) && side(x.side) && number(x.targetRom) && date(x.createdAt) && nullableDate(x.dueDate) && nullableDate(x.achievedAt);
-var patient = (x) => object(x) && patientCode(x.code) && number(x.birthYear) && oneOf(x.cpForm, ["hemiplegia", "diplegia", "tetraplegia", "dyskinetic", "ataxic", "other"]) && level(x.gmfcs) && level(x.macs) && oneOf(x.affectedSide, ["left", "right", "both", "none"]) && oneOf(x.status, ["active", "paused", "discharged"]) && date(x.createdAt) && nullableDate(x.courseStart) && nullableDate(x.nextVisit) && (x.nextProtocol === null || protocol(x.nextProtocol)) && array(x.goals, goal);
+var goal = (x) => object(x) && text(x.id) && exercise(x.exercise) && side(x.side) && number(x.targetRom) && date2(x.createdAt) && nullableDate(x.dueDate) && nullableDate(x.achievedAt);
+var patient = (x) => object(x) && patientCode(x.code) && number(x.birthYear) && oneOf2(x.cpForm, ["hemiplegia", "diplegia", "tetraplegia", "dyskinetic", "ataxic", "other"]) && level(x.gmfcs) && level(x.macs) && oneOf2(x.affectedSide, ["left", "right", "both", "none"]) && oneOf2(x.status, ["active", "paused", "discharged"]) && date2(x.createdAt) && nullableDate(x.courseStart) && nullableDate(x.nextVisit) && (x.nextProtocol === null || protocol(x.nextProtocol)) && array(x.goals, goal);
 var rep = (x) => object(x) && numericFields(x, ["index", "tStart", "tEnd", "rom", "supination", "pronation", "sparc", "peakVelocity", "duration", "trunk", "check"]);
 var flags = STEP_FLAGS;
 var step = (x) => {
   if (!object(x) || !object(x.summary) || !object(x.trace)) return false;
   const s = x.summary, tr = x.trace;
-  return oneOf(x.status, ["done", "partial", "skipped"]) && exercise(s.exercise) && side(s.side) && number(s.targetReps) && array(s.reps, rep) && numericFields(s, ["rom", "romBest", "supination", "pronation", "sparc", "peakVelocity", "repDuration", "trunk", "check", "cv"]) && array(s.flags, (v) => oneOf(v, flags)) && array(tr.t, number) && array(tr.angle, number) && array(tr.trunk, nullableNumber) && tr.t.length === tr.angle.length && tr.t.length === tr.trunk.length;
+  return oneOf2(x.status, ["done", "partial", "skipped"]) && exercise(s.exercise) && side(s.side) && number(s.targetReps) && array(s.reps, rep) && numericFields(s, ["rom", "romBest", "supination", "pronation", "sparc", "peakVelocity", "repDuration", "trunk", "check", "cv"]) && array(s.flags, (v) => oneOf2(v, flags)) && array(tr.t, number) && array(tr.angle, number) && array(tr.trunk, nullableNumber) && tr.t.length === tr.angle.length && tr.t.length === tr.trunk.length;
 };
 var events = SESSION_EVENT_KINDS;
-var session = (x) => object(x) && date(x.startedAt) && date(x.endedAt) && protocol(x.protocolId) && oneOf(x.status, ["completed", "incomplete"]) && typeof x.demo === "boolean" && typeof x.hasRaw === "boolean" && numericFields(x, ["activeSec", "totalSec", "calibrationAttempts"]) && calPose(x.calibrationPose) && short(x.algorithmVersion) && short(x.appVersion) && short(x.clinician) && long(x.note) && object(x.device) && oneOf(x.device.kind, ["usb", "ble", "simulator", "replay"]) && typeof x.device.simulated === "boolean" && short(x.device.name) && short(x.device.firmware) && short(x.device.format) && number(x.device.rateHz) && accCal(x.device.accCal) && moduleIds(x.device.moduleIds) && object(x.quality) && numericFields(x.quality, ["received", "lost", "saturated", "percent"]) && array(x.steps, step) && array(x.events, (e) => object(e) && oneOf(e.kind, events) && number(e.t) && (e.step === void 0 || number(e.step)) && (e.value === void 0 || number(e.value)));
-var note = (x) => object(x) && long(x.text) && short(x.author) && oneOf(x.kind, ["clinical", "summary"]) && date(x.createdAt);
-var alert = (x) => object(x) && oneOf(x.kind, ["rom_drop", "trunk_compensation", "signal_quality", "goal_reached", "incomplete_session", "measurement_conditions", "plateau"]) && oneOf(x.severity, ["info", "attention", "warning"]) && typeof x.acknowledged === "boolean" && date(x.createdAt) && object(x.params) && Object.values(x.params).every((v) => short(v) || number(v));
+var session = (x) => object(x) && date2(x.startedAt) && date2(x.endedAt) && protocol(x.protocolId) && oneOf2(x.status, ["completed", "incomplete"]) && typeof x.demo === "boolean" && typeof x.hasRaw === "boolean" && numericFields(x, ["activeSec", "totalSec", "calibrationAttempts"]) && calPose(x.calibrationPose) && short(x.algorithmVersion) && short(x.appVersion) && short(x.clinician) && long(x.note) && object(x.device) && oneOf2(x.device.kind, ["usb", "ble", "simulator", "replay"]) && typeof x.device.simulated === "boolean" && short(x.device.name) && short(x.device.firmware) && short(x.device.format) && number(x.device.rateHz) && accCal(x.device.accCal) && moduleIds(x.device.moduleIds) && object(x.quality) && numericFields(x.quality, ["received", "lost", "saturated", "percent"]) && array(x.steps, step) && array(x.events, (e) => object(e) && oneOf2(e.kind, events) && number(e.t) && (e.step === void 0 || number(e.step)) && (e.value === void 0 || number(e.value)));
+var note = (x) => object(x) && long(x.text) && short(x.author) && oneOf2(x.kind, ["clinical", "summary"]) && date2(x.createdAt);
+var alert = (x) => object(x) && oneOf2(x.kind, ["rom_drop", "trunk_compensation", "signal_quality", "goal_reached", "incomplete_session", "measurement_conditions", "plateau"]) && oneOf2(x.severity, ["info", "attention", "warning"]) && typeof x.acknowledged === "boolean" && date2(x.createdAt) && object(x.params) && Object.values(x.params).every((v) => short(v) || number(v));
 function checkStoredRecords(data) {
   const validators = { patients: patient, sessions: session, notes: note, alerts: alert };
   let rejected = 0;
@@ -562,11 +804,11 @@ function checkStoredRecords(data) {
     } catch {
       asArchived = null;
     }
-    const ok = validators[key](asArchived) && object(entry) && short(entry.id) && entry.id !== "" && oneOf(entry.workspace, ["demo", "clinic"]) && !(key === "sessions" && entry.workspace === "clinic" && isSimulatedSession(entry));
+    const ok = validators[key](asArchived) && object(entry) && short(entry.id) && entry.id !== "" && oneOf2(entry.workspace, ["demo", "clinic"]) && !(key === "sessions" && entry.workspace === "clinic" && isSimulatedSession(entry));
     if (!ok) {
       rejected += 1;
-      const id = object(entry) && typeof entry.id === "string" ? entry.id : "";
-      records.push({ collection: key, id, record: entry });
+      const id2 = object(entry) && typeof entry.id === "string" ? entry.id : "";
+      records.push({ collection: key, id: id2, record: entry });
     }
     return ok;
   };
@@ -586,35 +828,35 @@ function checkStoredRecords(data) {
 var ALGORITHM_VERSION = "nm-core 0.2.0";
 
 // src/research/validate.ts
-var obj = (x) => !!x && typeof x === "object" && !Array.isArray(x);
-var str = (x, max2 = 300) => typeof x === "string" && x.length <= max2;
-var nonEmpty = (x, max2 = 300) => str(x, max2) && x.length > 0;
-var num = (x) => typeof x === "number" && Number.isFinite(x);
-var date2 = (x) => str(x, 40) && Number.isFinite(Date.parse(x));
+var obj2 = (x) => !!x && typeof x === "object" && !Array.isArray(x);
+var str2 = (x, max2 = 300) => typeof x === "string" && x.length <= max2;
+var nonEmpty2 = (x, max2 = 300) => str2(x, max2) && x.length > 0;
+var num2 = (x) => typeof x === "number" && Number.isFinite(x);
+var date3 = (x) => str2(x, 40) && Number.isFinite(Date.parse(x));
 var nullable = (x, f) => x === null || f(x);
-var oneOf2 = (x, xs) => xs.includes(x);
-var intIn = (x, lo, hi) => Number.isInteger(x) && x >= lo && x <= hi;
+var oneOf3 = (x, xs) => xs.includes(x);
+var intIn2 = (x, lo, hi) => Number.isInteger(x) && x >= lo && x <= hi;
 function definition(d) {
-  if (!obj(d)) return false;
+  if (!obj2(d)) return false;
   const q = d.quality;
-  return nonEmpty(d.name, 200) && str(d.description, 2e3) && oneOf2(d.bodyRegion, ["upper_limb", "lower_limb", "trunk", "multi_segment", "custom"]) && str(d.joint, 100) && oneOf2(d.exercise, EXERCISE_IDS) && oneOf2(d.side, ["left", "right"]) && str(d.movementType, 200) && Array.isArray(d.measurementPoints) && d.measurementPoints.length > 0 && d.measurementPoints.length <= 20 && d.measurementPoints.every((p) => obj(p) && nonEmpty(p.id, 40) && oneOf2(p.kind, ["max_flexion", "max_extension", "neutral", "custom"]) && str(p.label, 100)) && intIn(d.repetitions, 1, 200) && intIn(d.sets, 1, 20) && num(d.restSec) && typeof d.goniometerRequired === "boolean" && oneOf2(d.captureMode, ["hold", "rep_peak"]) && num(d.holdWindowSec) && obj(q) && num(q.maxWindowSdDeg) && num(q.minWindowSamples) && num(q.reviewAbsErrorDeg) && str(d.operatorNotes, 4e3) && obj(d.customFields) && Object.values(d.customFields).every((v) => str(v, 1e3));
+  return nonEmpty2(d.name, 200) && str2(d.description, 2e3) && oneOf3(d.bodyRegion, ["upper_limb", "lower_limb", "trunk", "multi_segment", "custom"]) && str2(d.joint, 100) && oneOf3(d.exercise, EXERCISE_IDS) && oneOf3(d.side, ["left", "right"]) && str2(d.movementType, 200) && Array.isArray(d.measurementPoints) && d.measurementPoints.length > 0 && d.measurementPoints.length <= 20 && d.measurementPoints.every((p) => obj2(p) && nonEmpty2(p.id, 40) && oneOf3(p.kind, ["max_flexion", "max_extension", "neutral", "custom"]) && str2(p.label, 100)) && intIn2(d.repetitions, 1, 200) && intIn2(d.sets, 1, 20) && num2(d.restSec) && typeof d.goniometerRequired === "boolean" && oneOf3(d.captureMode, ["hold", "rep_peak"]) && num2(d.holdWindowSec) && obj2(q) && num2(q.maxWindowSdDeg) && num2(q.minWindowSamples) && num2(q.reviewAbsErrorDeg) && str2(d.operatorNotes, 4e3) && obj2(d.customFields) && Object.values(d.customFields).every((v) => str2(v, 1e3));
 }
 function validProtocolVersion(x) {
-  return obj(x) && nonEmpty(x.key, 120) && nonEmpty(x.protocolId, 80) && intIn(x.version, 1, 1e5) && x.key === `${x.protocolId}@${x.version}` && oneOf2(x.workspace, ["clinic", "demo"]) && definition(x.definition) && date2(x.createdAt) && str(x.createdBy, 200) && typeof x.archived === "boolean";
+  return obj2(x) && nonEmpty2(x.key, 120) && nonEmpty2(x.protocolId, 80) && intIn2(x.version, 1, 1e5) && x.key === `${x.protocolId}@${x.version}` && oneOf3(x.workspace, ["clinic", "demo"]) && definition(x.definition) && date3(x.createdAt) && str2(x.createdBy, 200) && typeof x.archived === "boolean";
 }
 function device(d) {
-  return obj(d) && oneOf2(d.kind, ["usb", "ble", "simulator", "replay"]) && str(d.name, 200) && str(d.firmware, 100) && str(d.format, 100) && num(d.rateHz) && typeof d.simulated === "boolean" && Array.isArray(d.sensors) && d.sensors.every((s) => obj(s) && oneOf2(s.placement, ["trunk", "upper_l", "upper_r", "fore_l", "fore_r"]) && nullable(s.moduleId, (v) => str(v, 20)));
+  return obj2(d) && oneOf3(d.kind, ["usb", "ble", "simulator", "replay"]) && str2(d.name, 200) && str2(d.firmware, 100) && str2(d.format, 100) && num2(d.rateHz) && typeof d.simulated === "boolean" && Array.isArray(d.sensors) && d.sensors.every((s) => obj2(s) && oneOf3(s.placement, ["trunk", "upper_l", "upper_r", "fore_l", "fore_r"]) && nullable(s.moduleId, (v) => str2(v, 20)));
 }
 function validValidationSession(x) {
-  return obj(x) && nonEmpty(x.id, 80) && oneOf2(x.workspace, ["clinic", "demo"]) && nonEmpty(x.participantId, 80) && str(x.operator, 200) && nonEmpty(x.protocolKey, 120) && definition(x.protocol) && intIn(x.protocolVersion, 1, 1e5) && device(x.device) && str(x.algorithmVersion, 100) && str(x.appVersion, 100) && date2(x.startedAt) && (x.endedAt === null || date2(x.endedAt)) && oneOf2(x.status, ["active", "completed", "abandoned"]) && (x.calibration === null || obj(x.calibration) && date2(x.calibration.at) && num(x.calibration.attempts) && obj(x.calibration.poseDeg)) && (x.signal === null || obj(x.signal) && num(x.signal.received) && num(x.signal.lost) && num(x.signal.saturated) && num(x.signal.percent)) && str(x.notes, 4e3) && date2(x.createdAt) && date2(x.updatedAt);
+  return obj2(x) && nonEmpty2(x.id, 80) && oneOf3(x.workspace, ["clinic", "demo"]) && nonEmpty2(x.participantId, 80) && str2(x.operator, 200) && nonEmpty2(x.protocolKey, 120) && definition(x.protocol) && intIn2(x.protocolVersion, 1, 1e5) && device(x.device) && str2(x.algorithmVersion, 100) && str2(x.appVersion, 100) && date3(x.startedAt) && (x.endedAt === null || date3(x.endedAt)) && oneOf3(x.status, ["active", "completed", "abandoned"]) && (x.calibration === null || obj2(x.calibration) && date3(x.calibration.at) && num2(x.calibration.attempts) && obj2(x.calibration.poseDeg)) && (x.signal === null || obj2(x.signal) && num2(x.signal.received) && num2(x.signal.lost) && num2(x.signal.saturated) && num2(x.signal.percent)) && str2(x.notes, 4e3) && date3(x.createdAt) && date3(x.updatedAt);
 }
 function validTrial(x) {
-  if (!obj(x)) return false;
+  if (!obj2(x)) return false;
   const imu = x.imu;
-  const imuOk = imu === null || obj(imu) && num(imu.angleDeg) && Math.abs(imu.angleDeg) <= 400 && oneOf2(imu.method, ["hold", "rep_peak"]) && num(imu.tFrom) && num(imu.tTo) && intIn(imu.samples, 0, 1e6) && num(imu.windowSdDeg) && num(imu.windowMinDeg) && num(imu.windowMaxDeg) && date2(imu.capturedAt);
-  const refOk = x.referenceDeg === null || num(x.referenceDeg) && x.referenceDeg >= -180 && x.referenceDeg <= 360;
+  const imuOk = imu === null || obj2(imu) && num2(imu.angleDeg) && Math.abs(imu.angleDeg) <= 400 && oneOf3(imu.method, ["hold", "rep_peak"]) && num2(imu.tFrom) && num2(imu.tTo) && intIn2(imu.samples, 0, 1e6) && num2(imu.windowSdDeg) && num2(imu.windowMinDeg) && num2(imu.windowMaxDeg) && date3(imu.capturedAt);
+  const refOk = x.referenceDeg === null || num2(x.referenceDeg) && x.referenceDeg >= -180 && x.referenceDeg <= 360;
   const pairOk = (x.status !== "valid" || imu !== null && x.referenceDeg !== null) && (x.status !== "pending_reference" || imu !== null && x.referenceDeg === null);
-  return nonEmpty(x.id, 80) && oneOf2(x.workspace, ["clinic", "demo"]) && nonEmpty(x.sessionId, 80) && nonEmpty(x.participantId, 80) && intIn(x.set, 1, 20) && intIn(x.repetition, 1, 200) && nonEmpty(x.pointId, 40) && intIn(x.attempt, 1, 1e4) && oneOf2(x.status, ["pending_reference", "valid", "invalid", "skipped", "superseded"]) && imuOk && refOk && pairOk && (x.referenceAt === null || date2(x.referenceAt)) && str(x.reason, 1e3) && str(x.notes, 2e3) && str(x.operator, 200) && date2(x.createdAt) && date2(x.updatedAt);
+  return nonEmpty2(x.id, 80) && oneOf3(x.workspace, ["clinic", "demo"]) && nonEmpty2(x.sessionId, 80) && nonEmpty2(x.participantId, 80) && intIn2(x.set, 1, 20) && intIn2(x.repetition, 1, 200) && nonEmpty2(x.pointId, 40) && intIn2(x.attempt, 1, 1e4) && oneOf3(x.status, ["pending_reference", "valid", "invalid", "skipped", "superseded"]) && imuOk && refOk && pairOk && (x.referenceAt === null || date3(x.referenceAt)) && str2(x.reason, 1e3) && str2(x.notes, 2e3) && str2(x.operator, 200) && date3(x.createdAt) && date3(x.updatedAt);
 }
 
 // src/research/stats.ts
@@ -713,15 +955,15 @@ function errorSummary(pairs) {
   const d = pairs.map(signedError);
   const abs = d.map(Math.abs);
   const bias = meanOf(d);
-  const sd = sdOf(d);
-  const half = n >= 2 ? tQuantile(0.975, n - 1) * (sd / Math.sqrt(n)) : NaN;
+  const sd2 = sdOf(d);
+  const half = n >= 2 ? tQuantile(0.975, n - 1) * (sd2 / Math.sqrt(n)) : NaN;
   return {
     n,
     meanImu: finite(meanOf(pairs.map((p) => p.imu))),
     meanRef: finite(meanOf(pairs.map((p) => p.ref))),
     bias: finite(bias),
     biasCi: Number.isFinite(half) ? [bias - half, bias + half] : null,
-    sd: finite(sd),
+    sd: finite(sd2),
     mae: finite(meanOf(abs)),
     rmse: n ? Math.sqrt(meanOf(d.map((x) => x * x))) : null,
     medianAbs: finite(medianOf(abs)),
@@ -742,17 +984,17 @@ function lineFit(xs, ys) {
     sxy += (xs[i] - mx) * (ys[i] - my);
   }
   if (sxx === 0) return null;
-  const slope = sxy / sxx;
-  const intercept = my - slope * mx;
+  const slope2 = sxy / sxx;
+  const intercept = my - slope2 * mx;
   let slopeCi = null;
   if (n >= 3) {
     let sse = 0;
-    for (let i = 0; i < n; i++) sse += (ys[i] - intercept - slope * xs[i]) ** 2;
+    for (let i = 0; i < n; i++) sse += (ys[i] - intercept - slope2 * xs[i]) ** 2;
     const se = Math.sqrt(sse / (n - 2) / sxx);
     const h = tQuantile(0.975, n - 2) * se;
-    slopeCi = [slope - h, slope + h];
+    slopeCi = [slope2 - h, slope2 + h];
   }
-  return { n, intercept, slope, slopeCi };
+  return { n, intercept, slope: slope2, slopeCi };
 }
 function blandAltman(pairs) {
   const n = pairs.length;
@@ -760,17 +1002,17 @@ function blandAltman(pairs) {
   const d = pairs.map(signedError);
   const m = pairs.map((p) => (p.imu + p.ref) / 2);
   const bias = meanOf(d);
-  const sd = sdOf(d);
+  const sd2 = sdOf(d);
   const t = tQuantile(0.975, n - 1);
-  const seBias = sd / Math.sqrt(n);
-  const seLoa = Math.sqrt(3 * sd * sd / n);
-  const loa = [bias - Z975 * sd, bias + Z975 * sd];
+  const seBias = sd2 / Math.sqrt(n);
+  const seLoa = Math.sqrt(3 * sd2 * sd2 / n);
+  const loa = [bias - Z975 * sd2, bias + Z975 * sd2];
   return {
     method: "standard",
     n,
     subjects: new Set(pairs.map((p) => p.subject ?? "")).size,
     bias,
-    sd,
+    sd: sd2,
     loa,
     biasCi: [bias - t * seBias, bias + t * seBias],
     lowerCi: [loa[0] - t * seLoa, loa[0] + t * seLoa],
@@ -803,7 +1045,7 @@ function blandAltmanRepeated(pairs) {
   const msw = ssw / (N - k);
   const lambda = (N * N - sumM2) / ((k - 1) * N);
   const varB = Math.max(0, (msb - msw) / lambda);
-  const sd = Math.sqrt(varB + msw);
+  const sd2 = Math.sqrt(varB + msw);
   const m = pairs.map((p) => (p.imu + p.ref) / 2);
   const t = tQuantile(0.975, k - 1);
   const subjectMeans = [...groups.values()].map(meanOf);
@@ -813,8 +1055,8 @@ function blandAltmanRepeated(pairs) {
     n: N,
     subjects: k,
     bias: grand,
-    sd,
-    loa: [grand - Z975 * sd, grand + Z975 * sd],
+    sd: sd2,
+    loa: [grand - Z975 * sd2, grand + Z975 * sd2],
     biasCi: Number.isFinite(seBias) ? [grand - t * seBias, grand + t * seBias] : null,
     lowerCi: null,
     upperCi: null,
@@ -854,7 +1096,9 @@ var SYNC_ENTITIES = [
   "alert",
   "protocol_version",
   "validation_session",
-  "trial"
+  "trial",
+  // Functional Progression System: every rehab record kind travels as one entity (kind inside the payload)
+  "rehab_record"
 ];
 var PUSH_BATCH = 50;
 
@@ -947,27 +1191,51 @@ function checkBase(entity) {
     return null;
   };
 }
-var softDelete = (table, key) => async ({ t, p }, rev, id) => {
-  await t.query(`update ${table} set rev = $1, deleted_at = now(), updated_at = now(), updated_by = $2 where ${key} = $3 and team_id = $4`, [rev, p.userId, id, p.teamId]);
+var softDelete = (table, key) => async ({ t, p }, rev, id2) => {
+  await t.query(`update ${table} set rev = $1, deleted_at = now(), updated_at = now(), updated_by = $2 where ${key} = $3 and team_id = $4`, [rev, p.userId, id2, p.teamId]);
 };
-async function sameTeam(t, table, id, teamId) {
-  const r = await t.query(`select team_id from ${table} where id = $1`, [id]);
+async function sameTeam(t, table, id2, teamId) {
+  const r = await t.query(`select team_id from ${table} where id = $1`, [id2]);
   return !r[0] || r[0].team_id === teamId;
 }
 var Rejected = class extends Error {
 };
+function rehabColumns(r) {
+  switch (r.kind) {
+    case "activity":
+      return { series: r.seriesId, version: r.version, status: r.status, occurred: r.createdAt };
+    case "program":
+      return { series: r.seriesId, version: r.version, status: r.def.status, occurred: r.createdAt };
+    case "goal":
+      return { series: null, version: null, status: r.status, occurred: r.createdAt };
+    case "practice":
+      return { series: null, version: null, status: r.completion, occurred: r.date };
+    case "review":
+      return { series: null, version: null, status: r.decision, occurred: r.createdAt };
+    case "assessment":
+      return { series: null, version: null, status: r.timepoint, occurred: r.date };
+    case "study":
+      return { series: null, version: null, status: r.status, occurred: r.createdAt };
+    case "consent":
+      return { series: null, version: null, status: r.status, occurred: r.createdAt };
+    case "incident":
+      return { series: null, version: null, status: r.review ? "reviewed" : "open", occurred: r.occurredAt };
+    case "profile":
+      return { series: null, version: null, status: null, occurred: r.createdAt };
+  }
+}
 var HANDLERS = {
   participant: {
     table: "nm_participants",
     key: "id",
     check: checkBase("participant"),
-    async write(ctx, v, rev, deleted, id) {
-      if (deleted || !v) return softDelete("nm_participants", "id")(ctx, rev, id);
+    async write(ctx, v, rev, deleted, id2) {
+      if (deleted || !v) return softDelete("nm_participants", "id")(ctx, rev, id2);
       await ctx.t.query(
         `insert into nm_participants (id, team_id, code, birth_year, status, rev, payload, created_by, updated_by)
          values ($1, $2, $3, $4, $5, $6, $7, $8, $8)
          on conflict (id) do update set code = $3, birth_year = $4, status = $5, rev = $6, payload = $7, updated_at = now(), updated_by = $8, deleted_at = null`,
-        [id, ctx.p.teamId, v.code, v.birthYear, v.status, rev, v, ctx.p.userId]
+        [id2, ctx.p.teamId, v.code, v.birthYear, v.status, rev, v, ctx.p.userId]
       );
     }
   },
@@ -975,15 +1243,15 @@ var HANDLERS = {
     table: "nm_rehab_sessions",
     key: "id",
     check: checkBase("rehab_session"),
-    async write(ctx, v, rev, deleted, id) {
-      if (deleted || !v) return softDelete("nm_rehab_sessions", "id")(ctx, rev, id);
+    async write(ctx, v, rev, deleted, id2) {
+      if (deleted || !v) return softDelete("nm_rehab_sessions", "id")(ctx, rev, id2);
       if (!await sameTeam(ctx.t, "nm_participants", String(v.patientId), ctx.p.teamId)) throw new Rejected("forbidden");
       const dev = v.device;
       await ctx.t.query(
         `insert into nm_rehab_sessions (id, team_id, participant_id, protocol_id, started_at, status, algorithm_version, device_kind, rev, payload, created_by, updated_by)
          values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $11)
          on conflict (id) do update set participant_id = $3, protocol_id = $4, started_at = $5, status = $6, algorithm_version = $7, device_kind = $8, rev = $9, payload = $10, updated_at = now(), updated_by = $11, deleted_at = null`,
-        [id, ctx.p.teamId, v.patientId, v.protocolId, v.startedAt, v.status, v.algorithmVersion, dev.kind, rev, v, ctx.p.userId]
+        [id2, ctx.p.teamId, v.patientId, v.protocolId, v.startedAt, v.status, v.algorithmVersion, dev.kind, rev, v, ctx.p.userId]
       );
     }
   },
@@ -991,13 +1259,13 @@ var HANDLERS = {
     table: "nm_notes",
     key: "id",
     check: checkBase("note"),
-    async write(ctx, v, rev, deleted, id) {
-      if (deleted || !v) return softDelete("nm_notes", "id")(ctx, rev, id);
+    async write(ctx, v, rev, deleted, id2) {
+      if (deleted || !v) return softDelete("nm_notes", "id")(ctx, rev, id2);
       if (!await sameTeam(ctx.t, "nm_participants", String(v.patientId), ctx.p.teamId)) throw new Rejected("forbidden");
       await ctx.t.query(
         `insert into nm_notes (id, team_id, participant_id, session_id, rev, payload, created_by, updated_by) values ($1, $2, $3, $4, $5, $6, $7, $7)
          on conflict (id) do update set participant_id = $3, session_id = $4, rev = $5, payload = $6, updated_at = now(), updated_by = $7, deleted_at = null`,
-        [id, ctx.p.teamId, v.patientId, v.sessionId, rev, v, ctx.p.userId]
+        [id2, ctx.p.teamId, v.patientId, v.sessionId, rev, v, ctx.p.userId]
       );
     }
   },
@@ -1005,13 +1273,13 @@ var HANDLERS = {
     table: "nm_alerts",
     key: "id",
     check: checkBase("alert"),
-    async write(ctx, v, rev, deleted, id) {
-      if (deleted || !v) return softDelete("nm_alerts", "id")(ctx, rev, id);
+    async write(ctx, v, rev, deleted, id2) {
+      if (deleted || !v) return softDelete("nm_alerts", "id")(ctx, rev, id2);
       if (!await sameTeam(ctx.t, "nm_participants", String(v.patientId), ctx.p.teamId)) throw new Rejected("forbidden");
       await ctx.t.query(
         `insert into nm_alerts (id, team_id, participant_id, session_id, kind, rev, payload, created_by, updated_by) values ($1, $2, $3, $4, $5, $6, $7, $8, $8)
          on conflict (id) do update set participant_id = $3, session_id = $4, kind = $5, rev = $6, payload = $7, updated_at = now(), updated_by = $8, deleted_at = null`,
-        [id, ctx.p.teamId, v.patientId, v.sessionId, v.kind, rev, v, ctx.p.userId]
+        [id2, ctx.p.teamId, v.patientId, v.sessionId, v.kind, rev, v, ctx.p.userId]
       );
     }
   },
@@ -1024,7 +1292,7 @@ var HANDLERS = {
       if (payload.workspace !== "clinic") return "demo_data_not_accepted";
       return null;
     },
-    async write(ctx, v, rev, deleted, id) {
+    async write(ctx, v, rev, deleted, id2) {
       if (deleted || !v) throw new Rejected("protocol_versions_are_never_deleted");
       const pv = v;
       const owner = await ctx.t.query("select team_id from nm_protocols where id = $1", [pv.protocolId]);
@@ -1034,7 +1302,7 @@ var HANDLERS = {
         `insert into nm_protocol_versions (key, team_id, protocol_id, version, definition, archived, rev, payload, created_by, updated_by)
          values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9)
          on conflict (key) do update set definition = $5, archived = $6, rev = $7, payload = $8, updated_at = now(), updated_by = $9`,
-        [id, ctx.p.teamId, pv.protocolId, pv.version, pv.definition, pv.archived, rev, v, ctx.p.userId]
+        [id2, ctx.p.teamId, pv.protocolId, pv.version, pv.definition, pv.archived, rev, v, ctx.p.userId]
       );
     }
   },
@@ -1048,7 +1316,7 @@ var HANDLERS = {
       if (payload.device.simulated || payload.device.kind === "simulator") return "simulated_data_not_accepted";
       return null;
     },
-    async write(ctx, v, rev, deleted, id) {
+    async write(ctx, v, rev, deleted, id2) {
       if (deleted || !v) throw new Rejected("validation_sessions_are_never_deleted");
       const s = v;
       const { t, p } = ctx;
@@ -1077,22 +1345,54 @@ var HANDLERS = {
         `insert into nm_validation_sessions (id, team_id, participant_id, protocol_key, sensor_configuration_id, operator, status, started_at, ended_at, algorithm_version, app_version, simulated, rev, payload, created_by, updated_by)
          values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $15)
          on conflict (id) do update set sensor_configuration_id = $5, operator = $6, status = $7, ended_at = $9, rev = $13, payload = $14, updated_at = now(), updated_by = $15`,
-        [id, p.teamId, s.participantId, s.protocolKey, cfg[0]?.id ?? null, s.operator, s.status, s.startedAt, s.endedAt, s.algorithmVersion, s.appVersion, s.device.simulated, rev, v, p.userId]
+        [id2, p.teamId, s.participantId, s.protocolKey, cfg[0]?.id ?? null, s.operator, s.status, s.startedAt, s.endedAt, s.algorithmVersion, s.appVersion, s.device.simulated, rev, v, p.userId]
       );
       if (s.calibration) {
         const params = { attempts: s.calibration.attempts, poseDeg: s.calibration.poseDeg };
         await t.query(
           `insert into nm_calibration_records (team_id, session_id, kind, parameters, recorded_at, params_hash) values ($1, $2, 'stand_still', $3, $4, $5) on conflict (session_id, kind, params_hash) do nothing`,
-          [p.teamId, id, params, s.calibration.at, sha256(canonical(params))]
+          [p.teamId, id2, params, s.calibration.at, sha256(canonical(params))]
         );
       }
       if (s.device.accCal && Object.keys(s.device.accCal).length) {
         await t.query(
           `insert into nm_calibration_records (team_id, session_id, kind, parameters, recorded_at, params_hash) values ($1, $2, 'acc_six_position', $3, $4, $5) on conflict (session_id, kind, params_hash) do nothing`,
-          [p.teamId, id, s.device.accCal, s.startedAt, sha256(canonical(s.device.accCal))]
+          [p.teamId, id2, s.device.accCal, s.startedAt, sha256(canonical(s.device.accCal))]
         );
       }
-      if (s.status === "completed") await recomputeMetrics(t, p.teamId, id);
+      if (s.status === "completed") await recomputeMetrics(t, p.teamId, id2);
+    }
+  },
+  rehab_record: {
+    table: "nm_rehab_records",
+    key: "id",
+    check(payload, entityId) {
+      if (!validRehabRecord(payload)) return "invalid_payload";
+      if (payload.id !== entityId) return "id_mismatch";
+      if (payload.workspace !== "clinic") return "demo_data_not_accepted";
+      return null;
+    },
+    async write(ctx, v, rev, deleted, id2, current) {
+      const { t, p } = ctx;
+      const prev = current ?? null;
+      if (deleted || !v) throw new Rejected("rehab_records_are_never_deleted");
+      const r = v;
+      const linked = await linkedParticipants(t, p);
+      const denial = canWriteRehab({ role: p.role, participantIds: linked }, r, prev);
+      if (denial) throw new Rejected(denial);
+      if (prev) {
+        if (IMMUTABLE_KINDS.includes(prev.kind)) throw new Rejected("immutable");
+        const problem = checkTransition(prev, r);
+        if (problem) throw new Rejected(problem);
+      }
+      if (r.participantId && !await sameTeam(t, "nm_participants", r.participantId, p.teamId)) throw new Rejected("forbidden");
+      const c = rehabColumns(r);
+      await t.query(
+        `insert into nm_rehab_records (id, team_id, kind, participant_id, series_id, version, status, occurred_at, author_role, rev, payload, created_by, updated_by)
+         values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $12)
+         on conflict (id) do update set status = $7, occurred_at = $8, rev = $10, payload = $11, updated_at = now(), updated_by = $12`,
+        [id2, p.teamId, r.kind, r.participantId, c.series, c.version, c.status, c.occurred, r.createdByRole, rev, v, p.userId]
+      );
     }
   },
   trial: {
@@ -1104,7 +1404,7 @@ var HANDLERS = {
       if (payload.workspace !== "clinic") return "demo_data_not_accepted";
       return null;
     },
-    async write(ctx, v, rev, deleted, id) {
+    async write(ctx, v, rev, deleted, id2) {
       if (deleted || !v) throw new Rejected("trials_are_never_deleted");
       const tr = v;
       const { t, p } = ctx;
@@ -1115,7 +1415,7 @@ var HANDLERS = {
         `insert into nm_trials (id, team_id, session_id, participant_id, set_no, repetition, point_id, attempt, status, imu_angle_deg, reference_deg, capture_method, window_sd_deg, captured_at, reference_at, operator, rev, payload, created_by, updated_by)
          values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $19)
          on conflict (id) do update set status = $9, imu_angle_deg = $10, reference_deg = $11, capture_method = $12, window_sd_deg = $13, captured_at = $14, reference_at = $15, operator = $16, rev = $17, payload = $18, updated_at = now(), updated_by = $19`,
-        [id, p.teamId, tr.sessionId, tr.participantId, tr.set, tr.repetition, tr.pointId, tr.attempt, tr.status, tr.imu?.angleDeg ?? null, tr.referenceDeg, tr.imu?.method ?? null, tr.imu?.windowSdDeg ?? null, tr.imu?.capturedAt ?? null, tr.referenceAt, tr.operator, rev, v, p.userId]
+        [id2, p.teamId, tr.sessionId, tr.participantId, tr.set, tr.repetition, tr.pointId, tr.attempt, tr.status, tr.imu?.angleDeg ?? null, tr.referenceDeg, tr.imu?.method ?? null, tr.imu?.windowSdDeg ?? null, tr.imu?.capturedAt ?? null, tr.referenceAt, tr.operator, rev, v, p.userId]
       );
       if (s[0]?.status === "completed") await recomputeMetrics(t, p.teamId, tr.sessionId);
     }
@@ -1159,8 +1459,8 @@ async function applyOp(db, p, deviceId, op) {
       const cur = (await t.query(`select team_id, rev, payload, deleted_at from ${h.table} where ${h.key} = $1 for update`, [op.entityId]))[0];
       if (cur && cur.team_id !== p.teamId) return { opId: op.opId, status: "rejected", error: "forbidden" };
       if (cur) {
-        const same = !!cur.deleted_at === op.deleted && (op.deleted || canonical(cur.payload) === canonical(op.payload));
-        if (same) {
+        const same2 = !!cur.deleted_at === op.deleted && (op.deleted || canonical(cur.payload) === canonical(op.payload));
+        if (same2) {
           await t.query("insert into nm_idempotency (team_id, op_id, entity, entity_id, rev) values ($1, $2, $3, $4, $5)", [p.teamId, op.opId, op.entity, op.entityId, cur.rev]);
           return { opId: op.opId, status: "duplicate", rev: cur.rev };
         }
@@ -1170,7 +1470,7 @@ async function applyOp(db, p, deviceId, op) {
         return { opId: op.opId, status: "applied", rev: 0 };
       }
       const rev = (cur?.rev ?? 0) + 1;
-      await h.write({ t, p }, op.deleted ? null : op.payload, rev, op.deleted, op.entityId);
+      await h.write({ t, p }, op.deleted ? null : op.payload, rev, op.deleted, op.entityId, cur && !cur.deleted_at ? cur.payload : null);
       const ch = await t.query("insert into nm_changes (team_id, entity, entity_id, rev, deleted) values ($1, $2, $3, $4, $5) returning seq", [p.teamId, op.entity, op.entityId, rev, op.deleted]);
       await t.query("insert into nm_audit_events (team_id, user_id, device_id, action, entity, entity_id, rev, op_id, details) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)", [
         p.teamId,
@@ -1230,8 +1530,20 @@ async function pull(db, redis, p, since) {
     }
   }
   changes.sort((a, b) => a.seq - b.seq);
+  const visible = p.role === "caregiver" ? await caregiverFilter(db, p, changes) : changes;
   const cursor = rows.length ? Number(rows[rows.length - 1]?.seq) : since;
-  return { changes, cursor, more: rows.length === PULL_LIMIT };
+  return { changes: visible, cursor, more: rows.length === PULL_LIMIT };
+}
+async function caregiverFilter(db, p, changes) {
+  const linked = await linkedParticipants(db, p);
+  return changes.filter((ch) => {
+    if (ch.deleted || ch.payload === null) return ch.entity === "participant" && linked.includes(ch.entityId);
+    const v = ch.payload;
+    if (ch.entity === "participant") return linked.includes(ch.entityId);
+    if (ch.entity === "note") return v.kind === "summary" && linked.includes(String(v.patientId));
+    if (ch.entity === "rehab_record") return caregiverMayRead(v, linked);
+    return false;
+  });
 }
 
 // server/storage.ts
@@ -1266,6 +1578,149 @@ async function putRawChunk(db, env, p, b) {
 }
 async function listRawChunks(db, p, recordingId) {
   return db.query("select chunk_index, sha256, frame_count, encoding, created_at from nm_raw_chunks where team_id = $1 and recording_id = $2 order by chunk_index", [p.teamId, recordingId]);
+}
+
+// src/rehab/progress.ts
+var WINDOW_DAYS = 14;
+var RULES = [
+  { id: "safety_unreviewed", version: 1, category: "safety", severity: "review", logic: "Any safety incident (pain, discomfort, unusual response, fall, stopped session) without a professional review.", notMeaning: "Not a clinical judgement of the event; it only says nobody has reviewed it yet." },
+  { id: "data_quality_latest", version: 1, category: "data_quality", severity: "info", logic: `Latest sensor session has a step with signal < 90 %, < 3 repetitions, saturation, data gap, lost sensor, flipped mount or moved calibration.`, notMeaning: "Not a statement about the child; the session cannot be compared reliably." },
+  { id: "assigned_not_completed", version: 1, category: "adherence", severity: "info", logic: `Last ${WINDOW_DAYS} days: professional-planned home occasions (\u03A3 frequency/week \xD7 weeks) \u2265 2 and reports of completed/partial < 50 % of planned, or \u2265 2 reports "not completed"/"stopped".`, notMeaning: "Not a judgement of the family. Missing reports are not proof that practice did not happen." },
+  { id: "reported_fatigue_discomfort", version: 1, category: "reported", severity: "review", logic: `Last ${WINDOW_DAYS} days: \u2265 2 reports with fatigue "moderate" or "a lot", any discomfort, or a stopped session.`, notMeaning: "Caregiver/child report, not a measurement. Never a reason to push through." },
+  { id: "repeated_barrier", version: 1, category: "reported", severity: "info", logic: `Last ${WINDOW_DAYS} days: the same barrier reported \u2265 2 times.`, notMeaning: "Context for the conversation with the family." },
+  { id: "consistency_trend", version: 1, category: "measurement", severity: "info", logic: "Last \u2264 6 usable sessions of one movement (\u2265 3): ROM CV trend per week; reported when the last CV is \u2265 3 percentage points lower (or higher) than the first in the window and the trend has the same sign.", notMeaning: "Consistency of an IMU angle across repetitions, not motor control or function." },
+  { id: "range_vs_baseline", version: 1, category: "measurement", severity: "info", logic: "Median ROM of the latest usable session differs from the individual baseline by more than 2 \xD7 SE of the difference of repetition means.", notMeaning: "A measured angle difference. Does not imply a change in daily function, and the noise check is not a validated MDC." },
+  { id: "unusual_repetitions", version: 1, category: "measurement", severity: "info", logic: "Latest usable session: repetitions whose ROM is further than 3 \xD7 scaled MAD from the step median (\u2265 4 repetitions).", notMeaning: "Could be effort, attention, a sensor slip or a different movement; look at the trace." },
+  { id: "baseline_not_designated", version: 1, category: "measurement", severity: "info", logic: "Usable sensor sessions exist but no baseline session was designated; comparisons use the first usable session provisionally.", notMeaning: "Bookkeeping only." },
+  { id: "goal_reassessment", version: 1, category: "goal", severity: "review", logic: 'Goal marked "needs review", review date passed, or no history entry for 56 days (goals not achieved/paused).', notMeaning: "Not a statement about progress towards the goal." },
+  { id: "imu_goal_without_measurement", version: 1, category: "goal", severity: "info", logic: "Goal measured with the IMU (by the professional's choice) has no usable session of that movement since the goal was created.", notMeaning: "Missing data only." },
+  { id: "review_due", version: 1, category: "schedule", severity: "review", logic: "Active program and: its review date or a checkpoint has passed since the last progress review, or no progress review for 56 days.", notMeaning: "A scheduling reminder; the professional decides whether anything changes." },
+  { id: "assessment_interval", version: 1, category: "schedule", severity: "info", logic: "Active program and the last instrument-based assessment is older than 16 weeks (or none recorded).", notMeaning: "The professional selects whether and which instrument is appropriate." }
+];
+var RULE = new Map(RULES.map((r) => [r.id, r]));
+
+// src/rehab/summary.ts
+var SUMMARY_SECTIONS = ["goals", "program", "practice", "safety", "measurements", "assessments", "review"];
+var SUMMARY_LANGUAGES = { ru: "Russian", kk: "Kazakh", en: "English" };
+function systemPrompt(language) {
+  return [
+    "You draft a short progress summary for a pediatric rehabilitation professional, who will review and edit it.",
+    "Use ONLY the numbered facts provided. Every sentence must cite the ids of the facts it is based on, and must not add any information that is not in those facts.",
+    "Keep the three kinds of information apart and say which kind a sentence is about: instrument-based assessments, IMU sensor measurements (not clinically validated, body-function level), and what the family or child reported.",
+    "Do not diagnose, do not interpret medical conditions, do not recommend or change treatment, exercises, doses, frequency or difficulty, and do not judge eligibility. Do not say that the child improved or got worse; describe measured differences neutrally (higher/lower, within/larger than the noise check). A change in a measured angle does not mean a change in daily function.",
+    "Rule-based observations are prompts for the professional, not findings; mention open ones briefly as items to look at.",
+    "Never blame the family; missing reports do not prove that practice did not happen.",
+    `Write in ${SUMMARY_LANGUAGES[language]}. Plain, concise, at most 3 sentences per section. Omit sections that have no facts.`
+  ].join("\n");
+}
+function factsPrompt(facts) {
+  return ["Facts:", ...facts.map((f) => `${f.id} [${f.section}; source: ${f.source}] ${f.text}`)].join("\n");
+}
+var FORBIDDEN = /\b(diagnos\w*|prescri\w*|recommend\w*|should (increase|decrease|add|stop|continue)|improv\w*|deteriorat\w*|worsen\w*)\b|диагноз|рекоменд|назнач|улучш|ухудш|следует (увелич|уменьш)|ұсыным|ұсынамыз|жақсар|нашарла/i;
+function checkDraft(draft, facts) {
+  const ids = new Set(facts.map((f) => f.id));
+  let flagged = 0;
+  const sections = draft.sections.filter((s) => SUMMARY_SECTIONS.includes(s.section)).map((s) => ({
+    section: s.section,
+    sentences: s.sentences.map((x) => {
+      const flags2 = [];
+      if (!x.facts.length) flags2.push("uncited");
+      if (x.facts.some((f) => !ids.has(f))) flags2.push("unknown_fact");
+      if (FORBIDDEN.test(x.text)) flags2.push("wording");
+      if (flags2.length) flagged++;
+      const checked = { text: x.text.slice(0, 1200), facts: x.facts.filter((f) => ids.has(f)), flags: flags2 };
+      return checked;
+    })
+  }));
+  return { sections, flagged };
+}
+function validDraft(x) {
+  if (!x || typeof x !== "object" || !Array.isArray(x.sections)) return false;
+  return x.sections.every(
+    (s) => s && typeof s.section === "string" && Array.isArray(s.sentences) && s.sentences.every((t) => t && typeof t.text === "string" && Array.isArray(t.facts) && t.facts.every((f) => typeof f === "string"))
+  );
+}
+function validFactsPayload(x) {
+  return Array.isArray(x) && x.length > 0 && x.length <= 200 && x.every(
+    (f) => f && typeof f === "object" && typeof f.id === "string" && /^F\d{1,3}$/.test(f.id) && SUMMARY_SECTIONS.includes(f.section) && ["instrument", "imu", "reported", "professional", "analysis"].includes(f.source) && typeof f.text === "string" && f.text.length <= 600
+  );
+}
+
+// server/ai.ts
+var DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
+function geminiKeys(env) {
+  return (env.GEMINI_API_KEYS ?? "").split(",").map((k) => k.trim()).filter(Boolean);
+}
+function aiEnabled(env) {
+  return env.NEUROMOVE_AI_SUMMARIES === "1" && geminiKeys(env).length > 0;
+}
+var counter = 0;
+function nextKeyIndex(count) {
+  const i = counter % count;
+  counter = (counter + 1) % 1e6;
+  return i;
+}
+var DraftError = class extends Error {
+};
+var RESPONSE_SCHEMA = {
+  type: "OBJECT",
+  required: ["sections"],
+  properties: {
+    sections: {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        required: ["section", "sentences"],
+        properties: {
+          section: { type: "STRING", enum: [...SUMMARY_SECTIONS] },
+          sentences: {
+            type: "ARRAY",
+            items: { type: "OBJECT", required: ["text", "facts"], properties: { text: { type: "STRING" }, facts: { type: "ARRAY", items: { type: "STRING" } } } }
+          }
+        }
+      }
+    }
+  }
+};
+var TRY_NEXT_KEY = /* @__PURE__ */ new Set([401, 403, 429, 500, 502, 503, 504]);
+async function draftSummary(fetchFn, keys, facts, language, model = DEFAULT_GEMINI_MODEL) {
+  if (!keys.length) throw new DraftError("not_configured");
+  const start = nextKeyIndex(keys.length);
+  const body2 = JSON.stringify({
+    systemInstruction: { parts: [{ text: systemPrompt(language) }] },
+    contents: [{ role: "user", parts: [{ text: factsPrompt(facts) }] }],
+    generationConfig: { responseMimeType: "application/json", responseSchema: RESPONSE_SCHEMA, temperature: 0.2, maxOutputTokens: 4096 }
+  });
+  let lastStatus = 0;
+  for (let n = 0; n < keys.length; n++) {
+    const keyIndex = (start + n) % keys.length;
+    const res = await fetchFn(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": keys[keyIndex] },
+      body: body2
+    });
+    if (TRY_NEXT_KEY.has(res.status)) {
+      lastStatus = res.status;
+      continue;
+    }
+    if (res.status !== 200) throw new DraftError(`http_${res.status}`);
+    const data = await res.json();
+    if (data.promptFeedback?.blockReason) throw new DraftError("refused");
+    const cand = data.candidates?.[0];
+    if (!cand) throw new DraftError("empty");
+    if (cand.finishReason === "SAFETY" || cand.finishReason === "PROHIBITED_CONTENT" || cand.finishReason === "BLOCKLIST") throw new DraftError("refused");
+    if (cand.finishReason === "MAX_TOKENS") throw new DraftError("truncated");
+    const text2 = (cand.content?.parts ?? []).map((p) => p.text ?? "").join("");
+    let parsed;
+    try {
+      parsed = JSON.parse(text2);
+    } catch {
+      throw new DraftError("invalid_output");
+    }
+    if (!validDraft(parsed)) throw new DraftError("invalid_output");
+    return { draft: checkDraft(parsed, facts), model: data.modelVersion ?? model, keyIndex };
+  }
+  throw new DraftError(lastStatus === 429 ? "all_keys_rate_limited" : "all_keys_failed");
 }
 
 // server/http.ts
@@ -1321,7 +1776,7 @@ async function handle(req, deps) {
         dbState = "error";
       }
     }
-    return json(200, { ok: dbState === "ok" && pending.length === 0, database: dbState, pendingMigrations: pending, redis: redis.configured ? "configured" : "not_configured", signup: env.NEUROMOVE_SETUP_CODE ? "setup_code" : "disabled" });
+    return json(200, { ok: dbState === "ok" && pending.length === 0, database: dbState, pendingMigrations: pending, redis: redis.configured ? "configured" : "not_configured", signup: env.NEUROMOVE_SETUP_CODE ? "setup_code" : "disabled", aiSummaries: aiEnabled(env) ? "enabled" : "disabled" });
   }
   if (!db) return err(503, "database_not_configured");
   const token = readCookie(req.headers.get("cookie"));
@@ -1381,7 +1836,8 @@ async function handle(req, deps) {
     return json(200, { ok: true }, { "Set-Cookie": clearCookie(secure) });
   }
   if (!p) return err(401, "unauthenticated");
-  if (route === "auth/me" && method === "GET") return json(200, { account: account(p) });
+  if (route === "auth/me" && method === "GET") return json(200, { account: { ...account(p), participantIds: await linkedParticipants(db, p) } });
+  if (p.role === "caregiver" && !route.startsWith("sync/")) return err(403, "forbidden_role");
   if (route === "team/members" && method === "GET") {
     const rows = await db.query("select u.id, u.email, u.display_name, m.role, m.created_at from nm_memberships m join nm_users u on u.id = m.user_id where m.team_id = $1 order by m.created_at", [p.teamId]);
     return json(200, { members: rows });
@@ -1391,7 +1847,7 @@ async function handle(req, deps) {
     const b = await body(req);
     if (b instanceof Response) return b;
     const email = b.email?.trim().toLowerCase();
-    if (!isEmail(email) || !b.role || !ROLES.includes(b.role) || !b.displayName?.trim()) return err(400, "invalid_input");
+    if (!isEmail(email) || !b.role || !ROLES.includes(b.role) || b.role === "caregiver" || !b.displayName?.trim()) return err(400, "invalid_input");
     const existing = (await db.query("select id from nm_users where email = $1", [email]))[0];
     let userId = existing?.id;
     if (!userId) {
@@ -1403,6 +1859,61 @@ async function handle(req, deps) {
     await db.query("insert into nm_memberships (team_id, user_id, role) values ($1, $2, $3) on conflict (team_id, user_id) do update set role = $3", [p.teamId, userId, b.role]);
     await db.query("insert into nm_audit_events (team_id, user_id, action, details) values ($1, $2, 'member_upsert', $3)", [p.teamId, p.userId, { email, role: b.role }]);
     return json(200, { ok: true });
+  }
+  if (route === "team/caregivers" && method === "GET") {
+    if (p.role !== "admin") return err(403, "admin_only");
+    const rows = await db.query(
+      `select u.id, u.email, u.display_name, l.participant_id, l.created_at, l.revoked_at from nm_caregiver_links l join nm_users u on u.id = l.user_id where l.team_id = $1 order by l.created_at`,
+      [p.teamId]
+    );
+    return json(200, { links: rows });
+  }
+  if (route === "team/caregivers" && method === "POST") {
+    if (p.role !== "admin") return err(403, "admin_only");
+    const b = await body(req);
+    if (b instanceof Response) return b;
+    const email = b.email?.trim().toLowerCase();
+    if (!isEmail(email) || !b.displayName?.trim() || !Array.isArray(b.participantIds) || !b.participantIds.length || b.participantIds.length > 20 || !b.participantIds.every((x) => typeof x === "string" && x.length <= 120)) return err(400, "invalid_input");
+    const owned = await db.query("select id from nm_participants where team_id = $1 and id = any($2) and deleted_at is null", [p.teamId, b.participantIds]);
+    if (owned.length !== new Set(b.participantIds).size) return err(400, "unknown_participant");
+    const existing = (await db.query("select id from nm_users where email = $1", [email]))[0];
+    let userId = existing?.id;
+    if (userId) {
+      const m = (await db.query("select role from nm_memberships where team_id = $1 and user_id = $2", [p.teamId, userId]))[0];
+      if (m && m.role !== "caregiver") return err(409, "account_is_staff");
+    } else {
+      if (typeof b.password !== "string") return err(400, "password_required");
+      const pw = passwordProblem(b.password);
+      if (pw) return err(400, pw);
+      userId = (await db.query("insert into nm_users (email, display_name, password_hash) values ($1, $2, $3) returning id", [email, b.displayName.trim(), await hashPassword(b.password)]))[0].id;
+    }
+    await db.tx(async (t) => {
+      await t.query("insert into nm_memberships (team_id, user_id, role) values ($1, $2, 'caregiver') on conflict (team_id, user_id) do nothing", [p.teamId, userId]);
+      for (const pid of b.participantIds)
+        await t.query(
+          b.revoke ? "update nm_caregiver_links set revoked_at = now() where team_id = $1 and user_id = $2 and participant_id = $3" : "insert into nm_caregiver_links (team_id, user_id, participant_id, created_by) values ($1, $2, $3, $4) on conflict (team_id, user_id, participant_id) do update set revoked_at = null",
+          b.revoke ? [p.teamId, userId, pid] : [p.teamId, userId, pid, p.userId]
+        );
+      await t.query("insert into nm_audit_events (team_id, user_id, action, details) values ($1, $2, $3, $4)", [p.teamId, p.userId, b.revoke ? "caregiver_unlink" : "caregiver_link", { email, participantIds: b.participantIds }]);
+    });
+    return json(200, { ok: true });
+  }
+  if (route === "ai/summary" && method === "POST") {
+    if (p.role !== "admin" && p.role !== "session_operator") return err(403, "professional_only");
+    if (!aiEnabled(env)) return err(503, "ai_not_configured");
+    const b = await body(req);
+    if (b instanceof Response) return b;
+    if (!validFactsPayload(b.facts) || !(b.language && b.language in SUMMARY_LANGUAGES)) return err(400, "invalid_input");
+    if (await limited(redis, `ai:${p.userId}`, 20, 3600)) return err(429, "rate_limited");
+    try {
+      const r = await draftSummary(deps.aiFetch ?? fetch, geminiKeys(env), b.facts, b.language, env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL);
+      await db.query("insert into nm_audit_events (team_id, user_id, action, details) values ($1, $2, 'ai_summary', $3)", [p.teamId, p.userId, { facts: b.facts.length, model: r.model, keyIndex: r.keyIndex, flagged: r.draft.flagged }]);
+      return json(200, r);
+    } catch (e) {
+      if (e instanceof DraftError) return err(502, `ai_${e.message}`);
+      console.error("[api] ai summary failed", e instanceof Error ? e.name : "error");
+      return err(502, "ai_unavailable");
+    }
   }
   if (route === "sync/push" && method === "POST") {
     const b = await body(req);
@@ -1425,8 +1936,8 @@ async function handle(req, deps) {
     return "error" in r ? err(r.status, r.error) : json(200, r);
   }
   if (route === "raw" && method === "GET") {
-    const id = new URL(req.url).searchParams.get("recordingId") ?? "";
-    return json(200, { chunks: await listRawChunks(db, p, id) });
+    const id2 = new URL(req.url).searchParams.get("recordingId") ?? "";
+    return json(200, { chunks: await listRawChunks(db, p, id2) });
   }
   if (route === "audit" && method === "GET") {
     if (p.role === "observer") return err(403, "forbidden_role");

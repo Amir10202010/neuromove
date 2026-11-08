@@ -62,3 +62,16 @@ df = pd.read_csv("neuromove-dataset-….csv", comment="#")
 pairs = df[(df.status == "valid") & (df.is_current == 1)]
 bias = pairs.signed_error_deg.mean()
 ```
+
+## Functional Progression System (8 November 2026)
+
+Rehabilitation records (profile, goal, activity, program, practice, review, assessment, study, consent, incident) share one IndexedDB store, `rehab` (schema v3, additive), and one PostgreSQL table, `nm_rehab_records` (migration `0002_rehab`). They sync as the entity `rehab_record`.
+
+- **Immutable kinds.** Activity and program versions, reviews, assessments and practice reports are protected by the trigger `nm_rehab_immutable`.
+- **Mutable kinds.** These move forward only through `checkTransition` in `src/rehab/validate.ts`:
+  - goal history is append-only;
+  - an incident gets one review;
+  - consent can only be withdrawn.
+- **Caregiver accounts.** These use the role `caregiver` and see only the children in `nm_caregiver_links`.
+
+Details: [../NEUROMOVE_PEDIATRIC_REHABILITATION_ARCHITECTURE.md](../NEUROMOVE_PEDIATRIC_REHABILITATION_ARCHITECTURE.md).

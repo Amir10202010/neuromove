@@ -13,6 +13,8 @@ export const SYNC_ENTITIES = [
   'protocol_version',
   'validation_session',
   'trial',
+  // Functional Progression System: every rehab record kind travels as one entity (kind inside the payload)
+  'rehab_record',
 ] as const;
 export type SyncEntity = (typeof SYNC_ENTITIES)[number];
 

@@ -48,6 +48,7 @@ export const kk: typeof ru = {
 
   nav: {
     research: 'Зерттеу',
+    rehab: 'Оңалту',
     overview: 'Басты бет',
     patients: 'Пациенттер',
     sessions: 'Сеанстар',

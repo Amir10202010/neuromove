@@ -36,7 +36,9 @@ export interface Account {
   displayName: string;
   teamId: string;
   teamName: string;
-  role: 'admin' | 'session_operator' | 'measurement_operator' | 'observer';
+  role: 'admin' | 'session_operator' | 'measurement_operator' | 'observer' | 'caregiver';
+  /** Caregiver accounts: the children this account is linked to (from the server). */
+  participantIds?: string[];
 }
 
 export interface SyncConfig {

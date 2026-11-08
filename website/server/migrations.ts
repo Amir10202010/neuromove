@@ -13,6 +13,12 @@
 //   raw_chunks (raw sensor data, separate from derived data), datasets (export manifests)
 //   changes (ordered change feed for pull), idempotency (op ledger), audit_events (who/what/when)
 // Every synced row keeps the exact client payload (jsonb) next to typed, indexed columns.
+//
+// 0002_rehab (Functional Progression System):
+//   teams ─< rehab_records (ten kinds, one table; immutable kinds enforced by trigger)
+//   users ─< caregiver_links >─ participants  (caregivers see only the children they are linked to)
+
+import { IMMUTABLE_KINDS, REHAB_KINDS } from '../src/rehab/model';
 
 export interface Migration {
   id: string;
@@ -303,6 +309,58 @@ create table if not exists nm_audit_events (
 );
 create index if not exists nm_audit_team on nm_audit_events(team_id, at);
 create index if not exists nm_audit_entity on nm_audit_events(entity, entity_id);
+`,
+  },
+  {
+    id: '0002_rehab',
+    sql: `
+-- Caregiver accounts: a fifth role. The check constraint is replaced by a wider one (no data touched).
+alter table nm_memberships drop constraint if exists nm_memberships_role_check;
+alter table nm_memberships add constraint nm_memberships_role_check check (role in ('admin', 'session_operator', 'measurement_operator', 'observer', 'caregiver'));
+
+-- Which children a caregiver account may see. Revoking sets revoked_at; rows are never deleted.
+create table if not exists nm_caregiver_links (
+  team_id uuid not null references nm_teams(id),
+  user_id uuid not null references nm_users(id),
+  participant_id text not null references nm_participants(id),
+  created_at timestamptz not null default now(),
+  created_by uuid references nm_users(id),
+  revoked_at timestamptz,
+  primary key (team_id, user_id, participant_id)
+);
+
+-- Every rehab record kind in one table: typed columns for querying, the exact payload for everything else.
+create table if not exists nm_rehab_records (
+  id text primary key,
+  team_id uuid not null references nm_teams(id),
+  kind text not null check (kind in (${REHAB_KINDS.map((k) => `'${k}'`).join(', ')})),
+  participant_id text references nm_participants(id),
+  series_id text,
+  version integer check (version is null or version >= 1),
+  status text,
+  occurred_at timestamptz,
+  author_role text not null check (author_role in ('professional', 'caregiver', 'researcher')),${RECORD_COLUMNS},
+  unique (series_id, version)
+);
+create index if not exists nm_rehab_records_team_kind on nm_rehab_records(team_id, kind);
+create index if not exists nm_rehab_records_participant on nm_rehab_records(participant_id);
+
+-- Historical integrity in the database itself: program/activity versions, reviews, assessments and
+-- practice reports never change and are never deleted after the first write — not even by direct SQL.
+create or replace function nm_rehab_immutable() returns trigger as $$
+begin
+  if old.kind in (${IMMUTABLE_KINDS.map((k) => `'${k}'`).join(', ')})
+     and (new.payload is distinct from old.payload or new.deleted_at is not null or new.kind <> old.kind) then
+    raise exception 'rehab record % (%) is immutable', old.id, old.kind using errcode = 'P0001';
+  end if;
+  if new.kind <> old.kind or new.participant_id is distinct from old.participant_id or new.team_id <> old.team_id then
+    raise exception 'rehab record % identity is immutable', old.id using errcode = 'P0001';
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+create or replace trigger nm_rehab_records_immutable before update on nm_rehab_records
+  for each row execute function nm_rehab_immutable();
 `,
   },
 ];

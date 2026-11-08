@@ -12,7 +12,10 @@ import { errorSummary, agreement } from '../src/research/stats';
 import type { ProtocolVersion, Trial, ValidationSession } from '../src/research/model';
 import { validPairs } from '../src/research/workflow';
 import { SYNC_ENTITIES, type PullChange, type PushResult, type SyncEntity } from '../src/sync/types';
-import { canWrite, sha256, type Principal } from './auth';
+import { canWrite, linkedParticipants, sha256, type Principal } from './auth';
+import { IMMUTABLE_KINDS, type RehabRecord } from '../src/rehab/model';
+import { caregiverMayRead, canWriteRehab } from '../src/rehab/policy';
+import { checkTransition, validRehabRecord } from '../src/rehab/validate';
 import { sqlCode, type Db } from './db';
 import { CURSOR_TTL_S, type Redis } from './redis';
 
@@ -47,7 +50,7 @@ interface Handler {
   key: string;
   /** Validate the payload for this team. Returns an error code or null. */
   check(payload: unknown, entityId: string): string | null;
-  write(ctx: Ctx, payload: Record<string, unknown> | null, rev: number, deleted: boolean, entityId: string): Promise<void>;
+  write(ctx: Ctx, payload: Record<string, unknown> | null, rev: number, deleted: boolean, entityId: string, current: unknown): Promise<void>;
 }
 
 const BASE: Record<string, keyof WorkspaceData> = { participant: 'patients', rehab_session: 'sessions', note: 'notes', alert: 'alerts' };
@@ -77,6 +80,32 @@ async function sameTeam(t: Db, table: string, id: string, teamId: string): Promi
 }
 
 class Rejected extends Error {}
+
+/** Typed columns of a rehab record (the payload keeps everything). */
+function rehabColumns(r: RehabRecord): { series: string | null; version: number | null; status: string | null; occurred: string | null } {
+  switch (r.kind) {
+    case 'activity':
+      return { series: r.seriesId, version: r.version, status: r.status, occurred: r.createdAt };
+    case 'program':
+      return { series: r.seriesId, version: r.version, status: r.def.status, occurred: r.createdAt };
+    case 'goal':
+      return { series: null, version: null, status: r.status, occurred: r.createdAt };
+    case 'practice':
+      return { series: null, version: null, status: r.completion, occurred: r.date };
+    case 'review':
+      return { series: null, version: null, status: r.decision, occurred: r.createdAt };
+    case 'assessment':
+      return { series: null, version: null, status: r.timepoint, occurred: r.date };
+    case 'study':
+      return { series: null, version: null, status: r.status, occurred: r.createdAt };
+    case 'consent':
+      return { series: null, version: null, status: r.status, occurred: r.createdAt };
+    case 'incident':
+      return { series: null, version: null, status: r.review ? 'reviewed' : 'open', occurred: r.occurredAt };
+    case 'profile':
+      return { series: null, version: null, status: null, occurred: r.createdAt };
+  }
+}
 
 const HANDLERS: Record<SyncEntity, Handler> = {
   participant: {
@@ -220,6 +249,40 @@ const HANDLERS: Record<SyncEntity, Handler> = {
       if (s.status === 'completed') await recomputeMetrics(t, p.teamId, id);
     },
   },
+  rehab_record: {
+    table: 'nm_rehab_records',
+    key: 'id',
+    check(payload, entityId) {
+      if (!validRehabRecord(payload)) return 'invalid_payload';
+      if (payload.id !== entityId) return 'id_mismatch';
+      if (payload.workspace !== 'clinic') return 'demo_data_not_accepted';
+      return null;
+    },
+    async write(ctx, v, rev, deleted, id, current) {
+      const { t, p } = ctx;
+      const prev = (current ?? null) as RehabRecord | null;
+      // Rehab history is never deleted
+      if (deleted || !v) throw new Rejected('rehab_records_are_never_deleted');
+      const r = v as unknown as RehabRecord;
+      // Authorisation from the SERVER view of the account (role, linked children), never the client view
+      const linked = await linkedParticipants(t, p);
+      const denial = canWriteRehab({ role: p.role, participantIds: linked }, r, prev);
+      if (denial) throw new Rejected(denial);
+      if (prev) {
+        if ((IMMUTABLE_KINDS as readonly string[]).includes(prev.kind)) throw new Rejected('immutable');
+        const problem = checkTransition(prev, r);
+        if (problem) throw new Rejected(problem);
+      }
+      if (r.participantId && !(await sameTeam(t, 'nm_participants', r.participantId, p.teamId))) throw new Rejected('forbidden');
+      const c = rehabColumns(r);
+      await t.query(
+        `insert into nm_rehab_records (id, team_id, kind, participant_id, series_id, version, status, occurred_at, author_role, rev, payload, created_by, updated_by)
+         values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $12)
+         on conflict (id) do update set status = $7, occurred_at = $8, rev = $10, payload = $11, updated_at = now(), updated_by = $12`,
+        [id, p.teamId, r.kind, r.participantId, c.series, c.version, c.status, c.occurred, r.createdByRole, rev, v, p.userId],
+      );
+    },
+  },
   trial: {
     table: 'nm_trials',
     key: 'id',
@@ -299,7 +362,7 @@ export async function applyOp(db: Db, p: Principal, deviceId: string, op: Incomi
         return { opId: op.opId, status: 'applied', rev: 0 };
       }
       const rev = (cur?.rev ?? 0) + 1;
-      await h.write({ t, p }, op.deleted ? null : (op.payload as Record<string, unknown>), rev, op.deleted, op.entityId);
+      await h.write({ t, p }, op.deleted ? null : (op.payload as Record<string, unknown>), rev, op.deleted, op.entityId, cur && !cur.deleted_at ? cur.payload : null);
       const ch = await t.query<{ seq: string }>('insert into nm_changes (team_id, entity, entity_id, rev, deleted) values ($1, $2, $3, $4, $5) returning seq', [p.teamId, op.entity, op.entityId, rev, op.deleted]);
       await t.query('insert into nm_audit_events (team_id, user_id, device_id, action, entity, entity_id, rev, op_id, details) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)', [
         p.teamId,
@@ -363,6 +426,25 @@ export async function pull(db: Db, redis: Redis, p: Principal, since: number): P
     }
   }
   changes.sort((a, b) => a.seq - b.seq);
+  const visible = p.role === 'caregiver' ? await caregiverFilter(db, p, changes) : changes;
   const cursor = rows.length ? Number(rows[rows.length - 1]?.seq) : since;
-  return { changes, cursor, more: rows.length === PULL_LIMIT };
+  return { changes: visible, cursor, more: rows.length === PULL_LIMIT };
+}
+
+/**
+ * Caregivers receive only: their linked children's participant records, rehab records a caregiver may read
+ * (policy.caregiverMayRead) and approved family summaries (notes of kind 'summary'). Everything else
+ * (other children, sensor sessions, clinical notes, assessments, reviews, research data) is withheld.
+ * The cursor still advances past withheld changes.
+ */
+async function caregiverFilter(db: Db, p: Principal, changes: PullChange[]): Promise<PullChange[]> {
+  const linked = await linkedParticipants(db, p);
+  return changes.filter((ch) => {
+    if (ch.deleted || ch.payload === null) return ch.entity === 'participant' && linked.includes(ch.entityId);
+    const v = ch.payload as Record<string, unknown>;
+    if (ch.entity === 'participant') return linked.includes(ch.entityId);
+    if (ch.entity === 'note') return v.kind === 'summary' && linked.includes(String(v.patientId));
+    if (ch.entity === 'rehab_record') return caregiverMayRead(v as unknown as RehabRecord, linked);
+    return false;
+  });
 }
