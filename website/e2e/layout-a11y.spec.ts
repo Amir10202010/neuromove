@@ -31,6 +31,13 @@ const ROUTES = [
   '#/research/protocols',
   '#/research/new',
   '#/research/datasets',
+  '#/research/lab',
+  '#/research/learning?p=demo-p01&task=shoulder_flexion%3Aright&metric=rom',
+  '#/research/twin/demo-p04',
+  '#/research/movement',
+  '#/research/designer',
+  '#/research/runs',
+  '#/research/readiness',
 ];
 
 /** Что вылезает за правый край: селектор и на сколько пикселей. */
@@ -69,7 +76,7 @@ test('нет горизонтальной прокрутки на ширинах
   expect(problems).toEqual([]);
 });
 
-const AXE_ROUTES = ['#/', '#/overview', '#/patients/demo-p01', '#/session/new?patient=demo-p01', '#/sessions/demo-p01-s9', '#/analytics', '#/devices', '#/settings', '#/onboarding', '#/rehab', '#/rehab/p/demo-p01?tab=goals', '#/rehab/p/demo-p01?tab=movement', '#/rehab/p/demo-p01?tab=review', '#/rehab/activities', '#/home/demo-p01', '#/play/demo-p01'];
+const AXE_ROUTES = ['#/', '#/overview', '#/patients/demo-p01', '#/session/new?patient=demo-p01', '#/sessions/demo-p01-s9', '#/analytics', '#/devices', '#/settings', '#/onboarding', '#/rehab', '#/rehab/p/demo-p01?tab=goals', '#/rehab/p/demo-p01?tab=movement', '#/rehab/p/demo-p01?tab=review', '#/rehab/activities', '#/home/demo-p01', '#/play/demo-p01', '#/research/lab', '#/research/learning?p=demo-p01&task=shoulder_flexion%3Aright&metric=rom', '#/research/twin/demo-p04', '#/research/designer', '#/research/readiness'];
 
 test('доступность: нет серьёзных и критичных нарушений WCAG 2.1 AA и автоматических правил 2.2 AA', async ({ page }) => {
   test.setTimeout(180_000);

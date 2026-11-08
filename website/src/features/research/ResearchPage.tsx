@@ -14,6 +14,7 @@ import { LinkButton } from '../../ui/Button';
 import { EmptyState } from '../../ui/EmptyState';
 import { useRT, fmtDeg } from './i18n';
 import { SaveStatus } from './SaveStatus';
+import { LabEntry } from '../motorlab/LabOverviewPage';
 
 export function ResearchPage() {
   const rt = useRT();
@@ -58,6 +59,7 @@ export function ResearchPage() {
           </>
         }
       />
+      <LabEntry />
       {ws === 'demo' && <div className="callout callout--demo">{rt('Demo workspace: validation sessions here use the simulator and are not measurements.')}</div>}
       {active.length > 0 && (
         <div className="callout callout--info">

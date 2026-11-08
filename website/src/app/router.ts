@@ -25,6 +25,15 @@ export type Route =
   | { name: 'researchNew'; protocolKey: string | null }
   | { name: 'researchSession'; id: string }
   | { name: 'researchDatasets' }
+  // Computational motor-learning lab (src/lab, features/motorlab)
+  | { name: 'labOverview' }
+  | { name: 'labLearning'; participant: string | null; task: string | null; metric: string | null }
+  | { name: 'labTwin'; id: string }
+  | { name: 'labMovement'; sessionId: string | null }
+  | { name: 'labDesigner' }
+  | { name: 'labRuns' }
+  | { name: 'labRun'; id: string }
+  | { name: 'labReadiness' }
   | { name: 'rehab' }
   | { name: 'rehabParticipant'; id: string; tab: RehabTab; review: string | null }
   | { name: 'rehabActivities' }
@@ -83,6 +92,14 @@ export function parseHash(hash: string): Route {
       if (b === 'datasets' && !c) return { name: 'researchDatasets' };
       if (b === 'new' && !c) return { name: 'researchNew', protocolKey: q.get('protocol') };
       if (b === 'sessions' && c) return { name: 'researchSession', id: c };
+      if (b === 'lab' && !c) return { name: 'labOverview' };
+      if (b === 'learning' && !c) return { name: 'labLearning', participant: q.get('p'), task: q.get('task'), metric: q.get('metric') };
+      if (b === 'twin' && c && parts.length === 3) return { name: 'labTwin', id: c };
+      if (b === 'movement') return parts.length <= 3 ? { name: 'labMovement', sessionId: c ?? null } : { name: 'notFound' };
+      if (b === 'designer' && !c) return { name: 'labDesigner' };
+      if (b === 'runs' && !c) return { name: 'labRuns' };
+      if (b === 'runs' && c && parts.length === 3) return { name: 'labRun', id: c };
+      if (b === 'readiness' && !c) return { name: 'labReadiness' };
       return { name: 'notFound' };
     // Functional Progression System: professional workspace, family workspace, child practice
     case 'rehab': {
@@ -155,6 +172,28 @@ export function href(r: Route): string {
       return `#/research/new${r.protocolKey ? `?protocol=${e(r.protocolKey)}` : ''}`;
     case 'researchSession':
       return `#/research/sessions/${e(r.id)}`;
+    case 'labOverview':
+      return '#/research/lab';
+    case 'labLearning': {
+      const q = new URLSearchParams();
+      if (r.participant) q.set('p', r.participant);
+      if (r.task) q.set('task', r.task);
+      if (r.metric) q.set('metric', r.metric);
+      const qs = q.toString();
+      return `#/research/learning${qs ? `?${qs}` : ''}`;
+    }
+    case 'labTwin':
+      return `#/research/twin/${e(r.id)}`;
+    case 'labMovement':
+      return `#/research/movement${r.sessionId ? `/${e(r.sessionId)}` : ''}`;
+    case 'labDesigner':
+      return '#/research/designer';
+    case 'labRuns':
+      return '#/research/runs';
+    case 'labRun':
+      return `#/research/runs/${e(r.id)}`;
+    case 'labReadiness':
+      return '#/research/readiness';
     case 'rehab':
       return '#/rehab';
     case 'rehabActivities':

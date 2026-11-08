@@ -34,6 +34,10 @@ import { FamilyHomePage } from '../features/rehab/FamilyHomePage';
 import { ChildPlayPage } from '../features/rehab/ChildPlayPage';
 import { CaregiverGate } from '../features/rehab/CaregiverGate';
 import { ErrorBoundary } from './ErrorBoundary';
+import { lazy, Suspense } from 'react';
+
+// Motor-learning lab: its own chunk, loaded on first visit (src/features/motorlab)
+const MotorLabRoute = lazy(() => import('../features/motorlab/MotorLabRoute'));
 import type { Route } from './router';
 
 function Page({ route }: { route: Route }) {
@@ -68,6 +72,19 @@ function Page({ route }: { route: Route }) {
       return <ValidationSessionPage id={route.id} />;
     case 'researchDatasets':
       return <DatasetsPage />;
+    case 'labOverview':
+    case 'labLearning':
+    case 'labTwin':
+    case 'labMovement':
+    case 'labDesigner':
+    case 'labRuns':
+    case 'labRun':
+    case 'labReadiness':
+      return (
+        <Suspense fallback={<div className="page" aria-busy="true" />}>
+          <MotorLabRoute route={route} />
+        </Suspense>
+      );
     case 'rehab':
       return <RehabDashboard />;
     case 'rehabParticipant':

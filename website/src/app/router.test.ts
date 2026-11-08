@@ -19,6 +19,16 @@ describe('маршруты', () => {
       { name: 'analytics' },
       { name: 'devices' },
       { name: 'settings' },
+      { name: 'labOverview' },
+      { name: 'labLearning', participant: 'demo-p01', task: 'shoulder_flexion:right', metric: 'rom' },
+      { name: 'labLearning', participant: null, task: null, metric: null },
+      { name: 'labTwin', id: 'demo-p01' },
+      { name: 'labMovement', sessionId: null },
+      { name: 'labMovement', sessionId: 's 1/2' },
+      { name: 'labDesigner' },
+      { name: 'labRuns' },
+      { name: 'labRun', id: 'run_abc' },
+      { name: 'labReadiness' },
     ];
     for (const route of routes) expect(parseHash(href(route))).toEqual(route);
   });

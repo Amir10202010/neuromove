@@ -16,6 +16,7 @@
     "e2e": "playwright test",
     "docs:check": "node scripts/check-mermaid.mjs",
     "experiments": "EXPERIMENTS_FULL=1 EXPERIMENTS_OUT=docs/ENGINEERING_10H/data/latest.json vitest run src/verification/experiments.node.test.ts",
+    "lab:experiments": "LAB_EXPERIMENTS_FULL=1 LAB_EXPERIMENTS_OUT=../research/data/model-validation.json vitest run src/lab/experiments.node.test.ts",
     "mutate": "node scripts/mutate.mjs",
     "build:api": "node scripts/build-api.mjs",
     "check:api": "node scripts/build-api.mjs --check",

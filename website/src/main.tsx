@@ -10,6 +10,7 @@ import './styles/figures.css';
 import './styles/pages.css';
 import './styles/research.css';
 import './styles/rehab.css';
+import './styles/motorlab.css';
 import './styles/landing.css';
 import './styles/print.css';
 import { App } from './app/App';

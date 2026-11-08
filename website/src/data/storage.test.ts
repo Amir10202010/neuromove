@@ -83,6 +83,22 @@ describe('хранилище IndexedDB', () => {
   });
 });
 
+describe('IndexedDB v3 → v4 (motor-learning lab)', () => {
+  it('is additive: rehab records and the outbox survive, the lab store appears and accepts records', async () => {
+    const v3 = await openDB('neuromove', 3, { upgrade: (db, old) => upgradeSchema(db, old, 3) });
+    await v3.put('rehab', { id: 'r1', workspace: 'clinic', kind: 'goal', participantId: 'p1' });
+    await v3.put('outbox', { opId: 'op-9', entity: 'rehab_record', entityId: 'r1', entityKey: 'rehab_record:r1', state: 'pending' });
+    expect([...v3.objectStoreNames]).not.toContain('lab');
+    v3.close();
+    const storage = await openStorage();
+    expect(await storage.getAllResearch('rehab')).toEqual([{ id: 'r1', workspace: 'clinic', kind: 'goal', participantId: 'p1' }]);
+    expect((await storage.listOutbox()).map((o) => o.opId)).toContain('op-9');
+    expect(await storage.getAllResearch('lab')).toEqual([]);
+    await storage.putResearch('lab', { id: 'lp_1', kind: 'learning_protocol', workspace: 'clinic', participantId: null } as never);
+    expect((await storage.getAllResearch('lab')).map((r) => r.id)).toEqual(['lp_1']);
+  });
+});
+
 describe('повреждённая запись в базе', async () => {
   const { useAppStore } = await import('../state/appStore');
   it('при загрузке скрыта и посчитана, но из базы не удалена', async () => {

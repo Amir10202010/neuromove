@@ -1,0 +1,146 @@
+{
+ "started": "2026-11-08T08:53:53.558Z",
+ "finished": "2026-11-08T08:55:26.768Z",
+ "full": true,
+ "node": "v24.16.0",
+ "results": [
+  {
+   "id": "E1",
+   "question": "With no true change, how often does model selection pick a model of change?",
+   "design": "8 weekly sessions × 3 repetitions, σε = 4, σs = 2.5, true performance constant",
+   "criterion": "false-change rate ≤ 0.15",
+   "seeds": 200,
+   "metrics": {
+    "false_change_rate": 0.005,
+    "linear": 0.005,
+    "local_level": 0,
+    "exponential": 0,
+    "learning_retention": 0
+   },
+   "pass": true
+  },
+  {
+   "id": "E2",
+   "question": "How large must a weekly change be before it is detected in 8 weekly sessions?",
+   "design": "8 weekly sessions × 3 repetitions, σε = 4, σs = 2.5, true linear change of 0.5–3 units/week",
+   "criterion": "power ≥ 0.8 at 2 units/week (≈ 14 units over the series)",
+   "seeds": 100,
+   "metrics": {
+    "power_slope_0.5_per_week": 0.03,
+    "power_slope_1_per_week": 0.22,
+    "power_slope_2_per_week": 0.71,
+    "power_slope_3_per_week": 0.99
+   },
+   "pass": false
+  },
+  {
+   "id": "E3",
+   "question": "Do 95 % profile-likelihood intervals for the weekly slope cover the true slope ~95 % of the time?",
+   "design": "10 weekly sessions × 3 repetitions, true slope 1.5 units/week",
+   "criterion": "coverage in [0.88, 0.99] (small-sample likelihood intervals are known to be slightly liberal)",
+   "seeds": 200,
+   "metrics": {
+    "coverage": 0.955,
+    "mean_bias": 0.022
+   },
+   "pass": true
+  },
+  {
+   "id": "E4",
+   "question": "Can a slow learning-curve time constant (τ = 60 d) be estimated from 8 weekly sessions, 24 sessions every 4 days, or 16 weekly sessions?",
+   "design": "Exponential approach 90 → 150 units; σε = 4, σs = 2.5, 3 repetitions",
+   "criterion": "16 weekly sessions identifiable more often than 8 weekly sessions",
+   "seeds": 40,
+   "metrics": {
+    "sparse_8_weekly_identifiable": 0.25,
+    "sparse_8_weekly_tau_coverage": 0.925,
+    "dense_24_every_4_days_identifiable": 0.95,
+    "dense_24_every_4_days_tau_coverage": 0.975,
+    "long_16_weekly_identifiable": 0.95,
+    "long_16_weekly_tau_coverage": 1
+   },
+   "pass": true
+  },
+  {
+   "id": "E5",
+   "question": "With 10 sessions, do the data favour forgetting (learning–retention) over saturation (exponential) when forgetting is true?",
+   "design": "Truth: learning–retention, h = 21 d, gain 0.3 units/min; regular weekly 40 min vs 4- and 6-week breaks with 20–60 min doses",
+   "criterion": "ΔAICc > 2 in favour of learning–retention in ≥ 50 % of seeds with breaks, ≤ 20 % with the regular schedule",
+   "seeds": 40,
+   "metrics": {
+    "regular_weekly_constant_dose_retention_preferred": 0,
+    "regular_weekly_constant_dose_half_life_coverage": 0.975,
+    "regular_weekly_constant_dose_median_rel_error": 0.211,
+    "breaks_and_variable_dose_retention_preferred": 1,
+    "breaks_and_variable_dose_half_life_coverage": 0.95,
+    "breaks_and_variable_dose_median_rel_error": 0.103
+   },
+   "pass": true
+  },
+  {
+   "id": "E6",
+   "question": "Are fast/slow learning rates recoverable from assessment-like sparse data, or only from dense error-driven trials?",
+   "design": "Smith 2006 paradigm (235 trials: baseline, adaptation, reversal, error clamp); A_f 0.92, A_s 0.996, B_f 0.10, B_s 0.02, σ 0.08",
+   "criterion": "dense observation identifies all four rates more often than 10 sparse observations",
+   "seeds": 12,
+   "metrics": {
+    "dense_every_trial_all_rates_identifiable": 0.833,
+    "dense_every_trial_Bs_median_rel_error": 0.054,
+    "sparse_10_trials_all_rates_identifiable": 0,
+    "sparse_10_trials_Bs_median_rel_error": 0.329
+   },
+   "pass": true
+  },
+  {
+   "id": "E7",
+   "question": "Do 95 % intervals for the NEXT session mean contain it ~95 % of the time (plug-in vs bootstrap)?",
+   "design": "True linear change 1.5/week; fit on 10 weekly sessions; predict an 11th session one week later; B = 150",
+   "criterion": "bootstrap interval coverage in [0.88, 0.99]",
+   "seeds": 100,
+   "metrics": {
+    "plugin_coverage": 0.93,
+    "bootstrap_coverage": 0.92,
+    "n": 100
+   },
+   "pass": true
+  },
+  {
+   "id": "E8",
+   "question": "How do more sessions or more repetitions per session change the power to detect 2 units/week?",
+   "design": "True linear change 2 units/week, σε = 4, σs = 2.5; weekly sessions",
+   "criterion": "descriptive (planning table) — passes when computed",
+   "seeds": 100,
+   "metrics": {
+    "power_8_sessions_3_reps": 0.81,
+    "power_8_sessions_6_reps": 0.9,
+    "power_12_sessions_3_reps": 1,
+    "power_12_sessions_6_reps": 1
+   },
+   "pass": true
+  }
+ ],
+ "representation": {
+  "id": "R1",
+  "windows": 419,
+  "subjects": 8,
+  "sessionsPerSubject": 2,
+  "labels": [
+   "shoulder_flexion",
+   "shoulder_abduction",
+   "elbow_flexion",
+   "forearm_rotation"
+  ],
+  "random_window_accuracy": 0.8663511187607573,
+  "loso_accuracy": 0.8620122594395411,
+  "loso_per_subject": [
+   0.9130434782608695,
+   0.8958333333333334,
+   0.875,
+   0.8823529411764706,
+   0.8461538461538461,
+   0.8545454545454545,
+   0.7931034482758621,
+   0.8360655737704918
+  ]
+ }
+}

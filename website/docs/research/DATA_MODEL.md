@@ -75,3 +75,17 @@ Rehabilitation records (profile, goal, activity, program, practice, review, asse
 - **Caregiver accounts.** These use the role `caregiver` and see only the children in `nm_caregiver_links`.
 
 Details: [../NEUROMOVE_PEDIATRIC_REHABILITATION_ARCHITECTURE.md](../NEUROMOVE_PEDIATRIC_REHABILITATION_ARCHITECTURE.md).
+
+## Computational motor-learning lab (8 November 2026)
+
+IndexedDB schema **v4** (additive; `src/data/storage.test.ts` covers v3 → v4) adds one store, `lab`:
+- keyPath `id`;
+- indexes on workspace, kind and participantId;
+- records of two kinds: `learning_protocol` versions and frozen `analysis_run` records.
+
+Lab records are **local to the browser** in this version: there are no outbox ops and no server table yet. Frozen runs carry their own snapshot, configuration, component versions and SHA-256 hashes.
+
+Details:
+- [../architecture/computational-motor-learning.md](../architecture/computational-motor-learning.md)
+- [../architecture/data-lineage.md](../architecture/data-lineage.md)
+- the research documents in the repository's [`research/`](../../../research/README.md) folder.

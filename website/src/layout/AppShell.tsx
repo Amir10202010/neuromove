@@ -29,7 +29,7 @@ const NAV_MAIN: NavDef[] = [
   { route: { name: 'sessions' }, match: ['sessions', 'session', 'sessionPrint'], label: 'nav.sessions', icon: <History aria-hidden /> },
   { route: { name: 'analytics' }, match: ['analytics'], label: 'nav.analytics', icon: <ChartNoAxesCombined aria-hidden /> },
   { route: { name: 'rehab' }, match: ['rehab', 'rehabParticipant', 'rehabActivities', 'rehabStudies'], label: 'nav.rehab', icon: <HeartHandshake aria-hidden /> },
-  { route: { name: 'research' }, match: ['research', 'researchProtocols', 'researchNew', 'researchSession', 'researchDatasets'], label: 'nav.research', icon: <FlaskConical aria-hidden /> },
+  { route: { name: 'research' }, match: ['research', 'researchProtocols', 'researchNew', 'researchSession', 'researchDatasets', 'labOverview', 'labLearning', 'labTwin', 'labMovement', 'labDesigner', 'labRuns', 'labRun', 'labReadiness'], label: 'nav.research', icon: <FlaskConical aria-hidden /> },
 ];
 const NAV_MORE: NavDef[] = [
   { route: { name: 'devices' }, match: ['devices'], label: 'nav.devices', icon: <Cpu aria-hidden /> },

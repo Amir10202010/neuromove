@@ -12,6 +12,7 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { Placement, RawFrame } from '../devices/types';
 import type { ProtocolVersion, Trial, ValidationSession } from '../research/model';
 import type { RehabRecord } from '../rehab/model';
+import type { LabRecord } from '../lab/records';
 import type { OutboxOp, SyncStateRow } from '../sync/types';
 import type { Alert, Note, Patient, Session, Workspace, WorkspaceData } from './models';
 
@@ -22,13 +23,14 @@ export interface StoredData extends WorkspaceData {
   meta: Record<string, unknown>;
 }
 
-/** Research stores added in schema v2 (validation studies) and v3 (rehabilitation records, one store for all kinds). */
-export type ResearchStore = 'protocols' | 'vsessions' | 'trials' | 'rehab';
+/** Research stores added in schema v2 (validation studies), v3 (rehabilitation records, one store for all kinds) and v4 (motor-learning lab: study protocols, frozen analysis runs). */
+export type ResearchStore = 'protocols' | 'vsessions' | 'trials' | 'rehab' | 'lab';
 export interface ResearchRecords {
   protocols: ProtocolVersion;
   vsessions: ValidationSession;
   trials: Trial;
   rehab: RehabRecord;
+  lab: LabRecord;
 }
 
 export interface DataStorage {
@@ -81,7 +83,7 @@ interface RawChunk {
 }
 
 const DB_NAME = 'neuromove';
-export const DB_VERSION = 3;
+export const DB_VERSION = 4;
 const COLLECTIONS: CollectionName[] = ['patients', 'sessions', 'notes', 'alerts'];
 const CHUNK = 1000;
 
@@ -299,7 +301,7 @@ class MemoryStorage implements DataStorage {
   };
   private meta: Record<string, unknown> = {};
   private raw = new Map<string, RawFrame[]>();
-  private research: { [S in ResearchStore]: Map<string, ResearchRecords[S]> } = { protocols: new Map(), vsessions: new Map(), trials: new Map(), rehab: new Map() };
+  private research: { [S in ResearchStore]: Map<string, ResearchRecords[S]> } = { protocols: new Map(), vsessions: new Map(), trials: new Map(), rehab: new Map(), lab: new Map() };
   private outbox: OutboxOp[] = [];
   private seq = 0;
   private syncState = new Map<string, SyncStateRow>();
@@ -430,7 +432,15 @@ export function upgradeSchema(db: IDBPDatabase, oldVersion: number, newVersion: 
     rehab.createIndex('kind', 'kind');
     rehab.createIndex('participantId', 'participantId');
   }
-  // Версия 4 и дальше — здесь: if (oldVersion < 4) { … }, с тестом в storage.test.ts
+  // v4 (8 Nov 2026): computational motor-learning lab — learning-study protocol versions and frozen analysis runs,
+  // one store for both kinds. Additive; local only (not synced yet — see docs/architecture/computational-motor-learning.md).
+  if (oldVersion < 4 && newVersion >= 4) {
+    const lab = db.createObjectStore('lab', { keyPath: 'id' });
+    lab.createIndex('workspace', 'workspace');
+    lab.createIndex('kind', 'kind');
+    lab.createIndex('participantId', 'participantId');
+  }
+  // Версия 5 и дальше — здесь: if (oldVersion < 5) { … }, с тестом в storage.test.ts
 }
 
 export async function openStorage(): Promise<DataStorage> {
