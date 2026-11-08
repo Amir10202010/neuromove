@@ -558,7 +558,7 @@ class Hub:
     squeeze: float = 0.25
     door_clear: float = 0.35
     # Окно USB-C: на 0,33 мм шире гнезда с каждой стороны, снаружи карман под корпус штекера
-    hole: tuple[float, float] = (10.0, 4.8)  # с запасом: гнездо 8,94 × 3,26, высота по замеру ±0,5 мм
+    hole: tuple[float, float] = (10.6, 5.4)  # с запасом на погрешность замера и печати: гнездо 8,94 × 3,26, по 0,8–1,1 мм с каждой стороны
     pocket: tuple[float, float] = (13.4, 7.8)  # штекеры бывают до 12,4 × 6,8
     # Опоры и прижимы
     post: float = 2.6
@@ -581,10 +581,10 @@ class Hub:
     # ESP32 с макетной платой вставляется под неё наклонно: антенной вперёд, потом конец с USB-C опускается вниз
     shelf_len: float = 9.5  # кончается до проводов «папа» в столбце 2 макетной платы: над ними любое окно в полке Bambu печатает обрывками моста
     shelf_t: float = 2.2  # мост 41 мм между стенками ±Y: первый слой провисает меньше, чем у 2 мм
-    # Сильнее, чем у сокомандника: заходит за стенку на 0,6 мм (у него 0,5 и 0,3), выступ 10 мм вместо 4,
-    # удерживающий скос 60° вместо 45–52° и третья защёлка — на торце у USB-C
-    snap: Snap = field(default_factory=lambda: Snap(beam_len=28.0, beam_t=1.6, interference=0.6, bump_len=10.0, groove_len=11.0,
-                                                   ret_deg=60.0, end_len=32.0))
+    # Чуть крепче, чем у сокомандника: выступ заходит за стенку на 0,5 мм с обеих сторон (у него 0,5 и 0,3),
+    # длина 5 мм вместо 4, удерживающий скос 50° (у него 45° и 52°); паз 1,0 мм, как у него
+    snap: Snap = field(default_factory=lambda: Snap(beam_len=28.0, beam_t=1.6, interference=0.5, bump_len=5.0, groove_len=6.0,
+                                                   ret_deg=50.0))
 
     @property
     def shelf_top(self) -> float:
@@ -1049,10 +1049,6 @@ def check_hub(p: Hub, box: Part, lid: Part, inlay: Part) -> bool:
         pulled = ov(Pos(-1.2, 0, 0) * housing, box) > 1e-3
         r.check(free and pressed > 1e-4 and pulled, f"кабель «{name}»: 4 жилы в ложбинке, дверца прижимает, колодка изнутри в окно не пролезает")
     check_snap(r, lid, box, p.snap, p.cav_w, p.height)
-    end_side = Pos(p.cav_l / 2 - 5, 0, 0) * Box(12, 200, 400)
-    v = ov((Pos(-p.snap.fit, 0, 1.0) * lid) & end_side, box)
-    eps = 12 * p.snap.interference * p.snap.beam_t / p.snap.end_len ** 2
-    r.check(v > 1e-3 and eps <= 0.016, f"третья защёлка на торце у USB-C держит (балка {p.snap.end_len:.0f} мм, растяжение {100 * eps:.2f} %)")
     bb = parts["макетная плата"]
     lim = p.usb_out + 0.3 + 0.3
     r.check(ov(Pos(-(lim - 0.05), 0, 0) * bb, box) < 1e-3 and ov(Pos(-(lim + 0.3), 0, 0) * bb, box) > 1e-3,
