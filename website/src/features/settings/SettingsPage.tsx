@@ -1,4 +1,4 @@
-import { BookOpen, Building2, Database, Download, ExternalLink, FlaskConical, RotateCcw, Trash2, Upload } from 'lucide-react';
+import { BookOpen, Box, Building2, Database, Download, ExternalLink, FlaskConical, RotateCcw, Trash2, Upload } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { navigate } from '../../app/router';
 import { ALGORITHM_VERSION, APP_VERSION, BUILD_DATE } from '../../core/version';
@@ -193,10 +193,14 @@ export function SettingsPage() {
           <p className="secondary" style={{ fontSize: 'var(--fs-sm)' }}>
             {t('settings.teamGuideText')}
           </p>
-          <div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {/* Static page shipped with the site (public/guide): opens in a new tab, works offline from the demo file too */}
             <a className="btn btn--secondary" href="guide/index.html" target="_blank" rel="noopener" style={{ textDecoration: 'none' }}>
               <BookOpen aria-hidden /> {t('settings.teamGuideOpen')}
+            </a>
+            {/* 3D view of the v4 enclosures (public/hardware, built by hardware/models/enclosure/vid_v4.py); three.js loads from a CDN */}
+            <a className="btn btn--secondary" href="hardware/korpus-v4-vid.html" target="_blank" rel="noopener" style={{ textDecoration: 'none' }}>
+              <Box aria-hidden /> {t('settings.enclosure3dOpen')}
             </a>
           </div>
         </div>

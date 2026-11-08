@@ -63,21 +63,24 @@ static const uint8_t RECOVERIES_BEFORE_DROP = 3;
 #endif
 
 #if defined(NM_BOARD_ESP32) || defined(CONFIG_IDF_TARGET_ESP32)
-// Классический ESP32 DevKit — плата стенда, куплена 9 октября. Шина 0 на стандартных 21 и 22
-// (железо.md, раздел 5)
+// Классический ESP32 DevKit HW-394 (модуль ESP-32D, 4 МБ флеш, без PSRAM) — плата стенда, куплена 9 октября.
 #define NM_BOARD_NAME "esp32"
+#ifdef NM_TWO_BUSES
+// Прежняя разводка на две шины (железо.md, раздел 5)
 #define NM_BUS0_SDA 21
 #define NM_BUS0_SCL 22
-#ifdef NM_TWO_BUSES
 #define NM_BUS1_SDA 32
 #define NM_BUS1_SCL 33
 #else
-// Все выводы трёх шин — в правом ряду платы, рядом с 3V3 и GND: в корпусе v3 этот ряд воткнут в макетную
-// плату (../hardware/models/enclosure/ПЕЧАТЬ-v3.md). 16 и 17 — на плате HW-394 подписаны D16 и D17, на других платах RX2 и TX2;
-// у модуля WROOM-32 они свободны и не влияют на загрузку
-#define NM_BUS1_SDA 19
-#define NM_BUS1_SCL 18
-#define NM_BUS2_SDA 16
+// С 8 ноября 2026 — под корпус ESP32 v4 (../hardware/models/enclosure/ПЕЧАТЬ-v4.md, схема-стенда.png): все выводы
+// в ряду 3V3…D23, который воткнут в макетную плату. Самые дальние от колодок кабелей — у плеча, чтобы провода
+// «папа–папа» 10 см ложились ровным жгутом. Не заняты TX0, RX0 (USB-порт) и 2, 5, 15 (от них зависит загрузка).
+// 17 у модуля ESP-32D (без PSRAM) свободен
+#define NM_BUS0_SDA 23  // плечо
+#define NM_BUS0_SCL 22
+#define NM_BUS1_SDA 21  // предплечье
+#define NM_BUS1_SCL 19
+#define NM_BUS2_SDA 18  // туловище, программная шина
 #define NM_BUS2_SCL 17
 #endif
 #else

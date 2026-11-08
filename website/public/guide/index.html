@@ -6,780 +6,593 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
-<title>NeuroMove: внутренний гид</title>
+<title>NeuroMove: гид команды</title>
 <style>
-/* Layout: the app's own "workbench" — warm frame, light sheet, white flat cards; sticky table of contents on the left, one long reading column on the right. */
+/* Цвета и шрифт — как в приложении: тёплая рамка, белые листы, киноварь только там, куда смотреть.
+   Главное на странице — схема системы: каждый узел нажимается и открывает панель с подробностями. */
 :root {
-  --frame: #eeebe4;
-  --sheet: #faf9f6;
-  --card: #ffffff;
-  --sunken: #f2efe9;
-  --line: #e5e1d8;
-  --line-strong: #d3cdc1;
-  --ink: #1d211f;
-  --ink-2: #4d534b;
-  --ink-3: #5c6159;
-  --accent: #b7452c;          /* vermilion: only "look here", like the app's demo and guide */
-  --accent-bg: #fbe9e6;
-  --left: #2a78d6;
-  --right: #eb6834;
-  --good: #16713c; --good-bg: #e6f3ea;
-  --warn: #8a5800; --warn-bg: #fcf1d9;
-  --bad: #a92e25;  --bad-bg: #fbe9e6;
-  --info: #1f5aa5; --info-bg: #e8f0fb;
-  --shot-shadow: 0 1px 0 rgba(29,33,31,.06), 0 8px 24px rgba(29,33,31,.07);
-  --f-body: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --f-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --frame: #eeebe4; --sheet: #faf9f6; --card: #ffffff; --sunken: #f2efe9;
+  --line: #e5e1d8; --line-strong: #d3cdc1;
+  --ink: #1d211f; --ink-2: #4d534b; --ink-3: #6b7067;
+  --accent: #b7452c; --accent-bg: #fbe9e6;
+  --wire: #9aa096;
+  --good: #16713c; --good-bg: #e3f2e7; --warn: #8a5800; --warn-bg: #fcf1d9;
+  --exp: #1f5aa5; --exp-bg: #e8f0fb; --bad: #a92e25; --bad-bg: #fbe9e6;
+  --shadow: 0 1px 0 rgba(29,33,31,.05), 0 10px 30px rgba(29,33,31,.08);
+  --f: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --frame: #151816; --sheet: #1b1f1d; --card: #222725; --sunken: #191c1b; --line: #323835; --line-strong: #434a46;
-    --ink: #eceee9; --ink-2: #c3c8c0; --ink-3: #a3a9a0; --accent: #f08a6c; --accent-bg: #3a2620;
-    --left: #6aa6ef; --right: #f59a6f;
-    --good: #7fd19f; --good-bg: #1d3326; --warn: #f2c66b; --warn-bg: #3a2f17; --bad: #f19a90; --bad-bg: #3d2320; --info: #8fb9f3; --info-bg: #1d2a3d;
-    --shot-shadow: 0 1px 0 rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --ink: #eceee9; --ink-2: #c3c8c0; --ink-3: #9ea49b; --accent: #f08a6c; --accent-bg: #3a2620; --wire: #5d645f;
+    --good: #7fd19f; --good-bg: #1d3326; --warn: #f2c66b; --warn-bg: #3a2f17; --exp: #8fb9f3; --exp-bg: #1d2a3d; --bad: #f19a90; --bad-bg: #3d2320;
+    --shadow: 0 1px 0 rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --frame: #151816; --sheet: #1b1f1d; --card: #222725; --sunken: #191c1b; --line: #323835; --line-strong: #434a46;
-  --ink: #eceee9; --ink-2: #c3c8c0; --ink-3: #a3a9a0; --accent: #f08a6c; --accent-bg: #3a2620;
-  --left: #6aa6ef; --right: #f59a6f;
-  --good: #7fd19f; --good-bg: #1d3326; --warn: #f2c66b; --warn-bg: #3a2f17; --bad: #f19a90; --bad-bg: #3d2320; --info: #8fb9f3; --info-bg: #1d2a3d;
-  --shot-shadow: 0 1px 0 rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  --ink: #eceee9; --ink-2: #c3c8c0; --ink-3: #9ea49b; --accent: #f08a6c; --accent-bg: #3a2620; --wire: #5d645f;
+  --good: #7fd19f; --good-bg: #1d3326; --warn: #f2c66b; --warn-bg: #3a2f17; --exp: #8fb9f3; --exp-bg: #1d2a3d; --bad: #f19a90; --bad-bg: #3d2320;
+  --shadow: 0 1px 0 rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-img { max-width: 100%; }
 [hidden] { display: none !important; }
-:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
-html { scroll-behavior: smooth; scroll-padding-top: 16px; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--frame); color: var(--ink); font: 15px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; }
-a { color: inherit; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
+body { margin: 0; background: var(--frame); color: var(--ink); font: 15px/1.55 var(--f); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--line-strong); }
 a:hover { text-decoration-color: var(--accent); }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
-code, .mono { font-family: var(--f-mono); font-size: .86em; }
-code { background: var(--sunken); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; overflow-wrap: anywhere; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+img { max-width: 100%; display: block; }
+code, .mono { font-family: var(--mono); font-size: .88em; }
 
-.wrap { display: grid; grid-template-columns: 264px minmax(0, 1fr); gap: 0; max-width: 1360px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px; }
-.toc { position: sticky; top: calc(16px + env(safe-area-inset-top, 0px)); align-self: start; max-height: calc(100vh - 32px); overflow: auto; padding: 8px 18px 24px 4px; }
-.brand { display: flex; align-items: center; gap: 10px; margin: 6px 0 4px; font-weight: 700; font-size: 17px; letter-spacing: -.01em; }
-.brand svg { flex: none; }
-.brand-sub { color: var(--ink-3); font-size: 12px; margin: 0 0 18px 0; }
-.back { margin: 0 0 16px; font-size: 13.5px; }
-.back a { color: var(--ink-2); }
-.mobile-back { display: none; }
-.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
-.toc a { display: block; padding: 6px 10px; border-radius: 8px; text-decoration: none; color: var(--ink-2); font-size: 14px; }
-.toc a:hover { background: var(--sunken); color: var(--ink); }
-.toc a.on { background: var(--card); color: var(--ink); font-weight: 600; box-shadow: inset 0 0 0 1px var(--line); }
-.toc .grp { margin: 14px 10px 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+/* Верхняя полоса */
+.top { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--frame) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top__in { max-width: 1240px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; gap: 18px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 650; text-decoration: none; white-space: nowrap; }
+.brand svg { width: 40px; height: 24px; }
+.nav { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; }
+.nav::-webkit-scrollbar { display: none; }
+.nav a { padding: 6px 11px; border-radius: 999px; text-decoration: none; color: var(--ink-2); white-space: nowrap; font-size: 14px; }
+.nav a:hover, .nav a.on { background: var(--card); color: var(--ink); }
+.top__act { display: flex; gap: 8px; }
+.btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--card); text-decoration: none; cursor: pointer; font-size: 14px; font-weight: 550; white-space: nowrap; }
+.btn:hover { border-color: var(--ink-3); }
+.btn--ink { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+.btn svg { width: 16px; height: 16px; }
 
-main.sheet { background: var(--sheet); border-radius: 14px; border: 1px solid var(--line); min-width: 0; padding: 40px clamp(18px, 4vw, 56px) 72px; }
-section { padding-block: 28px; border-top: 1px solid var(--line); }
-section:first-child { border-top: 0; padding-top: 0; }
-h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.12; letter-spacing: -.025em; margin: 0 0 12px; text-wrap: balance; }
-h2 { font-size: 26px; line-height: 1.2; letter-spacing: -.02em; margin: 0 0 10px; text-wrap: balance; }
-h3 { font-size: 18px; line-height: 1.3; margin: 26px 0 8px; letter-spacing: -.01em; text-wrap: balance; }
-h4 { font-size: 15px; margin: 18px 0 6px; }
-p { margin: 0 0 12px; max-width: 72ch; }
-.lead { font-size: 17px; color: var(--ink-2); max-width: 66ch; }
-.eyebrow { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
-.route { font-family: var(--f-mono); font-size: 12.5px; color: var(--ink-2); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
-.where { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--ink-3); font-size: 13.5px; margin: 0 0 14px; }
-ul.plain, ol.plain { margin: 0 0 14px; padding-left: 20px; max-width: 72ch; }
-ul.plain li, ol.plain li { margin: 4px 0; }
+main { max-width: 1240px; margin: 0 auto; padding: 28px 20px 80px; }
+section { margin-top: 56px; }
+h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.12; letter-spacing: -.02em; margin: 0 0 10px; font-weight: 700; max-width: 22ch; }
+h2 { font-size: 24px; letter-spacing: -.01em; margin: 0 0 6px; font-weight: 700; }
+.lead { color: var(--ink-2); max-width: 68ch; margin: 0; }
+.sub { color: var(--ink-3); margin: 0 0 18px; max-width: 70ch; }
 
-/* facts strip */
-.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 22px 0 6px; }
-.fact { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
-.fact b { display: block; font-size: 13px; color: var(--ink-3); font-weight: 500; margin-bottom: 4px; }
-.fact span { font-size: 15px; font-weight: 600; }
+/* Первый экран: заголовок + правило + схема */
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 24px; align-items: end; }
+.rule { background: var(--ink); color: var(--sheet); border-radius: 14px; padding: 16px 18px; font-size: 14px; }
+.rule b { display: block; font-size: 15px; margin-bottom: 4px; }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin-top: 22px; }
+.fact { background: var(--card); padding: 12px 14px; }
+.fact b { display: block; font-size: 17px; letter-spacing: -.01em; }
+.fact span { color: var(--ink-3); font-size: 13px; }
 
-/* screenshots */
-figure.shot { margin: 16px 0 22px; }
-figure.shot button { display: block; width: 100%; padding: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--card); cursor: zoom-in; box-shadow: var(--shot-shadow); }
-figure.shot img { display: block; width: 100%; height: auto; }
-figure.shot figcaption { font-size: 13.5px; color: var(--ink-3); margin-top: 8px; max-width: 76ch; }
-.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 18px; }
-.pair figure.shot { margin: 8px 0 12px; }
+.map { margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); padding: 10px 10px 4px; position: relative; }
+.map svg { width: 100%; height: auto; display: block; }
+.map__hint { position: absolute; left: 22px; top: 16px; color: var(--ink-3); font-size: 13px; }
+.n { cursor: pointer; }
+.n .box { fill: var(--sheet); stroke: var(--line-strong); stroke-width: 1.4; transition: stroke .15s, fill .15s; }
+.n:hover .box, .n:focus-visible .box, .n.on .box { stroke: var(--accent); fill: var(--accent-bg); }
+.n:focus { outline: none; }
+.n text { fill: var(--ink); font: 600 14px var(--f); }
+.n .t2 { fill: var(--ink-3); font: 500 12px var(--f); }
+.dot { fill: var(--accent); stroke: var(--card); stroke-width: 3; }
+.n:hover .dot, .n.on .dot { r: 13; }
+.body { fill: var(--sunken); stroke: var(--line-strong); stroke-width: 1.4; }
+.wire { fill: none; stroke: var(--wire); stroke-width: 2; }
+.wire--d { stroke-dasharray: 5 5; }
+.lbl { fill: var(--ink-3); font: 500 12px var(--f); }
 
-/* site map */
-.map { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px; margin-top: 16px; }
-.map a { display: grid; grid-template-rows: auto auto 1fr; gap: 6px; text-decoration: none; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-.map a:hover { border-color: var(--line-strong); }
-.map img { width: 100%; height: auto; aspect-ratio: 1360 / 860; object-fit: cover; object-position: top left; border-bottom: 1px solid var(--line); }
-.map strong { padding: 2px 14px 0; font-size: 15px; }
-.map span { padding: 0 14px 14px; color: var(--ink-3); font-size: 13.5px; line-height: 1.45; }
+/* Путь теста */
+.flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; counter-reset: s; }
+.step { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; cursor: pointer; text-align: left; padding: 0; position: relative; display: flex; flex-direction: column; }
+.step:hover { border-color: var(--accent); }
+.step img { aspect-ratio: 16/10; object-fit: cover; object-position: top left; width: 100%; border-bottom: 1px solid var(--line); }
+.step__t { padding: 10px 12px 12px; }
+.step__t b { display: flex; align-items: center; gap: 8px; font-size: 15px; }
+.step__t b::before { counter-increment: s; content: counter(s); width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 12px; display: grid; place-items: center; flex: none; }
+.step__t span { color: var(--ink-3); font-size: 13px; display: block; margin-top: 3px; }
+.flow .step:not(:last-child)::after { content: ""; position: absolute; right: -12px; top: 30%; width: 10px; height: 2px; background: var(--wire); }
 
-/* tables */
-.tbl { overflow-x: auto; margin: 12px 0 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
-th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); font-weight: 600; background: var(--sunken); white-space: nowrap; }
-tr:last-child td { border-bottom: 0; }
-td.k { white-space: nowrap; font-weight: 600; }
+/* Плитки разделов */
+.groups { display: grid; gap: 26px; }
+.group h3 { margin: 0 0 10px; font-size: 15px; color: var(--ink-2); font-weight: 600; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; cursor: pointer; text-align: left; padding: 0; display: flex; flex-direction: column; }
+.tile:hover { border-color: var(--accent); }
+.tile img { aspect-ratio: 16/9; object-fit: cover; object-position: top left; width: 100%; border-bottom: 1px solid var(--line); background: var(--sunken); }
+.tile__t { padding: 12px 14px 14px; }
+.tile__t b { font-size: 15px; display: block; }
+.tile__t span { color: var(--ink-3); font-size: 13px; }
+.tile__k { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); border: 1px solid var(--line); }
 
-/* status chips */
-.chip { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 1px 9px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
-.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.chip.ok { color: var(--good); background: var(--good-bg); }
-.chip.sim { color: var(--info); background: var(--info-bg); }
-.chip.exp { color: var(--warn); background: var(--warn-bg); }
-.chip.no { color: var(--bad); background: var(--bad-bg); }
+/* Железо */
+.hw { display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px; }
+.hw__img { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; cursor: pointer; padding: 0; text-align: left; }
+.hw__img img { width: 100%; aspect-ratio: 14/9; object-fit: cover; }
+.hw__img figcaption { padding: 10px 14px 12px; color: var(--ink-3); font-size: 13px; }
+.hw__side { display: grid; gap: 12px; align-content: start; }
+.wear { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; font-size: 14px; }
+.wear td, .wear th { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.wear th { color: var(--ink-3); font-weight: 500; font-size: 13px; background: var(--sheet); }
+.wear tr:last-child td { border-bottom: 0; }
+.tag { display: inline-grid; place-items: center; min-width: 28px; height: 22px; padding: 0 6px; border-radius: 6px; background: var(--accent); color: #fff; font-weight: 700; font-size: 12px; }
 
-/* callouts */
-.note { border: 1px solid var(--line); background: var(--card); border-radius: 12px; padding: 14px 16px; margin: 14px 0; max-width: 80ch; }
-.note.look { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); background: var(--accent-bg); }
-.note.warn { background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 35%, var(--line)); }
-.note strong:first-child { display: block; margin-bottom: 4px; }
-.note p:last-child { margin-bottom: 0; }
+/* Статус */
+.bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--sunken); margin: 6px 0 14px; }
+.bar i { display: block; height: 100%; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.f { border: 1px solid var(--line-strong); background: var(--card); border-radius: 999px; padding: 6px 12px; cursor: pointer; font-size: 14px; display: inline-flex; gap: 8px; align-items: center; }
+.f[aria-pressed="true"] { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+.f i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.board { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 10px; }
+.st { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 12px; padding: 11px 13px; cursor: pointer; text-align: left; }
+.st b { display: block; font-size: 14px; }
+.st .pill { display: inline-block; margin-top: 6px; font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--cb); color: var(--c); font-weight: 600; }
+.st p { margin: 8px 0 0; color: var(--ink-2); font-size: 13px; }
+.s-good { --c: var(--good); --cb: var(--good-bg); } .s-warn { --c: var(--warn); --cb: var(--warn-bg); }
+.s-exp { --c: var(--exp); --cb: var(--exp-bg); } .s-bad { --c: var(--bad); --cb: var(--bad-bg); }
+.next { margin-top: 16px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.next div { background: var(--sheet); border: 1px dashed var(--line-strong); border-radius: 12px; padding: 10px 12px; font-size: 13px; color: var(--ink-2); }
 
-/* procedures */
-ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 12px 0 18px; display: grid; gap: 10px; max-width: 80ch; }
-ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; }
-ol.steps > li::before { content: counter(s); width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 600 12.5px/1 var(--f-mono); background: var(--ink); color: var(--sheet); margin-top: 1px; }
+/* Чек-листы */
+.checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.ck { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; cursor: pointer; text-align: left; display: grid; grid-template-columns: 54px 1fr; gap: 12px; align-items: center; }
+.ck:hover { border-color: var(--accent); }
+.ring { width: 54px; height: 54px; }
+.ring circle { fill: none; stroke-width: 6; }
+.ring .bg { stroke: var(--sunken); }
+.ring .fg { stroke: var(--good); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset .3s; }
+.ring text { font: 700 13px var(--f); fill: var(--ink); text-anchor: middle; dominant-baseline: central; }
+.ck b { display: block; font-size: 14px; }
+.ck span { color: var(--ink-3); font-size: 13px; }
+.bugs { margin-top: 14px; background: var(--bad-bg); color: var(--ink); border-radius: 14px; padding: 14px 16px; display: grid; grid-template-columns: 220px 1fr; gap: 16px; }
+.bugs b { color: var(--bad); }
+.bugs ul { margin: 0; padding-left: 18px; font-size: 14px; }
 
-/* checklists */
-.check { border: 1px solid var(--line); border-radius: 12px; background: var(--card); margin: 12px 0 18px; overflow: hidden; }
-.check header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--sunken); }
-.check header b { font-size: 15px; }
-.check header span { font-family: var(--f-mono); font-size: 12px; color: var(--ink-3); white-space: nowrap; }
-.check label { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; padding: 9px 16px; border-bottom: 1px solid var(--line); cursor: pointer; font-size: 14.5px; }
-.check label:last-child { border-bottom: 0; }
-.check input { width: 17px; height: 17px; margin-top: 3px; accent-color: var(--ink); }
-.check label:has(input:checked) > span { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--line-strong); }
-.check .exp { display: block; color: var(--ink-3); font-size: 13px; text-decoration: none; }
-.reset { font: inherit; font-size: 13px; color: var(--ink-2); background: none; border: 1px solid var(--line-strong); border-radius: 8px; padding: 5px 10px; cursor: pointer; }
-.reset:hover { background: var(--sunken); }
+/* Для разработчиков */
+.dev { display: grid; grid-template-columns: 1fr 1.25fr; gap: 16px; }
+.cmd { display: grid; gap: 8px; }
+.cmd button { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; cursor: pointer; text-align: left; }
+.cmd button:hover { border-color: var(--ink-3); }
+.cmd code { color: var(--ink); }
+.cmd small { color: var(--ink-3); grid-column: 1 / -1; font-size: 12.5px; }
+.cmd em { font-style: normal; font-size: 12px; color: var(--accent); }
+.code { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.code div { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; font-size: 13px; color: var(--ink-2); }
+.code code { display: block; color: var(--ink); margin-bottom: 2px; }
+.rules { margin-top: 12px; background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px 10px 30px; font-size: 13.5px; color: var(--ink-2); }
 
-/* lightbox */
-.lb { position: fixed; inset: 0; z-index: 50; background: rgba(15,18,17,.86); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); cursor: zoom-out; }
-.lb[hidden] { display: none; }
-.lb img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
-.lb-close { position: fixed; top: calc(14px + env(safe-area-inset-top, 0px)); right: calc(14px + env(safe-area-inset-right, 0px)); font: 600 14px var(--f-body); color: #fff; background: rgba(255,255,255,.14); border: 0; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+/* Поиск экрана */
+.find { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+.find input { flex: 1; max-width: 420px; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--card); color: var(--ink); font: inherit; }
+.routes { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+.route { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; text-decoration: none; display: block; }
+.route:hover { border-color: var(--accent); }
+.route b { font-size: 14px; display: block; }
+.route code { color: var(--accent); font-size: 12px; }
+.route span { display: block; color: var(--ink-3); font-size: 12.5px; }
 
-.mobile-toc { display: none; }
-@media (max-width: 920px) {
-  .wrap { grid-template-columns: minmax(0, 1fr); }
-  .toc { display: none; }
-  .mobile-toc { display: block; margin: 0 0 18px; }
-  .mobile-back { display: block; }
-  .mobile-toc summary { cursor: pointer; font-weight: 600; padding: 10px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
-  .mobile-toc ol { columns: 2; column-gap: 14px; padding: 10px 6px 0 20px; margin: 0; font-size: 14px; }
-  main.sheet { padding-top: 24px; border-radius: 12px; }
+/* Панель подробностей */
+.scrim { position: fixed; inset: 0; background: rgba(15,17,16,.38); z-index: 40; opacity: 0; transition: opacity .2s; }
+.scrim.open { opacity: 1; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(620px, 100vw); background: var(--sheet); z-index: 50; box-shadow: -20px 0 50px rgba(0,0,0,.18); transform: translateX(100%); transition: transform .25s cubic-bezier(.2,.8,.2,1); display: flex; flex-direction: column; }
+.drawer.open { transform: none; }
+.drawer__h { display: flex; align-items: flex-start; gap: 12px; padding: 18px 20px 12px; border-bottom: 1px solid var(--line); }
+.drawer__h h3 { margin: 0; font-size: 21px; letter-spacing: -.01em; flex: 1; }
+.drawer__x { border: 0; background: var(--card); border: 1px solid var(--line); width: 34px; height: 34px; border-radius: 10px; cursor: pointer; font-size: 18px; line-height: 1; }
+.drawer__b { overflow-y: auto; padding: 16px 20px 40px; }
+.drawer__b p { margin: 0 0 12px; color: var(--ink-2); }
+.drawer__b h4 { margin: 18px 0 8px; font-size: 15px; }
+.drawer__b ul, .drawer__b ol { margin: 0 0 12px; padding-left: 20px; color: var(--ink-2); }
+.drawer__b li { margin: 4px 0; }
+.drawer__b li b { color: var(--ink); }
+.links { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.links a { font-family: var(--mono); font-size: 12.5px; padding: 3px 9px; border-radius: 8px; background: var(--card); border: 1px solid var(--line); text-decoration: none; color: var(--accent); }
+.shots { display: grid; gap: 10px; margin: 6px 0 14px; }
+.shots.two { grid-template-columns: 1fr 1fr; }
+.shot { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--card); cursor: zoom-in; padding: 0; text-align: left; }
+.shot span { display: block; padding: 7px 10px 9px; font-size: 12.5px; color: var(--ink-3); }
+.note { background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 10px; padding: 10px 12px; margin: 0 0 12px; font-size: 14px; color: var(--ink-2); }
+.note b { color: var(--ink); }
+table.t { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 0 0 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+table.t th, table.t td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.t th { background: var(--sunken); color: var(--ink-3); font-weight: 500; }
+.cl { list-style: none; padding: 0 !important; }
+.cl li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); margin: 0 !important; }
+.cl input { width: 18px; height: 18px; accent-color: var(--good); margin-top: 2px; }
+.cl small { display: block; color: var(--ink-3); }
+.cl li:has(input:checked) > span { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--line-strong); }
+
+.lb { position: fixed; inset: 0; z-index: 70; background: rgba(10,12,11,.86); display: grid; place-items: center; padding: 24px; cursor: zoom-out; }
+.lb img { max-height: 92vh; width: auto; border-radius: 10px; }
+
+.foot { margin-top: 60px; color: var(--ink-3); font-size: 13px; }
+
+@media (max-width: 980px) {
+  .hero, .hw, .dev, .bugs { grid-template-columns: 1fr; }
+  .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .flow .step::after { display: none; }
+  .facts, .next { grid-template-columns: 1fr 1fr; }
+  .code { grid-template-columns: 1fr 1fr; }
 }
-@media (max-width: 480px) { .mobile-toc ol { columns: 1; } h2 { font-size: 22px; } }
+@media (max-width: 560px) {
+  main { padding: 18px 16px 60px; }
+  .top__in { padding: 8px 16px; gap: 10px; }
+  .brand span, .top__act .btn span { display: none; }
+  .flow { grid-template-columns: 1fr; }
+  .code, .shots.two { grid-template-columns: 1fr; }
+  .map { padding: 4px; border-radius: 14px; overflow-x: auto; }
+  .map svg { min-width: 760px; }
+  .map__hint { position: static; padding: 8px 10px 0; }
+  .facts, .next { grid-template-columns: 1fr; }
+  .hero > div, .lead { min-width: 0; }
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <nav class="toc" aria-label="Содержание">
-    <div class="brand">
-      <svg width="30" height="18" viewBox="0 0 30 18" aria-hidden="true"><path d="M2 16V6a4 4 0 0 1 8 0v10M10 8a4 4 0 0 1 8 0v8M18 8a4 4 0 0 1 8 0v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="14.2" cy="8.2" r="2" fill="var(--accent)"/></svg>
-      NeuroMove
+<header class="top">
+  <div class="top__in">
+    <a class="brand" href="../#/settings" title="Вернуться в приложение">
+      <svg viewBox="0 0 68 40" fill="none" aria-hidden="true"><path d="M4 33V7M4 18C4 3 24 3 24 18V27C24 37 36 37 36 27V17C36 3 50 3 50 17V33M50 17C50 3 64 3 64 17V33" stroke="currentColor" stroke-width="3.25" stroke-linecap="round" stroke-linejoin="round"/><circle cx="36" cy="21" r="3.25" fill="#b7452c"/></svg>
+      <span>Гид команды</span>
+    </a>
+    <nav class="nav" aria-label="Разделы гида">
+      <a href="#scheme">Схема</a><a href="#test">Тест</a><a href="#sections">Разделы</a><a href="#hardware">Железо</a><a href="#routes">Адреса</a><a href="#status">Статус</a><a href="#checks">Проверка</a><a href="#dev">Код</a>
+    </nav>
+    <div class="top__act">
+      <a class="btn" href="../hardware/korpus-v4-vid.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/></svg><span>Корпуса в 3D</span></a>
+      <a class="btn btn--ink" href="../#/settings"><span>В приложение</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
-    <p class="brand-sub">Внутренний гид · 8 ноября 2026</p>
-    <p class="back"><a href="../#/settings">← Вернуться в приложение</a></p>
-    <ol id="toc-list">
-      <li><a href="#start">С чего начать</a></li>
-      <li><a href="#map">Карта сайта</a></li>
-      <li class="grp">Работа специалиста</li>
-      <li><a href="#test">Тест: от датчиков до итога</a></li>
-      <li><a href="#patients">Пациенты, сеансы, аналитика</a></li>
-      <li><a href="#devices">Датчики и настройки</a></li>
-      <li><a href="#guide">Демо и гид для показа</a></li>
-      <li class="grp">Реабилитация</li>
-      <li><a href="#rehab">Цели, программы, обзор</a></li>
-      <li><a href="#family">Семья и режим ребёнка</a></li>
-      <li class="grp">Исследования</li>
-      <li><a href="#goniometer">Проверка угломером</a></li>
-      <li><a href="#lab">Лаборатория научения</a></li>
-      <li><a href="#coord">Координация и стратегии</a></li>
-      <li class="grp">Для команды</li>
-      <li><a href="#testing">Как тестировать</a></li>
-      <li><a href="#status">Что сделано и что осталось</a></li>
-      <li><a href="#dev">Для разработчиков</a></li>
-    </ol>
-  </nav>
+  </div>
+</header>
 
-  <main class="sheet">
-    <p class="back mobile-back"><a href="../#/settings">← Вернуться в приложение</a></p>
-    <details class="mobile-toc">
-      <summary>Содержание</summary>
-      <ol>
-        <li><a href="#start">С чего начать</a></li><li><a href="#map">Карта сайта</a></li><li><a href="#test">Тест</a></li><li><a href="#patients">Пациенты и аналитика</a></li><li><a href="#devices">Датчики и настройки</a></li><li><a href="#guide">Демо и гид</a></li><li><a href="#rehab">Реабилитация</a></li><li><a href="#family">Семья и ребёнок</a></li><li><a href="#goniometer">Проверка угломером</a></li><li><a href="#lab">Лаборатория научения</a></li><li><a href="#coord">Координация</a></li><li><a href="#testing">Как тестировать</a></li><li><a href="#status">Статус</a></li><li><a href="#dev">Разработчикам</a></li>
-      </ol>
-    </details>
+<main>
+  <div class="hero" id="scheme">
+    <div>
+      <h1>NeuroMove целиком: от датчика на руке до отчёта</h1>
+      <p class="lead">Три датчика на теле ребёнка с ДЦП, плата ESP32 на поясе и приложение в браузере. Нажмите на любую часть схемы — откроется, что это, где на сайте и как проверить.</p>
+    </div>
+    <div class="rule"><b>Демо и Клиника никогда не смешиваются</b>В демо всё смоделировано и подписано «ДЕМО» тёмной полосой. Симулятор в Клинике не работает, смоделированный сеанс туда не попадёт никаким путём. Скриншоты сняты в демо.</div>
+  </div>
 
-    <!-- ───────────────────────── START ───────────────────────── -->
-    <section id="start">
-      <div class="eyebrow">Для разработчиков и тестировщиков</div>
-      <h1>Что есть в NeuroMove, где это на сайте и как это проверять</h1>
-      <p class="lead">NeuroMove измеряет, как ребёнок с ДЦП двигает рукой, тремя датчиками на теле и показывает специалисту и семье, что изменилось. Вокруг теста выросли реабилитация (цели, программы, занятия дома), исследовательский модуль (проверка точности угломером) и лаборатория двигательного научения. Здесь всё это по разделам, со скриншотами, и как каждый раздел тестировать.</p>
-      <div class="facts">
-        <div class="fact"><b>Железо (заморожено)</b><span>ESP32 + 3 × MPU-6050: грудь, плечо, предплечье одной руки</span></div>
-        <div class="fact"><b>Частота и диапазоны</b><span class="mono">100 Гц · ±4 g · ±1000 °/с</span></div>
-        <div class="fact"><b>Где хранятся данные</b><span>В браузере (IndexedDB), сервер — по желанию</span></div>
-        <div class="fact"><b>Два пространства</b><span>Демо (выдуманные дети) и Клиника (настоящие)</span></div>
+  <div class="facts">
+    <div class="fact"><b>ESP32 + 3 × MPU-6050</b><span>грудь, плечо, предплечье одной руки</span></div>
+    <div class="fact"><b>100 Гц</b><span>±4 g, ±1000 °/с; углы считает приложение</span></div>
+    <div class="fact"><b>В браузере</b><span>IndexedDB; сервер — только если включить</span></div>
+    <div class="fact"><b>Chrome или Edge</b><span>для USB и Bluetooth (Web Serial, Web Bluetooth)</span></div>
+  </div>
+
+  <div class="map">
+    <div class="map__hint">Нажмите на узел</div>
+    <svg viewBox="0 0 1180 440" role="group" aria-label="Схема системы NeuroMove">
+      <!-- провода -->
+      <path class="wire" d="M150 150 C 175 205, 175 240, 168 262"/>
+      <path class="wire" d="M212 152 C 215 210, 196 250, 178 264"/>
+      <path class="wire" d="M262 196 C 250 245, 210 268, 186 270"/>
+      <path class="wire" d="M190 284 C 250 300, 280 300, 330 288"/>
+      <text class="lbl" x="232" y="316">USB-C</text>
+      <path class="wire wire--d" d="M470 340 L 470 380"/>
+      <g class="fan"></g>
+      <!-- человек -->
+      <circle class="body" cx="150" cy="62" r="27"/>
+      <rect class="body" x="112" y="98" width="76" height="160" rx="26"/>
+      <path class="body" d="M112 120 C 92 150, 88 200, 92 236 L 106 236 C 106 200, 110 165, 120 140 Z"/>
+      <path class="body" d="M183 108 L 228 168 L 276 186 L 270 204 L 214 186 L 172 132 Z"/>
+      <rect class="body" x="118" y="250" width="64" height="9" rx="4" opacity=".7"/>
+      <text class="lbl" x="56" y="306">ремень 5 см на поясе</text>
+      <!-- узлы -->
+      <g class="n" data-id="sensor-g" tabindex="0" role="button" aria-label="Датчик Г, грудь"><circle class="dot" cx="150" cy="148" r="11"/><text x="128" y="186" style="font-size:13px">Г</text></g>
+      <g class="n" data-id="sensor-p" tabindex="0" role="button" aria-label="Датчик П, плечо"><circle class="dot" cx="208" cy="148" r="11"/><text x="214" y="132" style="font-size:13px">П</text></g>
+      <g class="n" data-id="sensor-pr" tabindex="0" role="button" aria-label="Датчик ПР, предплечье"><circle class="dot" cx="262" cy="194" r="11"/><text x="270" y="226" style="font-size:13px">ПР</text></g>
+      <g class="n" data-id="esp32" tabindex="0" role="button" aria-label="ESP32 на поясе"><rect class="box" x="146" y="258" width="46" height="34" rx="9"/><text x="152" y="280" style="font-size:12px">ESP32</text></g>
+      <g class="n" data-id="app" tabindex="0" role="button" aria-label="Приложение в браузере">
+        <rect class="box" x="330" y="168" width="280" height="172" rx="18"/>
+        <text x="352" y="200">Приложение в браузере</text>
+        <text class="t2" x="352" y="222">Chrome / Edge, React, IndexedDB</text>
+        <text class="t2" x="352" y="252">сырые числа → ориентация → углы</text>
+        <text class="t2" x="352" y="272">→ повторы → метрики → отчёт</text>
+        <text class="t2" x="352" y="310">источники: симулятор, USB,</text>
+        <text class="t2" x="352" y="328">Bluetooth, запись CSV</text>
+      </g>
+      <g class="n" data-id="server" tabindex="0" role="button" aria-label="Сервер и синхронизация"><rect class="box" x="380" y="380" width="180" height="46" rx="12"/><text x="396" y="408">Сервер, по желанию</text></g>
+      <g class="secs"></g>
+    </svg>
+  </div>
+
+  <section id="test">
+    <h2>Тест: пять экранов от датчиков до итога</h2>
+    <p class="sub">Главный путь продукта. Быстрая проверка — около минуты, стандартная оценка — около двух. Нажмите на шаг.</p>
+    <div class="flow" id="flow"></div>
+  </section>
+
+  <section id="sections">
+    <h2>Разделы сайта</h2>
+    <p class="sub">Плитка — одна область продукта. Внутри: адреса, скриншоты и что именно проверять.</p>
+    <div class="groups" id="groups"></div>
+  </section>
+
+  <section id="hardware">
+    <h2>Железо: корпуса v4 и как надевать</h2>
+    <p class="sub">Прошивка и электроника заморожены. Корпуса печатаются на Bambu Lab A1, исходники — hardware/models/enclosure, инструкция — ПЕЧАТЬ-v4.md.</p>
+    <div class="hw">
+      <button class="hw__img" data-id="hw-cases"><figure style="margin:0"><img src="img/korpus-v4-esp32-vnutri.png" alt="ESP32 на макетной плате внутри корпуса, три кабеля датчиков"><figcaption>ESP32 на макетной плате, три кабеля датчиков. Нажмите — размеры, защёлка, окно USB-C.</figcaption></figure></button>
+      <div class="hw__side">
+        <table class="wear">
+          <tr><th></th><th>Где</th><th>Черта на крышке (ось X)</th></tr>
+          <tr><td><span class="tag">Г</span></td><td>грудина, по центру</td><td>вниз, к поясу</td></tr>
+          <tr><td><span class="tag">П</span></td><td>наружная сторона плеча, между суставом и локтем</td><td>к локтю и кисти</td></tr>
+          <tr><td><span class="tag">ПР</span></td><td>тыльная сторона предплечья, ближе к запястью</td><td>к кисти</td></tr>
+          <tr><td><span class="tag">ESP</span></td><td>пояс спереди, со стороны руки</td><td>USB-C вниз, кабели сверху</td></tr>
+        </table>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <a class="btn btn--ink" href="../hardware/korpus-v4-vid.html" target="_blank" rel="noopener">Открыть корпуса в 3D</a>
+          <button class="btn" data-id="hw-wear">Как надеть и вести кабели</button>
+        </div>
       </div>
-      <div class="note look">
-        <strong>Самое важное правило</strong>
-        <p>Демо и Клиника никогда не смешиваются. В демо всё смоделировано и подписано «ДЕМО» (тёмная полоса сверху). Симулятор датчиков в Клинике не работает: смоделированный сеанс туда не сохранится никаким путём. Все скриншоты на этой странице сняты в демо.</p>
-      </div>
-      <h3>Как открыть сайт</h3>
-      <ul class="plain">
-        <li>Боевой адрес — тот, что на Vercel. У каждого адреса (включая предпросмотры Vercel) <b>своё</b> хранилище в браузере: на новом адресе будет пусто, это не потеря данных.</li>
-        <li>Локально: <code>cd website</code> → <code>npm install</code> → <code>npm run dev</code>, затем адрес, который напишет Vite.</li>
-        <li>Для подключения настоящих датчиков нужен Chrome или Edge (Web Serial и Web Bluetooth).</li>
-      </ul>
-    </section>
+    </div>
+  </section>
 
-    <!-- ───────────────────────── MAP ───────────────────────── -->
-    <section id="map">
-      <h2>Карта сайта</h2>
-      <p>Меню слева в приложении ведёт в восемь разделов. Нажмите на карточку, чтобы перейти к описанию.</p>
-      <div class="map">
-        <a href="#test"><img src="img/03-overview.jpg" width="1360" height="860" alt="Главная" loading="lazy"><strong>Главная</strong><span>Следующий пациент, расписание дня, что требует внимания.</span></a>
-        <a href="#patients"><img src="img/05-patient.jpg" width="1360" height="860" alt="Карточка пациента" loading="lazy"><strong>Пациенты</strong><span>Карточка ребёнка: главное за курс, сеансы, цели и заметки.</span></a>
-        <a href="#test"><img src="img/10-live.jpg" width="1360" height="860" alt="Тест" loading="lazy"><strong>Новый тест</strong><span>Датчики → калибровка → движения → итог.</span></a>
-        <a href="#patients"><img src="img/12-sessions.jpg" width="1360" height="860" alt="Сеансы" loading="lazy"><strong>Сеансы</strong><span>Все проведённые тесты, отчёт по каждому.</span></a>
-        <a href="#patients"><img src="img/13-analytics.jpg" width="1360" height="860" alt="Аналитика" loading="lazy"><strong>Аналитика</strong><span>У кого рука поднимается выше, у кого ниже.</span></a>
-        <a href="#rehab"><img src="img/28-rehab.jpg" width="1360" height="860" alt="Реабилитация" loading="lazy"><strong>Реабилитация</strong><span>Цели, программы, занятия дома, обзор специалиста.</span></a>
-        <a href="#goniometer"><img src="img/16-research.jpg" width="1360" height="860" alt="Исследования" loading="lazy"><strong>Исследования</strong><span>Проверка угломером, протоколы, наборы данных, лаборатория.</span></a>
-        <a href="#devices"><img src="img/14-devices.jpg" width="1360" height="860" alt="Датчики" loading="lazy"><strong>Датчики и Настройки</strong><span>Подключение комплекта, язык, пространство, синхронизация.</span></a>
-      </div>
-      <h3>Все адреса</h3>
-      <p>Адреса с решёткой работают и на сервере, и при открытии файла с диска. Удобно для тестов: можно сразу открыть нужный экран.</p>
-      <div class="tbl"><table>
-        <thead><tr><th>Экран</th><th>Адрес</th><th>Для чего</th></tr></thead>
-        <tbody>
-          <tr><td class="k">Стартовая</td><td><code>#/</code></td><td>Лендинг: «Попробовать демо» или «Открыть пространство клиники»</td></tr>
-          <tr><td class="k">Главная</td><td><code>#/overview</code></td><td>Рабочий стол специалиста на сегодня</td></tr>
-          <tr><td class="k">Пациенты</td><td><code>#/patients</code>, <code>#/patients/&lt;id&gt;</code></td><td>Список и карточка; вкладки <code>?tab=sessions</code>, <code>?tab=goals</code></td></tr>
-          <tr><td class="k">Новый тест</td><td><code>#/session/new?patient=&lt;id&gt;&amp;protocol=upper_quick</code></td><td>Выбор пациента и протокола</td></tr>
-          <tr><td class="k">Идёт тест</td><td><code>#/session/run</code></td><td>Датчики, калибровка, тест</td></tr>
-          <tr><td class="k">Сеансы и отчёт</td><td><code>#/sessions</code>, <code>#/sessions/&lt;id&gt;</code></td><td>История и отчёт; <code>/print</code> — для печати</td></tr>
-          <tr><td class="k">Аналитика</td><td><code>#/analytics</code></td><td>Сводка по всем пациентам</td></tr>
-          <tr><td class="k">Реабилитация</td><td><code>#/rehab</code>, <code>#/rehab/p/&lt;id&gt;?tab=…</code></td><td>Панель и страница участника (8 вкладок)</td></tr>
-          <tr><td class="k">Библиотека / исследования</td><td><code>#/rehab/activities</code>, <code>#/rehab/studies</code></td><td>Занятия и пилотные исследования</td></tr>
-          <tr><td class="k">Страница семьи</td><td><code>#/home/&lt;id&gt;</code></td><td>Занятия дома и отчёт «как прошло»</td></tr>
-          <tr><td class="k">Режим ребёнка</td><td><code>#/play/&lt;id&gt;</code></td><td>Крупные карточки занятий для ребёнка</td></tr>
-          <tr><td class="k">Исследования</td><td><code>#/research</code></td><td>Сеансы проверки угломером, вход в лабораторию</td></tr>
-          <tr><td class="k">Протоколы / новый сеанс проверки</td><td><code>#/research/protocols</code>, <code>#/research/new</code></td><td>Версии протоколов, запуск проверки</td></tr>
-          <tr><td class="k">Наборы данных</td><td><code>#/research/datasets</code></td><td>Выгрузка CSV/JSON для анализа</td></tr>
-          <tr><td class="k">Лаборатория</td><td><code>#/research/lab</code></td><td>Вход во все инструменты лаборатории</td></tr>
-          <tr><td class="k">Обозреватель / двойник</td><td><code>#/research/learning</code>, <code>#/research/twin/&lt;id&gt;</code></td><td>Модели изменения результата</td></tr>
-          <tr><td class="k">Анализ движения</td><td><code>#/research/movement</code></td><td>Сырые сигналы 100 Гц одного сеанса</td></tr>
-          <tr><td class="k">Координация</td><td><code>#/research/coordination</code></td><td>Стратегии движения по всем датчикам</td></tr>
-          <tr><td class="k">Конструктор / отчёты / готовность</td><td><code>#/research/designer</code>, <code>/runs</code>, <code>/readiness</code></td><td>Протоколы научения, замороженные анализы</td></tr>
-          <tr><td class="k">Датчики / Настройки</td><td><code>#/devices</code>, <code>#/settings</code></td><td>Подключение, язык, пространство, синхронизация</td></tr>
-        </tbody>
-      </table></div>
-      <p>В демо id детей: <code>demo-p01</code> (Алихан) … <code>demo-p06</code> (Амина).</p>
-    </section>
+  <section id="routes">
+    <h2>Найти экран по адресу</h2>
+    <p class="sub">Адреса с решёткой работают и на сервере, и при открытии файла с диска. В демо id детей: demo-p01 (Алихан) … demo-p06 (Амина).</p>
+    <div class="find"><input id="q" type="search" placeholder="Например: отчёт, угломер, семья" aria-label="Поиск экрана"></div>
+    <div class="routes" id="routeList"></div>
+  </section>
 
-    <!-- ───────────────────────── TEST ───────────────────────── -->
-    <section id="test">
-      <div class="where"><span class="route">#/overview</span><span class="route">#/session/new</span><span class="route">#/session/run</span></div>
-      <h2>Тест: от датчиков до итога</h2>
-      <p>Главный путь продукта. Специалист проводит тест руки примерно за минуту (быстрая проверка) или две (стандартная оценка). Все углы считает приложение из сырых чисел датчиков; устройство только передаёт данные.</p>
+  <section id="status">
+    <h2>Что сделано и что осталось</h2>
+    <p class="sub">Состояние на 8 ноября 2026. Нажмите на статус, чтобы оставить только его.</p>
+    <div class="bar" id="bar"></div>
+    <div class="filters" id="filters"></div>
+    <div class="board" id="board"></div>
+    <div class="next" id="next"></div>
+  </section>
 
-      <h3>1. Главная</h3>
-      <figure class="shot"><button type="button" data-full="img/03-overview.jpg"><img src="img/03-overview.jpg" width="1360" height="860" alt="Главная: следующий пациент, расписание, требуют внимания" loading="lazy"></button>
-        <figcaption>Следующий пациент с главной цифрой, расписание на сегодня и блок «Требуют внимания» (наблюдения вроде «цель достигнута» или «на 17° меньше, чем в прошлый раз»). Второстепенное спрятано в «Показать подробности».</figcaption></figure>
-
-      <h3>2. Новый тест: пациент и протокол</h3>
-      <figure class="shot"><button type="button" data-full="img/07-setup.jpg"><img src="img/07-setup.jpg" width="1360" height="860" alt="Новый тест: выбор протокола" loading="lazy"></button>
-        <figcaption>Справа — план сеанса: какие движения, какой рукой, сколько повторов.</figcaption></figure>
-      <div class="tbl"><table>
-        <thead><tr><th>Протокол</th><th>Что внутри</th><th>Когда</th></tr></thead>
-        <tbody>
-          <tr><td class="k">Стандартная оценка</td><td>Подъём вперёд, в сторону, локоть, поворот предплечья; обе руки; по 3 повтора</td><td>Полный тест на визите</td></tr>
-          <tr><td class="k">Быстрая проверка</td><td>Подъём вперёд и локоть; обе руки; по 3 повтора</td><td>Короткий визит, демо</td></tr>
-          <tr><td class="k">Выносливость: локоть</td><td>Сгибание локтя поражённой рукой 60 с</td><td>Много повторов подряд</td></tr>
-          <tr><td class="k">Свой набор</td><td>Выбор движений и сторон; 3 или 5 повторов</td><td>Под задачу специалиста</td></tr>
-          <tr><td class="k">Проверка одним датчиком</td><td>Один датчик на плече или предплечье</td><td>Проверка железа и угла против угломера, не оценка пациента</td></tr>
-        </tbody>
-      </table></div>
-
-      <h3>3. Датчики выходят на связь</h3>
-      <figure class="shot"><button type="button" data-full="img/08-connect.jpg"><img src="img/08-connect.jpg" width="1360" height="860" alt="Подключение датчиков" loading="lazy"></button>
-        <figcaption>Схема тела с каждым датчиком и уровнем сигнала. Кнопка «Начать тест» станет активной, когда нужные датчики на связи. Симулятор показывает 5 мест; настоящий стенд — 3 (грудь, плечо и предплечье одной руки).</figcaption></figure>
-
-      <h3>4. Калибровка и тест</h3>
-      <div class="pair">
-        <figure class="shot"><button type="button" data-full="img/09-calibration.jpg"><img src="img/09-calibration.jpg" width="1360" height="860" alt="Калибровка" loading="lazy"></button>
-          <figcaption>Калибровка: 3 секунды сидеть ровно, руки вдоль тела. Эта поза — ноль всех углов. Если ребёнок шевельнулся, калибровка повторяется.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/10-live.jpg"><img src="img/10-live.jpg" width="1360" height="860" alt="Идёт тест" loading="lazy"></button>
-          <figcaption>Тест: угломер в реальном времени, отметка прошлого сеанса, фигурка повторяет движение. Внизу — пауза, следующий шаг, экран для пациента, завершить.</figcaption></figure>
-      </div>
-      <div class="note"><strong>Что должно происходить</strong>
-        <ul class="plain">
-          <li>Повтор засчитывается, когда угол ушёл выше порога и вернулся вниз.</li>
-          <li>Если связь пропала, тест встаёт на паузу, прерванный повтор не засчитывается («Связь с устройством потеряна» → «Связь восстановлена» → «Продолжить»).</li>
-          <li>Если вкладку случайно закрыли, незаконченный тест восстанавливается при следующем открытии.</li>
-          <li>Сырые кадры 100 Гц сохраняются вместе с сеансом (нужны лаборатории). С 8 ноября к ним пишется «манифест» с хэшем, чтобы проверить, что данные не менялись.</li>
-        </ul></div>
-
-      <h3>5. Итог</h3>
-      <figure class="shot"><button type="button" data-full="img/11-report.jpg"><img src="img/11-report.jpg" width="1360" height="860" alt="Итог сеанса" loading="lazy"></button>
-        <figcaption>Одна фраза о главном и строка на каждое движение: слабая рука крупно, рядом здоровая, сравнение с прошлым сеансом. «Печать / PDF» и «Отчёт для семьи» — простым языком. Таблицы и каждый повтор — в «Показать подробности».</figcaption></figure>
-    </section>
-
-    <!-- ───────────────────────── PATIENTS ───────────────────────── -->
-    <section id="patients">
-      <div class="where"><span class="route">#/patients</span><span class="route">#/sessions</span><span class="route">#/analytics</span></div>
-      <h2>Пациенты, сеансы, аналитика</h2>
-      <figure class="shot"><button type="button" data-full="img/05-patient.jpg"><img src="img/05-patient.jpg" width="1360" height="860" alt="Карточка пациента" loading="lazy"></button>
-        <figcaption>Карточка пациента. «Главное» — три рисунка: подъём руки (сейчас, было, цель врача), правая и левая (симметрия в процентах), помощь корпусом (наклон туловища, чтобы достать выше). Ниже — наблюдения.</figcaption></figure>
-      <div class="note"><strong>Как читать «помощь корпусом»</strong><p>Угол руки считается от вертикали, а не от туловища. Если ребёнок откинулся назад, рука в мире поднимается выше. Поэтому наклон туловища показан отдельной строкой: так видно, сколько градусов «добрано» корпусом.</p></div>
-      <div class="pair">
-        <figure class="shot"><button type="button" data-full="img/06-patient-sessions.jpg"><img src="img/06-patient-sessions.jpg" width="1360" height="860" alt="Сеансы пациента" loading="lazy"></button>
-          <figcaption>Вкладка «Сеансы»: протокол, длительность, подъём руки с изменением, симметрия, наклон туловища, полнота данных, статус.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/13-analytics.jpg"><img src="img/13-analytics.jpg" width="1360" height="860" alt="Аналитика" loading="lazy"></button>
-          <figcaption>Аналитика по всем пациентам: начало курса → сейчас, кто выше, кто ниже, предупреждение об откате с прошлого раза.</figcaption></figure>
-      </div>
-      <h3>Демо-пациенты: на ком что смотреть</h3>
-      <div class="tbl"><table>
-        <thead><tr><th>Ребёнок</th><th>История</th><th>Что проверять на нём</th></tr></thead>
-        <tbody>
-          <tr><td class="k">Алихан</td><td>8 лет, гемиплегия справа, 9 сеансов, рост 127° → 144°</td><td>Главный путь, гид, отчёт для семьи, реабилитация</td></tr>
-          <tr><td class="k">Айша</td><td>Плато</td><td>Наблюдение «плато»: 4 сеанса в пределах 6°</td></tr>
-          <tr><td class="k">Нурислам</td><td>Обе стороны, потери связи</td><td>Полнота записи, качество данных</td></tr>
-          <tr><td class="k">Томирис</td><td>Откат после перерыва</td><td>Наблюдение «откат к прошлому сеансу»</td></tr>
-          <tr><td class="k">Данияр</td><td>Только исходный тест</td><td>Что видно после первого визита</td></tr>
-          <tr><td class="k">Амина</td><td>Новый пациент</td><td>Пустые состояния</td></tr>
-        </tbody>
-      </table></div>
-      <p>Числа демо воспроизводимы: «Сбросить демо» возвращает те же значения (даты сдвигаются на сегодня).</p>
-    </section>
-
-    <!-- ───────────────────────── DEVICES ───────────────────────── -->
-    <section id="devices">
-      <div class="where"><span class="route">#/devices</span><span class="route">#/settings</span></div>
-      <h2>Датчики и настройки</h2>
-      <figure class="shot"><button type="button" data-full="img/14-devices.jpg"><img src="img/14-devices.jpg" width="1360" height="860" alt="Датчики" loading="lazy"></button>
-        <figcaption>Четыре источника данных через один интерфейс: симулятор, USB (провода через ESP32, Chrome/Edge), Bluetooth (беспроводные блоки), запись CSV (проиграть файл imu-csv как вживую). Справа — как надевать: ось X датчика вдоль кости, стрелка на корпусе к кисти; на груди стрелка вниз.</figcaption></figure>
-      <figure class="shot"><button type="button" data-full="img/15-settings.jpg"><img src="img/15-settings.jpg" width="1360" height="860" alt="Настройки" loading="lazy"></button>
-        <figcaption>Язык (RU, KZ, EN), рабочее пространство (Демо / Клиника), автопереход между шагами теста, облачная синхронизация команды. Ниже на странице: доступ семьи, выгрузка архива, скрытые записи (карантин).</figcaption></figure>
-      <h3>Облачная синхронизация</h3>
-      <ul class="plain">
-        <li>Выключена по умолчанию: пока сотрудник не вошёл и не включил её, ничего не уходит из браузера.</li>
-        <li>Любая запись сначала сохраняется на устройстве вместе с операцией в очереди. «Синхронизировано» появляется только после ответа сервера.</li>
-        <li>Демо и смоделированные данные не синхронизируются: сервер их тоже отклоняет.</li>
-        <li>Конфликты (две правки одной записи) — выбор «версия сервера» или «оставить мою».</li>
-        <li>Первая настройка команды требует одноразовый код <code>NEUROMOVE_SETUP_CODE</code> на сервере.</li>
-      </ul>
-    </section>
-
-    <!-- ───────────────────────── GUIDE ───────────────────────── -->
-    <section id="guide">
-      <div class="where"><span>Кнопка «Гид» в тёмной полосе демо</span></div>
-      <h2>Демо и гид для показа</h2>
-      <p>Гид проводит по пути «пациент → тест → итог» за 3 минуты: на каждом шаге светлым остаётся только то, о чём он говорит, а нужная кнопка обведена киноварью. Это для показов жюри, врачам, родителям.</p>
-      <div class="pair">
-        <figure class="shot"><button type="button" data-full="img/02-guide.jpg"><img src="img/02-guide.jpg" width="1360" height="860" alt="Начало гида" loading="lazy"></button>
-          <figcaption>Начало: одна фраза и три кадра. «Начать» или «Осмотреться без гида».</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/02b-guide-step.jpg"><img src="img/02b-guide-step.jpg" width="1360" height="860" alt="Шаг гида" loading="lazy"></button>
-          <figcaption>Шаг гида: подсветка и подсказка из заголовка и одной фразы. Всего 8 шагов.</figcaption></figure>
-      </div>
-      <ul class="plain">
-        <li>Гид переживает перезагрузку: продолжит с того же шага.</li>
-        <li>Если ушли на другой экран, гид скажет «Вы ушли с шага…» и предложит вернуться.</li>
-        <li>На шаге теста есть «Показать обрыв связи» — демонстрация паузы при потере датчика.</li>
-        <li>«Сбросить демо» (справа в полосе) возвращает демо-данные к исходным.</li>
-      </ul>
-    </section>
-
-    <!-- ───────────────────────── REHAB ───────────────────────── -->
-    <section id="rehab">
-      <div class="where"><span class="route">#/rehab</span><span class="route">#/rehab/p/demo-p01?tab=…</span></div>
-      <h2>Реабилитация: цели, программы, обзор</h2>
-      <p>Система функционального прогресса. Цикл: цели ребёнка и семьи → оценка специалиста → индивидуальная программа → занятия в клинике и дома → измерения → анализ → обзор специалиста → новая версия программы. Приложение ничего не назначает и не меняет само: все числа в программе вводит специалист, аналитика только подсказывает, что посмотреть.</p>
-      <figure class="shot"><button type="button" data-full="img/28-rehab.jpg"><img src="img/28-rehab.jpg" width="1360" height="860" alt="Панель реабилитации" loading="lazy"></button>
-        <figcaption>Панель: участники с текущей программой и датой пересмотра. Справа «Требует внимания» — наблюдения по правилам (сначала безопасность), не диагнозы.</figcaption></figure>
-      <h3>Страница участника: 8 вкладок</h3>
-      <div class="tbl"><table>
-        <thead><tr><th>Вкладка</th><th>Что там</th></tr></thead>
-        <tbody>
-          <tr><td class="k">Профиль</td><td>Ответственный специалист, области, классификации (как ввёл врач), участие семьи, как показывать режим ребёнка</td></tr>
-          <tr><td class="k">Цели</td><td>Цель словами, зачем, исходный уровень, цель, как измерять, срок пересмотра; история только дописывается; уровни GAS; коды МКФ-ДП</td></tr>
-          <tr><td class="k">Программа</td><td>Модули A–E, занятия с частотой и минутами от специалиста; каждая правка — новая неизменяемая версия с причиной</td></tr>
-          <tr><td class="k">Хронология</td><td>Всё по времени: клиника и дом, у каждой записи источник</td></tr>
-          <tr><td class="k">Движение</td><td>Метрики IMU с проверкой качества, исходный уровень, тренд. Помечено «клинически не валидировано»</td></tr>
-          <tr><td class="k">Оценки</td><td>GAS (T-балл), COPM, GMFM как ввели; исправления не перезаписывают, а заменяют</td></tr>
-          <tr><td class="k">Семья</td><td>Отчёты семьи, сообщения, события безопасности (боль), сводки для семьи</td></tr>
-          <tr><td class="k">Обзор</td><td>Сводка фактов с источниками (без ИИ), наблюдения, ответ специалиста, решение и обоснование</td></tr>
-        </tbody>
-      </table></div>
-      <div class="pair">
-        <figure class="shot"><button type="button" data-full="img/29-rehab-program.jpg"><img src="img/29-rehab-program.jpg" width="1360" height="860" alt="Программа" loading="lazy"></button>
-          <figcaption>Программа v2: «Изменить → новая версия» создаёт v3, старая остаётся как была.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/29-rehab-review.jpg"><img src="img/29-rehab-review.jpg" width="1360" height="860" alt="Обзор" loading="lazy"></button>
-          <figcaption>Обзор: каждая строка помечена источником — «Специалист» или «Со слов семьи / ребёнка».</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/29-rehab-goals.jpg"><img src="img/29-rehab-goals.jpg" width="1360" height="860" alt="Цели" loading="lazy"></button>
-          <figcaption>Цели: «Новая цель», статусы, ввод семьи.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/29-rehab-movement.jpg"><img src="img/29-rehab-movement.jpg" width="1360" height="860" alt="Движение" loading="lazy"></button>
-          <figcaption>Движение: закрашенные точки — пригодные сеансы, пустые — исключены проверкой качества.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/29-rehab-timeline.jpg"><img src="img/29-rehab-timeline.jpg" width="1360" height="860" alt="Хронология" loading="lazy"></button>
-          <figcaption>Хронология клиники и дома.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/29-rehab-family.jpg"><img src="img/29-rehab-family.jpg" width="1360" height="860" alt="Семья" loading="lazy"></button>
-          <figcaption>Семья: события безопасности рассматриваются один раз, кнопка «Рассмотреть событие».</figcaption></figure>
-      </div>
-      <div class="pair">
-        <figure class="shot"><button type="button" data-full="img/30-activities.jpg"><img src="img/30-activities.jpg" width="1360" height="860" alt="Библиотека занятий" loading="lazy"></button>
-          <figcaption>Библиотека занятий: версии, статусы (черновик, экспериментальное, одобрено специалистом), шаги в картинках, заметки по безопасности.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/31-studies.jpg"><img src="img/31-studies.jpg" width="1360" height="860" alt="Исследования реабилитации" loading="lazy"></button>
-          <figcaption>Пилотные исследования: без одобрения этического комитета нельзя начать набор; согласие и отзыв согласия; обезличенная выгрузка.</figcaption></figure>
-      </div>
-      <div class="note"><strong>Чего здесь нет намеренно</strong><p>Нет общего балла, нет слова «улучшилось» (только «выше/ниже исходного»), нет автоматического повышения нагрузки, нет рейтингов и наказаний для ребёнка. «Не сделали» — нейтральный ответ.</p></div>
-    </section>
-
-    <!-- ───────────────────────── FAMILY & CHILD ───────────────────────── -->
-    <section id="family">
-      <div class="where"><span class="route">#/home/demo-p01</span><span class="route">#/play/demo-p01</span></div>
-      <h2>Семья и режим ребёнка</h2>
-      <div class="pair">
-        <figure class="shot"><button type="button" data-full="img/32-family.jpg"><img src="img/32-family.jpg" width="1360" height="860" alt="Страница семьи" loading="lazy"></button>
-          <figcaption>Страница семьи: занятия, выбранные специалистом, шаги, заметка терапевта, предупреждение о боли. «Рассказать, как прошло»: сделали / частично / не сделали / остановили, препятствия, усталость, дискомфорт, минуты.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/33-child.jpg"><img src="img/33-child.jpg" width="1360" height="860" alt="Режим ребёнка" loading="lazy"></button>
-          <figcaption>Режим ребёнка: крупные карточки, счётчик участия (звёзды). Выйти может только взрослый — удерживая кнопку.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/33b-child-activity.jpg"><img src="img/33b-child-activity.jpg" width="1360" height="860" alt="Занятие в режиме ребёнка" loading="lazy"></button>
-          <figcaption>Занятие: шаги, «Дальше», «Перерыв» и «Стоп» всегда на экране. Последнее настоящее измерение показано рядом с целью специалиста.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/33c-child-sensors.jpg"><img src="img/33c-child-sensors.jpg" width="1360" height="860" alt="Датчики в режиме ребёнка" loading="lazy"></button>
-          <figcaption>«Датчики (для взрослого)»: живая подсказка угла во время занятия. Только показ: не сохраняется как измерение.</figcaption></figure>
-      </div>
-      <ul class="plain">
-        <li>Ответ «Было больно» сразу показывает «Пожалуйста, остановите занятие» и открывает событие безопасности для специалиста.</li>
-        <li>Запись попыток практики (для лаборатории) включает специалист на странице двойника участника; в клинике нужно активное согласие. Тогда сохраняются и сырые кадры занятия.</li>
-      </ul>
-    </section>
-
-    <!-- ───────────────────────── GONIOMETER ───────────────────────── -->
-    <section id="goniometer">
-      <div class="where"><span class="route">#/research</span><span class="route">#/research/protocols</span><span class="route">#/research/new</span><span class="route">#/research/datasets</span></div>
-      <h2>Проверка угломером</h2>
-      <p>Этот модуль доказывает (или опровергает), что угол датчиков совпадает с угломером (гониометром). Каждый повтор: датчик фиксирует угол, сеанс встаёт на паузу, человек меряет угломером и вводит число. Модуль считает систематическую ошибку, MAE, RMSE, пределы согласия Бланда–Альтмана и ICC. Точность прибора он не утверждает: он её измеряет.</p>
-      <figure class="shot"><button type="button" data-full="img/16-research.jpg"><img src="img/16-research.jpg" width="1360" height="860" alt="Исследования" loading="lazy"></button>
-        <figcaption>Исследования: сеансы проверки, протоколы, наборы данных и карта того, что могут измерить три датчика (работает / экспериментально / в будущем).</figcaption></figure>
-
-      <h3>Что нужно</h3>
-      <ul class="plain">
-        <li>Двое: оператор у компьютера и измеряющий угломером. Один и тот же угломер на весь сеанс, его модель — в заметках.</li>
-        <li>Chrome или Edge, комплект по USB или Bluetooth. Пространство «Клиника» для настоящих людей; в демо работает только симулятор, и его значения помечены как не измерения.</li>
-        <li>Участник под кодом (не имя). Для первых проверок — стенд с фиксированными углами (шаблон «Elbow — fixed angles (bench check)»).</li>
-      </ul>
-
-      <h3>Пошагово</h3>
-      <ol class="steps">
-        <li><div><b>Протокол.</b> Исследования → Протоколы → шаблон (например, «Elbow flexion — goniometer agreement») → проверить поля → «Создать протокол». Каждое сохранение — новая неизменяемая версия; сеанс помнит, по какой версии шёл.</div></li>
-        <li><div><b>Новый сеанс проверки.</b> Участник, протокол, подключение (USB / Bluetooth; симулятор только в демо), условия измерения (модель угломера, положение, помещение). «Создать сеанс и подключить датчики».</div></li>
-        <li><div><b>Датчики и калибровка.</b> Дождаться связи, «Начать тест», 3 секунды неподвижно, руки вдоль тела.</div></li>
-        <li><div><b>Удержание и запись.</b> Участник держит положение (~3 с). Когда под углом написано «Стабильно» (разброс окна в пределах порога), оператор жмёт «Записать значение IMU» или пробел. Записывается медиана угла за окно (1 с по умолчанию) и её разброс.</div></li>
-        <li><div><b>Угломер.</b> Сеанс на паузе, поле «Показание гониометра» уже в фокусе. Измерить, ввести (запятая или точка), Enter. Следующую запись нельзя сделать, пока значение не сохранено.</div></li>
-        <li><div><b>Если что-то не так.</b> «Повторить измерение», «Отметить недействительным» (нужна причина), «Пропустить с причиной». Прошлый повтор можно пересмотреть и исправить: замена хранится в журнале.</div></li>
-        <li><div><b>Отчёт.</b> Обновляется после каждой пары. «Завершить сеанс» → отчёт, печать/PDF, CSV и JSON. Все сеансы вместе — в «Наборах данных».</div></li>
-      </ol>
-      <div class="pair">
-        <figure class="shot"><button type="button" data-full="img/17b-protocol-template.jpg"><img src="img/17b-protocol-template.jpg" width="1360" height="860" alt="Протокол" loading="lazy"></button>
-          <figcaption>Протокол из шаблона: сустав, определение угла IMU, сторона, повторы, способ захвата, окно, максимальный разброс окна, порог проверки ошибки.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/18-validation-new.jpg"><img src="img/18-validation-new.jpg" width="1360" height="860" alt="Новый сеанс проверки" loading="lazy"></button>
-          <figcaption>Новый сеанс: какие датчики нужны и куда ставить угломер («ось на латеральном надмыщелке; бранши вдоль плечевой и лучевой кости»).</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/18c-validation-capture.jpg"><img src="img/18c-validation-capture.jpg" width="1360" height="860" alt="Запись значения IMU" loading="lazy"></button>
-          <figcaption>Перед записью: «Удерживайте положение и запишите». Справа текущий угол и стабильность.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/18d-validation-goniometer.jpg"><img src="img/18d-validation-goniometer.jpg" width="1360" height="860" alt="Ввод показания угломера" loading="lazy"></button>
-          <figcaption>Пауза: показание IMU зафиксировано, ждём угломер. Ошибка считается сразу после ввода.</figcaption></figure>
-      </div>
-      <figure class="shot"><button type="button" data-full="img/18e-validation-stats.jpg"><img src="img/18e-validation-stats.jpg" width="1360" height="2742" alt="Отчёт сеанса проверки" loading="lazy"></button>
-        <figcaption>Отчёт в реальном времени: действительные пары, средние углы, систематическая ошибка с ДИ, MAE, RMSE, графики по повторам, Бланд–Альтман, ICC, согласие по диапазону, таблица повторов. <b>Здесь симулятор и случайно введённые числа угломера</b>, поэтому ошибки огромные — это проверка работы экрана, а не точности.</figcaption></figure>
-      <div class="note warn"><strong>Чтобы результатам можно было верить</strong>
-        <ul class="plain">
-          <li>Сначала стенд с фиксированными углами, потом взрослые добровольцы, потом дети (у детей с ДЦП сам угломер расходится на 10–14° между замерами).</li>
-          <li>Не округлять показания угломера при вводе; приложение хранит их как есть.</li>
-          <li>Каждое значение угломера привязано к одному зафиксированному измерению IMU, а не к «текущему углу».</li>
-          <li>Метка «Недостаточно» у статистики значит, что пар слишком мало для вывода. Это не ошибка.</li>
-          <li>Сеансы проверки пока не пишут сырые кадры: пересчитать их новым алгоритмом нельзя.</li>
-        </ul></div>
-      <figure class="shot"><button type="button" data-full="img/19-datasets.jpg"><img src="img/19-datasets.jpg" width="1360" height="860" alt="Наборы данных" loading="lazy"></button>
-        <figcaption>Наборы данных: фильтры по протоколу, участнику, оператору, датам; CSV (одна строка — одна попытка, полная точность), JSON, словарь данных с единицами.</figcaption></figure>
-    </section>
-
-    <!-- ───────────────────────── LAB ───────────────────────── -->
-    <section id="lab">
-      <div class="where"><span class="route">#/research/lab</span></div>
-      <h2>Лаборатория двигательного научения</h2>
-      <p>Исследовательский слой: как результат конкретного движения меняется у одного человека с практикой, с моделями, неопределённостью и честным «данных недостаточно». Всё помечено: измерено / рассчитано / оценка модели / прогноз / гипотеза. Не клинический инструмент.</p>
-      <figure class="shot"><button type="button" data-full="img/20-lab.jpg"><img src="img/20-lab.jpg" width="1360" height="860" alt="Лаборатория" loading="lazy"></button>
-        <figcaption>Вход в лабораторию: шесть инструментов, ниже — покрытие по участникам (сеансы, готовность к моделям, сеансы с сырыми данными).</figcaption></figure>
-      <div class="tbl"><table>
-        <thead><tr><th>Инструмент</th><th>Для чего</th></tr></thead>
-        <tbody>
-          <tr><td class="k">Обозреватель научения</td><td>Ряд одного показателя (объём, скорость, плавность…) по сеансам; сравнение моделей (без изменений, линейная, экспонента и др.), «Без изменений» всегда среди кандидатов; прогноз с полосой</td></tr>
-          <tr><td class="k">Вычислительный двойник</td><td>Индивидуальная модель изменения результата и её границы (что двойник не может наблюдать); переключатель записи практики; модели по попыткам практики</td></tr>
-          <tr><td class="k">Анализ движения</td><td>Один сеанс с сырыми кадрами или файл imu-csv: качество сигнала по датчикам, угловая скорость, наклон, движения по скорости и их признаки</td></tr>
-          <tr><td class="k">Конструктор исследований</td><td>Версионируемые протоколы научения с заранее заданным планом анализа</td></tr>
-          <tr><td class="k">Отчёты</td><td>Замороженные анализы с хэшами; проверка «воспроизводится / отличается»</td></tr>
-          <tr><td class="k">Готовность к модели</td><td>Чего не хватает данным для обучения модели движений (такой модели пока нет)</td></tr>
-          <tr><td class="k">Координация и стратегии</td><td>Новое: <a href="#coord">отдельный раздел ниже</a></td></tr>
-        </tbody>
-      </table></div>
-      <div class="pair">
-        <figure class="shot"><button type="button" data-full="img/21-learning.jpg"><img src="img/21-learning.jpg" width="1360" height="860" alt="Обозреватель научения" loading="lazy"></button>
-          <figcaption>Обозреватель: участник, задача, показатель, план анализа, сводка (SD повторов, SD между сеансами, источник дозы).</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/22-twin.jpg"><img src="img/22-twin.jpg" width="1360" height="860" alt="Двойник" loading="lazy"></button>
-          <figcaption>Двойник: что он представляет и что не может наблюдать (мозг, мышцы, курс, положение кисти, жизнь вне теста).</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/23-movement.jpg"><img src="img/23-movement.jpg" width="1360" height="860" alt="Анализ движения" loading="lazy"></button>
-          <figcaption>Анализ движения: выбрать сеанс с сырыми данными или файл. У заготовленной демо-истории сырых кадров нет — проведите тест.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/26-readiness.jpg"><img src="img/26-readiness.jpg" width="1360" height="860" alt="Готовность" loading="lazy"></button>
-          <figcaption>Готовность к фундаментальной модели: условия и сколько им сейчас соответствует.</figcaption></figure>
-      </div>
-    </section>
-
-    <!-- ───────────────────────── COORD ───────────────────────── -->
-    <section id="coord">
-      <div class="where"><span class="route">#/research/coordination</span><span>Исследования → Лаборатория → «Лаборатория координации и стратегий»</span></div>
-      <h2>Координация и стратегии</h2>
-      <p>Новый движок (MCSE). Одинаковый результат можно получить разными способами: поднять руку на 120° только плечом, или плечом на 102° и откинуть туловище назад на 18°. Клинический тест покажет 120° в обоих случаях. Движок смотрит на все датчики сразу и отвечает: как движение распределено между туловищем, плечом, предплечьем и локтем; есть ли у ребёнка разные «стратегии» при одинаковом результате; как они меняются от сеанса к сеансу.</p>
-      <div class="note"><strong>Чего он не делает</strong><p>Не измеряет мышцы и мозг (это кинематика, не «синергии»), не ставит диагноз. Стратегии называются нейтрально — A, B; никогда «компенсаторная» или «правильная». Если данных мало, честно пишет «недостаточно данных».</p></div>
-      <figure class="shot"><button type="button" data-full="img/27-coord.jpg"><img src="img/27-coord.jpg" width="1360" height="860" alt="Координация: начало" loading="lazy"></button>
-        <figcaption>Участник, движение (подъём вперёд, в сторону, локоть), рука. «Анализировать записи» — по сеансам с сырыми кадрами. «Синтетическая демонстрация» — сгенерированный участник с известной истиной для проверки.</figcaption></figure>
-      <div class="pair">
-        <figure class="shot"><button type="button" data-full="img/27b-coord-provenance.jpg"><img src="img/27b-coord-provenance.jpg" width="1360" height="860" alt="Происхождение данных" loading="lazy"></button>
-          <figcaption>Записи: манифест сырых данных (проверен / нет / хэш не совпадает), качество, калибровка, найдено/полных повторов, недоступные каналы.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/27c-coord-components.jpg"><img src="img/27c-coord-components.jpg" width="1360" height="860" alt="Компоненты" loading="lazy"></button>
-          <figcaption>Компоненты координации: главные «способы отличаться». Компонента сохраняется, только если сильнее случайности и повторяется на подвыборках.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/27e-coord-strategies.jpg"><img src="img/27e-coord-strategies.jpg" width="1360" height="860" alt="Стратегии" loading="lazy"></button>
-          <figcaption>Стратегии: вердикт, последовательность по времени, «портрет» каждой стратегии (наклон туловища, вклад туловища, тайминг).</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/27f-coord-dissociation.jpg"><img src="img/27f-coord-dissociation.jpg" width="1360" height="860" alt="Диссоциация" loading="lazy"></button>
-          <figcaption>Диссоциация: результат одинаковый (проверка эквивалентности), а организация движения разная — где и насколько надёжно.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/27g-coord-pair.jpg"><img src="img/27g-coord-pair.jpg" width="1360" height="860" alt="Сравнение двух повторений" loading="lazy"></button>
-          <figcaption>Сравнение двух выбранных повторений: кривые по каналам, исходные сигналы с границами фаз.</figcaption></figure>
-        <figure class="shot"><button type="button" data-full="img/27h-coord-longitudinal.jpg"><img src="img/27h-coord-longitudinal.jpg" width="1360" height="860" alt="Изменение во времени" loading="lazy"></button>
-          <figcaption>По сеансам: результат отдельно, стратегии, разнообразие, расстояние от первого сеанса.</figcaption></figure>
-      </div>
-      <h3>Что ждать от синтетической демонстрации</h3>
-      <div class="tbl"><table>
-        <thead><tr><th>Где</th><th>Ожидается (одинаково при каждом запуске)</th></tr></thead>
-        <tbody>
-          <tr><td class="k">Плашка</td><td>«СИНТЕТИЧЕСКАЯ демонстрация — не участник»</td></tr>
-          <tr><td class="k">Записи</td><td>4 сеанса, по 12 / 12 повторов, калибровка сеанса</td></tr>
-          <tr><td class="k">Стратегии</td><td>«несколько стратегий», K = 2; A — 28 повторов (туловище ≈ −18°), B — 20 (туловище ≈ 0°); результат у обеих ≈ 120°</td></tr>
-          <tr><td class="k">Последовательность</td><td>Сеанс 1 — все A; дальше A/B: 9/3, 5/7, 2/10</td></tr>
-          <tr><td class="k">Диссоциация A против B</td><td>«диссоциация», результаты эквивалентны, почти всё различие в наклоне туловища</td></tr>
-          <tr><td class="k">Пара 0#6 и 1#7</td><td>Разница результатов ≈ 1°, «превышает типичную вариабельность»</td></tr>
-        </tbody>
-      </table></div>
-      <div class="note warn"><strong>Ограничения</strong>
-        <ul class="plain">
-          <li>Проверен только на синтетике (16 из 19 заранее заданных критериев); на реальных детях ещё не запускался.</li>
-          <li>Для стратегий нужно 12+ повторов одного движения одной руки (лучше 24+). Обычный тест даёт 3 — «недостаточно данных» тут нормально.</li>
-          <li>Локоть при отведении руки не измеряется надёжно — исключён из анализа отведения.</li>
-        </ul></div>
-      <p>Подробный гид по экрану, кодам причин и коду: <code>website/docs/MCSE_GUIDE.md</code>.</p>
-    </section>
-
-    <!-- ───────────────────────── TESTING ───────────────────────── -->
-    <section id="testing">
-      <h2>Как тестировать</h2>
-      <p>Чек-листы ниже можно отмечать: отметки хранятся только в вашем браузере. Для каждой проверки указано, что должно быть.</p>
-      <button type="button" class="reset" id="reset-checks">Снять все отметки</button>
-
-      <div class="check" data-list="smoke">
-        <header><b>Быстрая проверка после выкладки</b><span>10 минут</span></header>
-        <label><input type="checkbox"><span>Стартовая открывается, «Попробовать демо» ведёт на Главную с полосой «ДЕМО» <i class="exp">Без ошибок в консоли браузера</i></span></label>
-        <label><input type="checkbox"><span>Все 8 пунктов меню открываются <i class="exp">Ни одна страница не пустая и не «Не найдено»</i></span></label>
-        <label><input type="checkbox"><span>Быстрая проверка на Алихане проходит до итога <i class="exp">Около минуты; сеанс появился в «Сеансах» и в карточке</i></span></label>
-        <label><input type="checkbox"><span>Языки RU, KZ, EN переключаются <i class="exp">Нет «дыр» на английском в русском интерфейсе</i></span></label>
-        <label><input type="checkbox"><span>«Сбросить демо» возвращает исходные данные <i class="exp">Алихан снова 144°, расписание 0 из 3</i></span></label>
-        <label><input type="checkbox"><span>Телефонная ширина (~400 px): нет горизонтальной прокрутки страницы <i class="exp">Широкие таблицы прокручиваются внутри своих карточек</i></span></label>
-      </div>
-
-      <div class="check" data-list="test">
-        <header><b>Тест с симулятором</b><span>демо</span></header>
-        <label><input type="checkbox"><span>Все протоколы открывают правильный план сеанса</span></label>
-        <label><input type="checkbox"><span>«Начать тест» неактивна, пока датчики не на связи</span></label>
-        <label><input type="checkbox"><span>Калибровка повторяется, если «ребёнок» двигался</span></label>
-        <label><input type="checkbox"><span>Обрыв связи (гид → «Показать обрыв связи»): пауза, прерванный повтор не засчитан, «Продолжить» работает</span></label>
-        <label><input type="checkbox"><span>Пауза, «Следующий шаг», «Экран для пациента», «Завершить» делают то, что написано</span></label>
-        <label><input type="checkbox"><span>Обновить вкладку посреди теста <i class="exp">Тест предложат восстановить</i></span></label>
-        <label><input type="checkbox"><span>Итог: «Печать / PDF» и «Отчёт для семьи» открываются</span></label>
-        <label><input type="checkbox"><span>Повтор записи из файла CSV (Датчики → «Выбрать файл CSV») проходит как вживую</span></label>
-      </div>
-
-      <div class="check" data-list="hw">
-        <header><b>С настоящими датчиками</b><span>Chrome / Edge</span></header>
-        <label><input type="checkbox"><span>Настройки → пространство «Клиника» <i class="exp">Симулятор недоступен</i></span></label>
-        <label><input type="checkbox"><span>Датчики → USB: выбор порта, паспорт устройства, 3 датчика на связи <i class="exp">Грудь, плечо и предплечье одной руки; уровень сигнала у каждого</i></span></label>
-        <label><input type="checkbox"><span>Надеть по правилу: стрелка на корпусе к кисти, крышка наружу; на груди стрелка вниз <i class="exp">Если надет наоборот — приложение предупредит «датчик перевёрнут»</i></span></label>
-        <label><input type="checkbox"><span>Фигурка на экране повторяет движение человека <i class="exp">Если нет — датчик не там или сполз</i></span></label>
-        <label><input type="checkbox"><span>Выдернуть датчик во время теста <i class="exp">Тест встаёт на паузу; после возврата датчика можно продолжить</i></span></label>
-        <label><input type="checkbox"><span>Bluetooth: подключение беспроводных блоков <i class="exp">Каждый блок отдельно; потери пакетов видны в полноте данных</i></span></label>
-        <label><input type="checkbox"><span>После теста в отчёте полнота данных близка к 100 %, сеанс «с сырыми данными»</span></label>
-      </div>
-
-      <div class="check" data-list="gonio">
-        <header><b>Проверка угломером</b><span>двое участников</span></header>
-        <label><input type="checkbox"><span>Протокол из шаблона создаётся как версия 1; правка создаёт версию 2</span></label>
-        <label><input type="checkbox"><span>После «Записать значение IMU» поле угломера получает фокус, новая запись недоступна до сохранения</span></label>
-        <label><input type="checkbox"><span>Enter сохраняет и переходит дальше; счётчик растёт (1 / 20 …)</span></label>
-        <label><input type="checkbox"><span>«Недействительным» и «Пропустить» требуют причину</span></label>
-        <label><input type="checkbox"><span>Перезагрузка посреди сеанса <i class="exp">Прогресс и незавершённая запись восстанавливаются</i></span></label>
-        <label><input type="checkbox"><span>Стенд с фиксированными углами (шаблон «Elbow — fixed angles») <i class="exp">Систематическая ошибка и MAE в пределах порога протокола</i></span></label>
-        <label><input type="checkbox"><span>«Завершить сеанс» → отчёт, CSV и JSON скачиваются; сеанс есть в «Наборах данных»</span></label>
-      </div>
-
-      <div class="check" data-list="rehab">
-        <header><b>Реабилитация, семья, ребёнок</b><span>демо</span></header>
-        <label><input type="checkbox"><span>Новая цель сохраняется и видна в Обзоре</span></label>
-        <label><input type="checkbox"><span>Программа: «Изменить → новая версия» требует причину, старая версия не меняется</span></label>
-        <label><input type="checkbox"><span>Страница семьи: отчёт «Остановили» + «Было больно» <i class="exp">Сообщение «остановите занятие»; на панели — событие безопасности первым</i></span></label>
-        <label><input type="checkbox"><span>Событие безопасности рассматривается один раз</span></label>
-        <label><input type="checkbox"><span>Режим ребёнка: «Перерыв» и «Стоп» всегда видны, нет рейтингов и мест</span></label>
-        <label><input type="checkbox"><span>Выход из режима ребёнка только удержанием кнопки</span></label>
-        <label><input type="checkbox"><span>«Датчики (для взрослого)» показывают угол, но после занятия ничего не появляется во вкладке «Движение»</span></label>
-      </div>
-
-      <div class="check" data-list="lab">
-        <header><b>Лаборатория и координация</b><span>демо</span></header>
-        <label><input type="checkbox"><span>На всех страницах лаборатории есть плашка «Синтетические демонстрационные данные»</span></label>
-        <label><input type="checkbox"><span>Обозреватель: «Без изменений» всегда в списке моделей</span></label>
-        <label><input type="checkbox"><span>Анализ движения: сеанс, проведённый на симуляторе, открывается с качеством сигнала и событиями</span></label>
-        <label><input type="checkbox"><span>Координация: синтетическая демонстрация совпадает с таблицей выше</span></label>
-        <label><input type="checkbox"><span>Координация: сеанс с 3 повторами → «недостаточно данных», а не выдуманные стратегии</span></label>
-        <label><input type="checkbox"><span>Повторный анализ тех же данных даёт те же числа</span></label>
-      </div>
-
-      <h3>Что считать багом сразу</h3>
-      <ul class="plain">
-        <li>Смоделированные данные без пометки, или они попали в пространство Клиники.</li>
-        <li>Пропал сохранённый сеанс (раньше такое было из-за проверки при загрузке — теперь такие записи уходят в «карантин», а не удаляются).</li>
-        <li>Число показано там, где датчика нет или данных недостаточно.</li>
+  <section id="checks">
+    <h2>Проверка перед показом и после выкладки</h2>
+    <p class="sub">Откройте чек-лист и отмечайте пункты. Отметки хранятся только в вашем браузере.</p>
+    <div class="checks" id="checkCards"></div>
+    <div class="bugs">
+      <b>Сразу считать багом</b>
+      <ul>
+        <li>Смоделированные данные без пометки или в пространстве Клиники.</li>
+        <li>Пропал сохранённый сеанс. Такие записи теперь уходят в «карантин», а не удаляются.</li>
+        <li>Число там, где датчика нет или данных недостаточно.</li>
         <li>Слова «улучшилось», «компенсаторная стратегия», «диагноз» в интерфейсе.</li>
-        <li>Страница падает или зависает; ошибки в консоли.</li>
+        <li>Страница падает, зависает или пишет ошибки в консоль.</li>
       </ul>
-      <p>Как сообщать: адрес экрана (из строки браузера), пространство (Демо / Клиника), язык, браузер, шаги, скриншот, текст ошибок из консоли.</p>
-    </section>
+    </div>
+    <p class="sub" style="margin-top:10px">Как сообщать: адрес экрана, пространство (Демо или Клиника), язык, браузер, шаги, скриншот и текст ошибок из консоли.</p>
+  </section>
 
-    <!-- ───────────────────────── STATUS ───────────────────────── -->
-    <section id="status">
-      <h2>Что сделано и что осталось</h2>
-      <p>Состояние на 8 ноября 2026 по отчётам проекта.</p>
-      <p><span class="chip ok">готово</span> реализовано, автотесты проходят · <span class="chip sim">не на железе</span> работает в софте и на симуляторе, с реальным комплектом не проверено · <span class="chip exp">эксперимент</span> работает с оговорками · <span class="chip no">не сделано</span></p>
-      <div class="tbl"><table>
-        <thead><tr><th>Часть</th><th>Статус</th><th>Комментарий</th></tr></thead>
-        <tbody>
-          <tr><td class="k">Тест, отчёт, карточка, аналитика, демо и гид</td><td><span class="chip ok">готово</span></td><td>Симулятор, USB, Bluetooth, повтор CSV через один интерфейс</td></tr>
-          <tr><td class="k">Хранение и восстановление</td><td><span class="chip ok">готово</span></td><td>Исправлена пропажа сеансов (карантин вместо удаления), подтверждённая запись</td></tr>
-          <tr><td class="k">Сервер и синхронизация</td><td><span class="chip ok">готово</span></td><td>Проверено на встроенном PostgreSQL (PGlite); с живой базой и Upstash ещё не запускалось</td></tr>
-          <tr><td class="k">Проверка угломером</td><td><span class="chip sim">не на железе</span></td><td>Весь процесс и статистика протестированы; сама точность устройства ещё не измерена</td></tr>
-          <tr><td class="k">Захват по пику повтора</td><td><span class="chip exp">эксперимент</span></td><td>Рекомендуемый режим — удержание</td></tr>
-          <tr><td class="k">Поворот предплечья, наклон туловища</td><td><span class="chip exp">эксперимент</span></td><td>Подъём плеча и сгибание локтя — рабочие</td></tr>
-          <tr><td class="k">Реабилитация, семья, режим ребёнка</td><td><span class="chip ok">готово</span></td><td>Правила наблюдений и содержание занятий должны подтвердить специалисты</td></tr>
-          <tr><td class="k">Датчики в режиме ребёнка</td><td><span class="chip sim">не на железе</span></td><td>Только показ, не сохраняется</td></tr>
-          <tr><td class="k">ИИ-черновик сводки</td><td><span class="chip exp">эксперимент</span></td><td>Выключен по умолчанию; проверен на поддельном клиенте, не на живом API</td></tr>
-          <tr><td class="k">Лаборатория научения</td><td><span class="chip ok">готово</span></td><td>Валидация моделей на синтетике; реальных продольных данных пока нет</td></tr>
-          <tr><td class="k">Координация и стратегии</td><td><span class="chip ok">готово</span></td><td>16 из 19 критериев на синтетике; реальные дети — следующий шаг</td></tr>
-          <tr><td class="k">Сырые кадры в сеансах проверки угломером</td><td><span class="chip no">не сделано</span></td><td>Пересчитать проверку новым алгоритмом нельзя</td></tr>
-          <tr><td class="k">Экраны тест–ретест и межэкспертной надёжности</td><td><span class="chip no">не сделано</span></td><td>Расчёт есть, интерфейса дизайна исследования нет</td></tr>
-          <tr><td class="k">Управление командой в интерфейсе</td><td><span class="chip no">не сделано</span></td><td>Сотрудников пока добавляют через API</td></tr>
-          <tr><td class="k">Казахский язык</td><td><span class="chip exp">эксперимент</span></td><td>Семья, ребёнок, демо, лаборатория переведены; нужна проверка носителем; часть профессиональных экранов — на русском</td></tr>
-        </tbody>
-      </table></div>
-      <h3>Главные следующие шаги</h3>
-      <ol class="plain">
-        <li>Проверка угломером на стенде и на взрослых с настоящим комплектом.</li>
-        <li>Живая база PostgreSQL на Vercel, миграции, первая команда.</li>
-        <li>Исследование повторного надевания датчиков (сколько градусов даёт само переодевание).</li>
-        <li>Решить, заменить ли имена детей на псевдонимные коды до включения синхронизации.</li>
-      </ol>
-    </section>
+  <section id="dev">
+    <h2>Для разработчиков</h2>
+    <p class="sub">Команды запускаются из папки website. Нажмите, чтобы скопировать.</p>
+    <div class="dev">
+      <div class="cmd" id="cmds"></div>
+      <div>
+        <div class="code" id="codeMap"></div>
+        <ol class="rules">
+          <li>Изменение, которое меняет числа на тех же данных, — новая версия алгоритма (core/version.ts, lab/version.ts).</li>
+          <li>Новый вариант перечисления — из одной константы, без параллельных списков.</li>
+          <li>Строки интерфейса — на трёх языках; для лаборатории русский и казахский обязательны, иначе сборка падает.</li>
+          <li>Классы CSS реабилитации — с префиксом rh-, координации — co.</li>
+          <li>Железо и прошивка заморожены: только чтение.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
 
-    <!-- ───────────────────────── DEV ───────────────────────── -->
-    <section id="dev">
-      <h2>Для разработчиков</h2>
-      <div class="tbl"><table>
-        <thead><tr><th>Команда (из <code>website/</code>)</th><th>Что делает</th></tr></thead>
-        <tbody>
-          <tr><td><code>npm run dev</code></td><td>Сервер разработки</td></tr>
-          <tr><td><code>npx tsc -b</code></td><td>Проверка типов (приложение, node, сервер)</td></tr>
-          <tr><td><code>npx eslint .</code></td><td>Линтер</td></tr>
-          <tr><td><code>npm test</code></td><td>Все модульные и интеграционные тесты (≈ 475)</td></tr>
-          <tr><td><code>npm run e2e</code></td><td>Сквозные тесты в установленном Chrome на собранном сайте</td></tr>
-          <tr><td><code>npm run build</code></td><td>Сборка; <code>npm run build:demo</code> — демо одним файлом</td></tr>
-          <tr><td><code>npm run build:api</code></td><td>Пересобрать <code>api/index.js</code> после правок сервера или общего кода (тест упадёт, если забыть)</td></tr>
-          <tr><td><code>npm run db:migrate</code></td><td>Миграции PostgreSQL (с <code>DATABASE_URL</code>)</td></tr>
-        </tbody>
-      </table></div>
-      <div class="tbl"><table>
-        <thead><tr><th>Где код</th><th>Что там</th></tr></thead>
-        <tbody>
-          <tr><td><code>src/core</code></td><td>Перевод сырых чисел, ориентация, углы, повторы, метрики</td></tr>
-          <tr><td><code>src/session</code>, <code>src/state</code></td><td>Движок теста, контроллер сеанса, хранилище приложения</td></tr>
-          <tr><td><code>src/devices</code>, <code>src/simulation</code></td><td>USB, Bluetooth, повтор, симулятор и модель датчиков</td></tr>
-          <tr><td><code>src/data</code>, <code>src/sync</code>, <code>server/</code></td><td>IndexedDB, очередь синхронизации, сервер</td></tr>
-          <tr><td><code>src/research</code></td><td>Проверка угломером: модель, процесс, статистика, выгрузки</td></tr>
-          <tr><td><code>src/rehab</code></td><td>Реабилитация: модель, правила, политики (общие с сервером)</td></tr>
-          <tr><td><code>src/lab</code>, <code>src/lab/coord</code></td><td>Лаборатория научения и движок координации</td></tr>
-          <tr><td><code>src/features/*</code></td><td>Экраны по разделам</td></tr>
-          <tr><td><code>docs/</code>, <code>../research/</code></td><td>Отчёты, оси и знаки (<code>docs/ENGINEERING_10H/COORDINATES.md</code>), научные документы</td></tr>
-        </tbody>
-      </table></div>
-      <h3>Правила, которые держат тесты</h3>
-      <ul class="plain">
-        <li>Любое изменение, которое меняет числа при тех же данных, — новая версия алгоритма (<code>core/version.ts</code>, <code>lab/version.ts</code>).</li>
-        <li>Новый вариант перечисления (протокол и т. п.) — из одной константы; параллельных списков не держать.</li>
-        <li>Строки интерфейса — на трёх языках; для лаборатории русский и казахский обязательны (иначе ошибка сборки).</li>
-        <li>Классы CSS реабилитации с префиксом <code>rh-</code>, координации — <code>co</code>.</li>
-        <li>Железо и прошивка заморожены: только чтение.</li>
-      </ul>
-    </section>
-  </main>
-</div>
+  <p class="foot">Внутренний гид NeuroMove, 8 ноября 2026. Подробный гид по координации — website/docs/MCSE_GUIDE.md.</p>
+</main>
 
-<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Скриншот крупно">
-  <button type="button" class="lb-close" id="lb-close">Закрыть</button>
-  <img id="lb-img" alt="">
-</div>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" aria-hidden="true" role="dialog" aria-labelledby="dTitle">
+  <div class="drawer__h"><h3 id="dTitle"></h3><button class="drawer__x" id="dClose" aria-label="Закрыть">×</button></div>
+  <div class="drawer__b" id="dBody"></div>
+</aside>
+<div class="lb" id="lb" hidden><img id="lbImg" alt=""></div>
 
 <script>
 (function () {
-  // Lightbox
-  var lb = document.getElementById('lb'), img = document.getElementById('lb-img'), last = null;
-  function open(src, alt, from) { img.src = src; img.alt = alt || ''; lb.hidden = false; last = from; document.getElementById('lb-close').focus(); }
-  function close() { lb.hidden = true; img.removeAttribute('src'); if (last) last.focus(); }
-  document.querySelectorAll('figure.shot button').forEach(function (b) {
-    b.addEventListener('click', function () { var i = b.querySelector('img'); open(b.getAttribute('data-full'), i && i.alt, b); });
-  });
-  lb.addEventListener('click', close);
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lb.hidden) close(); });
+  'use strict';
+  var A = function (h) { return '../' + h; };
+  var shot = function (src, cap) { return '<button class="shot" data-zoom="img/' + src + '"><img src="img/' + src + '" alt="' + cap.replace(/"/g, '') + '" loading="lazy"><span>' + cap + '</span></button>'; };
+  var shots = function (list, two) { return '<div class="shots' + (two ? ' two' : '') + '">' + list.map(function (s) { return shot(s[0], s[1]); }).join('') + '</div>'; };
+  var links = function (list) { return '<div class="links">' + list.map(function (h) { return '<a href="' + A(h) + '" target="_blank" rel="noopener">' + h + '</a>'; }).join('') + '</div>'; };
+  var ul = function (list) { return '<ul>' + list.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>'; };
+  var table = function (head, rows) { return '<table class="t"><tr>' + head.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr>' + rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</table>'; };
 
-  // Checklists remembered per viewer
-  var KEY = 'nm-guide-checks-v1', state = {};
+  // ── Содержание панелей ────────────────────────────────────────────────────────────────
+  var D = {
+    'sensor-g': { t: 'Датчик Г — грудь', h: '<p>Опора для всех углов: угол руки считается от вертикали, а наклон туловища показан отдельной строкой — видно, сколько градусов «добрано» корпусом.</p>' + ul(['<b>Где:</b> грудина, по центру, на плоской части.', '<b>Ось X:</b> вниз, к поясу. На крышке «Г» черта киноварью — со стороны кабеля.', '<b>Кабель:</b> прямо вниз к ESP32 на поясе.', '<b>Ремень:</b> 5 см вокруг груди, сквозь туннель под датчиком.']) + '<div class="note"><b>Если надет наоборот,</b> приложение предупредит «датчик перевёрнут».</div>' + shots([['korpus-v4-datchik-snizu.png', 'Датчик снизу: ремешок 5 см проходит сквозь скрытый туннель']]) },
+    'sensor-p': { t: 'Датчик П — плечо', h: '<p>Подъём руки: плечо относительно туловища.</p>' + ul(['<b>Где:</b> наружная сторона плеча, посередине между плечевым суставом и локтем.', '<b>Ось X:</b> вдоль кости, к локтю и кисти. Черта на крышке — со стороны +X.', '<b>Кабель:</b> вверх к плечу, по боку вниз к поясу. У плеча петля 5–8 см.', '<b>Крышка</b> наружу, от кожи; длинная сторона — вдоль кости.']) + shots([['korpus-v4-datchik-razbor.png', 'Датчик в разборе: GY-521, угловые штырьки, колодка DuPont 4 пин']]) },
+    'sensor-pr': { t: 'Датчик ПР — предплечье', h: '<p>Сгибание локтя: предплечье относительно плеча.</p>' + ul(['<b>Где:</b> тыльная сторона, ближе к запястью — там меньше мышц, датчик меньше ездит.', '<b>Ось X:</b> к кисти.', '<b>Кабель:</b> к локтю и от локтя прямо к поясу, не через плечо — так хватает 70 см. У локтя петля.', 'Если руку поднимают выше плеча, кабеля может не хватить; тест с плечом, прижатым к телу, его не натягивает.']) },
+    'esp32': { t: 'ESP32 на поясе', h: '<p>Плата ESP32 DevKit воткнута одним рядом в макетную плату на 170 точек; три кабеля датчиков — шины I2C. Устройство только передаёт сырые числа, всё считает приложение. Прошивка заморожена.</p>' + ul(['<b>Как носить:</b> корпус на поясном ремне до 5 см, спереди со стороны руки. USB-C вниз, кабели входят сверху.', '<b>Внутри:</b> у входа кабелей — полка, отлитая заодно со стенками; на ней колодки кабелей «мама» под изолентой. Провода «папа–папа» по 10 см лежат ровным жгутом вдоль корпуса, без изоленты. ESP32 опускается прямо сверху.', '<b>USB-C:</b> окно 10,0 × 4,8 мм по замеру гнезда. <b>Пины:</b> VCC — 3V3, GND — GND, I2C: П — D23/D22, ПР — D21/D19, Г — D18/D17 (после перепрошивки).']) + shots([['korpus-v4-esp32.png', 'Корпус ESP32 на плите с прорезями под ремень'], ['korpus-v4-esp32-vnutri.png', 'Внутри: макетная плата, провода к рядам a–c']], true) + '<p><a class="btn" href="../hardware/korpus-v4-vid.html" target="_blank" rel="noopener">Открыть в 3D</a></p>' },
+    'app': { t: 'Приложение в браузере', h: '<p>Четыре источника данных через один интерфейс: симулятор, USB (провода через ESP32), Bluetooth (беспроводные блоки) и запись CSV, которую можно проиграть как вживую.</p>' + ul(['Все данные — в браузере (IndexedDB). У каждого адреса, включая предпросмотры Vercel, своё хранилище: на новом адресе пусто, это не потеря данных.', 'Сырые кадры 100 Гц сохраняются вместе с сеансом. С 8 ноября к ним пишется манифест с хэшем.', 'Языки RU, KZ, EN; два пространства — Демо и Клиника.']) + '<h4>Как открыть</h4>' + ul(['Боевой адрес — на Vercel.', 'Локально: <code>cd website</code>, <code>npm install</code>, <code>npm run dev</code>, затем адрес, который напишет Vite.', 'Для настоящих датчиков — Chrome или Edge.']) },
+    'server': { t: 'Сервер и облачная синхронизация', h: ul(['<b>Выключена по умолчанию:</b> пока сотрудник не вошёл и не включил её, ничего не уходит из браузера.', 'Запись сначала сохраняется на устройстве вместе с операцией в очереди. «Синхронизировано» — только после ответа сервера.', 'Демо и смоделированные данные не синхронизируются; сервер их тоже отклоняет.', 'Конфликт двух правок одной записи — выбор «версия сервера» или «оставить мою».', 'Первая настройка команды требует одноразовый код NEUROMOVE_SETUP_CODE на сервере.']) + '<div class="note"><b>Проверено</b> на встроенном PostgreSQL (PGlite); с живой базой и Upstash ещё не запускалось.</div>' + links(['#/settings']) },
+
+    'step-overview': { t: '1. Главная', h: links(['#/overview']) + shots([['03-overview.jpg', 'Главная специалиста']]) + '<p>Следующий пациент с главной цифрой, расписание на сегодня и «Требуют внимания» — наблюдения вроде «цель достигнута» или «на 17° меньше, чем в прошлый раз». Второстепенное спрятано в «Показать подробности».</p>' },
+    'step-setup': { t: '2. Пациент и протокол', h: links(['#/session/new?patient=demo-p01&protocol=upper_quick']) + shots([['07-setup.jpg', 'Справа — план сеанса: движения, рука, повторы']]) + table(['Протокол', 'Что внутри', 'Когда'], [['Стандартная оценка', 'Подъём вперёд, в сторону, локоть, поворот предплечья; обе руки; по 3 повтора', 'Полный тест на визите'], ['Быстрая проверка', 'Подъём вперёд и локоть; обе руки; по 3 повтора', 'Короткий визит, демо'], ['Выносливость: локоть', 'Сгибание локтя поражённой рукой 60 с', 'Много повторов подряд'], ['Свой набор', 'Движения и стороны на выбор; 3 или 5 повторов', 'Под задачу специалиста'], ['Одним датчиком', 'Датчик на плече или предплечье', 'Проверка железа против угломера, не оценка пациента']]) },
+    'step-connect': { t: '3. Датчики выходят на связь', h: links(['#/session/run']) + shots([['08-connect.jpg', 'Схема тела с уровнем сигнала каждого датчика']]) + '<p>«Начать тест» станет активной, когда нужные датчики на связи. Симулятор показывает 5 мест, настоящий стенд — 3: грудь, плечо и предплечье одной руки.</p>' },
+    'step-run': { t: '4. Калибровка и тест', h: shots([['09-calibration.jpg', 'Калибровка: 3 секунды ровно, руки вдоль тела — это ноль всех углов'], ['10-live.jpg', 'Тест: угломер, отметка прошлого сеанса, фигурка']], true) + '<h4>Что должно происходить</h4>' + ul(['Повтор засчитывается, когда угол ушёл выше порога и вернулся вниз.', 'Связь пропала — тест на паузе, прерванный повтор не засчитан: «Связь потеряна» → «Связь восстановлена» → «Продолжить».', 'Вкладку закрыли — незаконченный тест восстанавливается при следующем открытии.', 'Шевельнулся на калибровке — калибровка повторяется.', 'Сырые кадры 100 Гц сохраняются с сеансом, с манифестом и хэшем.']) },
+    'step-report': { t: '5. Итог', h: links(['#/sessions']) + shots([['11-report.jpg', 'Итог: одна фраза о главном и строка на каждое движение']]) + '<p>Слабая рука крупно, рядом здоровая, сравнение с прошлым сеансом. «Печать / PDF» и «Отчёт для семьи» — простым языком. Таблицы и каждый повтор — в «Показать подробности».</p>' },
+
+    'sec-patients': { t: 'Пациенты, сеансы, аналитика', h: links(['#/patients', '#/patients/demo-p01', '#/sessions', '#/analytics']) + shots([['05-patient.jpg', 'Карточка: подъём руки, симметрия, помощь корпусом']]) + '<div class="note"><b>Помощь корпусом.</b> Угол руки считается от вертикали, а не от туловища. Если ребёнок откинулся назад, рука в мире поднимается выше — поэтому наклон туловища показан отдельной строкой.</div>' + shots([['06-patient-sessions.jpg', 'Сеансы: протокол, подъём руки, симметрия, полнота данных'], ['13-analytics.jpg', 'Аналитика: начало курса → сейчас, откаты']], true) + '<h4>Демо-пациенты: на ком что смотреть</h4>' + table(['Ребёнок', 'История', 'Что проверять'], [['Алихан', '8 лет, гемиплегия справа, 9 сеансов, 127° → 144°', 'Главный путь, гид, отчёт для семьи, реабилитация'], ['Айша', 'Плато', 'Наблюдение «плато»: 4 сеанса в пределах 6°'], ['Нурислам', 'Обе стороны, потери связи', 'Полнота записи, качество данных'], ['Томирис', 'Откат после перерыва', 'Наблюдение «откат к прошлому сеансу»'], ['Данияр', 'Только исходный тест', 'Что видно после первого визита'], ['Амина', 'Новый пациент', 'Пустые состояния']]) + '<p>«Сбросить демо» возвращает те же числа; даты сдвигаются на сегодня.</p>' },
+    'sec-devices': { t: 'Датчики и настройки', h: links(['#/devices', '#/settings']) + shots([['14-devices.jpg', 'Датчики: источник данных и как надевать'], ['15-settings.jpg', 'Настройки: язык, пространство, синхронизация']], true) + ul(['Источники: симулятор, USB, Bluetooth, запись CSV.', 'Справа на экране датчиков — как надевать: ось X вдоль кости, черта к кисти; на груди — вниз.', 'Настройки: язык, пространство (Демо / Клиника), автопереход шагов, синхронизация. Ниже — доступ семьи, архив, скрытые записи (карантин).']) },
+    'sec-demo': { t: 'Демо и гид для показа', h: shots([['02-guide.jpg', 'Начало гида: одна фраза и три кадра'], ['02b-guide-step.jpg', 'Шаг: подсвечено только нужное, кнопка обведена киноварью']], true) + '<p>Кнопка «Гид» в тёмной полосе демо. Проводит по пути «пациент → тест → итог» за 3 минуты, 8 шагов — для жюри, врачей, родителей.</p>' + ul(['Переживает перезагрузку и продолжает с того же шага.', 'Ушли на другой экран — скажет «Вы ушли с шага…» и предложит вернуться.', 'На шаге теста есть «Показать обрыв связи».', '«Сбросить демо» справа в полосе возвращает демо-данные к исходным.']) },
+    'sec-rehab': { t: 'Реабилитация: цели, программы, обзор', h: links(['#/rehab', '#/rehab/p/demo-p01', '#/rehab/activities', '#/rehab/studies']) + '<p>Цикл: цели ребёнка и семьи → оценка → программа → занятия в клинике и дома → измерения → анализ → обзор → новая версия программы. Приложение ничего не назначает само: числа в программе вводит специалист.</p>' + shots([['28-rehab.jpg', 'Панель: участники, программа, дата пересмотра, «Требует внимания»']]) + '<h4>Страница участника: 8 вкладок</h4>' + table(['Вкладка', 'Что там'], [['Профиль', 'Специалист, области, классификации, участие семьи'], ['Цели', 'Цель, исходный уровень, как измерять, срок; GAS; коды МКФ-ДП'], ['Программа', 'Модули A–E; каждая правка — новая неизменяемая версия с причиной'], ['Хронология', 'Клиника и дом по времени, у записи источник'], ['Движение', 'Метрики IMU с проверкой качества; «клинически не валидировано»'], ['Оценки', 'GAS, COPM, GMFM; исправления заменяют, не перезаписывают'], ['Семья', 'Отчёты семьи, сообщения, события безопасности'], ['Обзор', 'Факты с источниками (без ИИ), наблюдения, решение специалиста']]) + shots([['29-rehab-program.jpg', 'Программа: «Изменить → новая версия»'], ['29-rehab-review.jpg', 'Обзор: у строки источник'], ['29-rehab-goals.jpg', 'Цели'], ['29-rehab-movement.jpg', 'Движение: пустые точки исключены проверкой качества'], ['30-activities.jpg', 'Библиотека занятий'], ['31-studies.jpg', 'Пилотные исследования: без этики набор не начать']], true) + '<div class="note"><b>Намеренно нет:</b> общего балла, слова «улучшилось» (только «выше/ниже исходного»), автоповышения нагрузки, рейтингов. «Не сделали» — нейтральный ответ.</div>' },
+    'sec-family': { t: 'Семья и режим ребёнка', h: links(['#/home/demo-p01', '#/play/demo-p01']) + shots([['32-family.jpg', 'Страница семьи: занятия, шаги, «Рассказать, как прошло»'], ['33-child.jpg', 'Режим ребёнка: крупные карточки, звёзды участия'], ['33b-child-activity.jpg', '«Перерыв» и «Стоп» всегда на экране'], ['33c-child-sensors.jpg', 'Датчики для взрослого: только показ угла']], true) + ul(['Выйти из режима ребёнка может только взрослый — удерживая кнопку.', '«Было больно» сразу показывает «Пожалуйста, остановите занятие» и открывает событие безопасности.', 'Запись попыток практики включает специалист на странице двойника; в клинике нужно активное согласие.']) },
+    'sec-gonio': { t: 'Проверка угломером', h: links(['#/research', '#/research/protocols', '#/research/new', '#/research/datasets']) + '<p>Модуль измеряет, совпадает ли угол датчиков с угломером: систематическая ошибка, MAE, RMSE, Бланд–Альтман, ICC. Точность он не утверждает — он её измеряет.</p><h4>Что нужно</h4>' + ul(['Двое: оператор у компьютера и измеряющий угломером. Один угломер на весь сеанс.', 'Chrome или Edge, комплект по USB или Bluetooth, пространство «Клиника».', 'Участник под кодом. Для первых проверок — стенд с фиксированными углами.']) + '<h4>Пошагово</h4><ol><li><b>Протокол</b> из шаблона; каждое сохранение — новая версия.</li><li><b>Новый сеанс:</b> участник, протокол, подключение, условия.</li><li><b>Датчики и калибровка:</b> 3 секунды неподвижно.</li><li><b>Удержание:</b> при «Стабильно» — «Записать значение IMU» или пробел. Пишется медиана за окно.</li><li><b>Угломер:</b> поле в фокусе, ввести, Enter. Следующую запись нельзя сделать без значения.</li><li><b>Если не так:</b> «Повторить», «Недействительным» или «Пропустить» с причиной.</li><li><b>Отчёт:</b> «Завершить сеанс» → PDF, CSV, JSON.</li></ol>' + shots([['17b-protocol-template.jpg', 'Протокол из шаблона'], ['18-validation-new.jpg', 'Новый сеанс: куда ставить угломер'], ['18c-validation-capture.jpg', 'Удерживайте положение и запишите'], ['18d-validation-goniometer.jpg', 'Пауза: ждём угломер'], ['18e-validation-stats.jpg', 'Отчёт в реальном времени'], ['19-datasets.jpg', 'Наборы данных: CSV, JSON, словарь']], true) + '<div class="note"><b>Чтобы результатам верить:</b> сначала стенд, потом взрослые, потом дети (у детей с ДЦП сам угломер расходится на 10–14°). Не округлять показания. «Недостаточно» — мало пар, не ошибка. Сеансы проверки пока не пишут сырые кадры.</div>' },
+    'sec-lab': { t: 'Лаборатория двигательного научения', h: links(['#/research/lab', '#/research/learning', '#/research/movement']) + '<p>Как результат одного движения меняется у одного человека с практикой: модели, неопределённость, честное «данных недостаточно». Всё помечено: измерено / рассчитано / оценка модели / прогноз / гипотеза. Не клинический инструмент.</p>' + shots([['20-lab.jpg', 'Вход: шесть инструментов и покрытие по участникам']]) + table(['Инструмент', 'Для чего'], [['Обозреватель научения', 'Ряд показателя по сеансам, сравнение моделей; «Без изменений» всегда среди кандидатов'], ['Вычислительный двойник', 'Модель изменения и её границы; запись практики'], ['Анализ движения', 'Сырые кадры сеанса или imu-csv: качество, скорость, наклон'], ['Конструктор исследований', 'Версионируемые протоколы с заранее заданным планом анализа'], ['Отчёты', 'Замороженные анализы с хэшами: «воспроизводится / отличается»'], ['Готовность к модели', 'Чего не хватает данным для модели движений']]) + shots([['21-learning.jpg', 'Обозреватель'], ['22-twin.jpg', 'Двойник: чего он не видит'], ['23-movement.jpg', 'Анализ движения'], ['26-readiness.jpg', 'Готовность к модели']], true) },
+    'sec-coord': { t: 'Координация и стратегии', h: links(['#/research/coordination']) + '<p>Одинаковый результат можно получить разными способами: 120° только плечом или 102° плечом и 18° откинутым туловищем. Движок смотрит на все датчики сразу: как движение распределено, есть ли разные стратегии при одинаковом результате, как они меняются.</p><div class="note"><b>Чего не делает:</b> не измеряет мышцы и мозг, не ставит диагноз. Стратегии называются нейтрально — A, B. Мало данных — пишет «недостаточно данных».</div>' + shots([['27-coord.jpg', 'Участник, движение, рука; синтетическая демонстрация'], ['27b-coord-provenance.jpg', 'Записи: манифест, качество, калибровка'], ['27c-coord-components.jpg', 'Компоненты координации'], ['27e-coord-strategies.jpg', 'Стратегии и их портреты'], ['27f-coord-dissociation.jpg', 'Диссоциация'], ['27g-coord-pair.jpg', 'Сравнение двух повторов'], ['27h-coord-longitudinal.jpg', 'По сеансам']], true) + '<h4>Синтетическая демонстрация — одинаково при каждом запуске</h4>' + table(['Где', 'Ожидается'], [['Плашка', '«СИНТЕТИЧЕСКАЯ демонстрация — не участник»'], ['Записи', '4 сеанса по 12 / 12 повторов'], ['Стратегии', 'K = 2; A — 28 повторов (туловище ≈ −18°), B — 20 (≈ 0°); результат ≈ 120°'], ['Последовательность', 'Сеанс 1 — все A; дальше A/B: 9/3, 5/7, 2/10'], ['Диссоциация', 'Результаты эквивалентны, различие в наклоне туловища'], ['Пара 0#6 и 1#7', 'Разница ≈ 1°, «превышает типичную вариабельность»']]) + ul(['Проверен только на синтетике (16 из 19 критериев).', 'Нужно 12+ повторов одного движения одной руки; обычный тест даёт 3 — «недостаточно данных» нормально.', 'Локоть при отведении исключён: не измеряется надёжно.', 'Подробно — website/docs/MCSE_GUIDE.md.']) },
+
+    'hw-cases': { t: 'Корпуса v4', h: '<p>Белая «галька» со знаком «nm», точка и черта киноварью — как на лендинге. Защёлка повторяет ту, что сокомандник поставил на корпус ESP32: паз 1,0 мм, натяг 0,5 мм.</p>' + table(['Корпус', 'Размер', 'Что внутри'], [['Датчик (три одинаковых)', '61 × 29,5 × 17 мм', 'GY-521 20 × 15 мм, колодка DuPont 4 пин, туннель под ремешок 5 см'], ['ESP32', '70,4 × 47,1 × 35,2 мм, плита 76,4 × 61,1', 'ESP32 на макетной плате (ряд 3V3…D23), три кабеля, полка под колодки, окно USB-C 10,0 × 4,8 мм']]) + shots([['korpus-v4-datchik-razbor.png', 'Датчик в разборе'], ['korpus-v4-datchik-snizu.png', 'Ремешок сквозь туннель'], ['korpus-v4-esp32.png', 'ESP32 закрыт'], ['korpus-v4-esp32-vnutri.png', 'ESP32 изнутри']], true) + ul(['Проверено моделью: 78 проверок корпусов и 12 — подробных моделей деталей. Ещё не печаталось.', 'Печать: print-ready/A1-v4-1-proba-ready.3mf — сначала проба (41 мин).', 'Перед ESP32 замерить выступ USB-C за край платы (заложено 1,0 мм).']) + '<p><a class="btn btn--ink" href="../hardware/korpus-v4-vid.html" target="_blank" rel="noopener">Открыть корпуса в 3D</a></p>' },
+    'hw-wear': { t: 'Как надеть и вести кабели', h: ul(['Крышка наружу, длинная сторона вдоль кости, ремешок 5 см — сквозь туннель.', 'Затянуть, чтобы не ездил, но пальцы не немели. Место отметить маркером.', '<b>Г</b> — грудина, черта вниз; <b>П</b> — середина плеча снаружи, черта к локтю; <b>ПР</b> — тыльная сторона у запястья, черта к кисти.', '<b>ESP32</b> — на поясе спереди со стороны руки; ремень снизу сквозь прорези плиты; USB-C вниз.']) + '<h4>Кабели</h4>' + ul(['Грудь — прямо вниз.', 'Плечо — вверх к плечу, по боку вниз.', 'Предплечье — к локтю и от локтя к поясу, не через плечо: так хватает 70 см.', 'У локтя и плеча петля 5–8 см; прихватить к ремешкам липучкой.']) + shots([['korpus-v4-datchik-snizu.png', 'Ремешок 5 см сквозь туннель датчика']]) }
+  };
+
+  // ── Схема: веер разделов справа ──────────────────────────────────────────────────────
+  var SECS = [['Главная', 'step-overview'], ['Пациенты', 'sec-patients'], ['Новый тест', 'step-setup'], ['Сеансы', 'step-report'], ['Аналитика', 'sec-patients'], ['Реабилитация', 'sec-rehab'], ['Исследования', 'sec-gonio'], ['Датчики и настройки', 'sec-devices']];
+  var NS = 'http://www.w3.org/2000/svg';
+  var svgSecs = document.querySelector('.map .secs'), svgFan = document.querySelector('.map .fan');
+  SECS.forEach(function (s, i) {
+    var y = 34 + i * 49, x = 760;
+    var p = document.createElementNS(NS, 'path');
+    p.setAttribute('class', 'wire'); p.setAttribute('d', 'M610 254 C 680 254, 690 ' + (y + 18) + ', ' + x + ' ' + (y + 18));
+    svgFan.appendChild(p);
+    var g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', 'n'); g.setAttribute('data-id', s[1]); g.setAttribute('tabindex', '0'); g.setAttribute('role', 'button'); g.setAttribute('aria-label', s[0]);
+    g.innerHTML = '<rect class="box" x="' + x + '" y="' + y + '" width="250" height="36" rx="10"/><text x="' + (x + 16) + '" y="' + (y + 23) + '">' + s[0] + '</text>';
+    svgSecs.appendChild(g);
+  });
+  var sideTxt = document.createElementNS(NS, 'text');
+  sideTxt.setAttribute('class', 'lbl'); sideTxt.setAttribute('x', '1030'); sideTxt.setAttribute('y', '230');
+  sideTxt.textContent = '8 пунктов меню';
+  svgSecs.appendChild(sideTxt);
+
+  // ── Путь теста ───────────────────────────────────────────────────────────────────────
+  var FLOW = [['step-overview', '03-overview.jpg', 'Главная', 'Кто следующий и что требует внимания'], ['step-setup', '07-setup.jpg', 'Пациент и протокол', 'Пять протоколов, план сеанса справа'], ['step-connect', '08-connect.jpg', 'Датчики на связи', 'Схема тела и сигнал каждого датчика'], ['step-run', '10-live.jpg', 'Калибровка и тест', '3 с ровно, потом движения'], ['step-report', '11-report.jpg', 'Итог', 'Одна фраза о главном, PDF, отчёт семье']];
+  document.getElementById('flow').innerHTML = FLOW.map(function (f) { return '<button class="step" data-id="' + f[0] + '"><img src="img/' + f[1] + '" alt="" loading="lazy"><div class="step__t"><b>' + f[2] + '</b><span>' + f[3] + '</span></div></button>'; }).join('');
+
+  // ── Разделы ──────────────────────────────────────────────────────────────────────────
+  var GROUPS = [
+    ['Работа специалиста', [['sec-patients', '05-patient.jpg', 'Пациенты, сеансы, аналитика', 'Карточка ребёнка, история тестов, сводка по всем', ['6 демо-детей', 'симметрия', 'помощь корпусом']], ['sec-devices', '14-devices.jpg', 'Датчики и настройки', 'Источник данных, язык, пространство, синхронизация', ['USB', 'Bluetooth', 'CSV']], ['sec-demo', '02-guide.jpg', 'Демо и гид для показа', '3 минуты, 8 шагов, переживает перезагрузку', ['для жюри и врачей']]]],
+    ['Реабилитация', [['sec-rehab', '28-rehab.jpg', 'Цели, программы, обзор', 'Цикл от целей семьи до новой версии программы', ['8 вкладок', 'версии', 'безопасность']], ['sec-family', '32-family.jpg', 'Семья и режим ребёнка', 'Занятия дома и крупные карточки для ребёнка', ['«Было больно»', 'выход удержанием']]]],
+    ['Исследования', [['sec-gonio', '18e-validation-stats.jpg', 'Проверка угломером', 'Совпадает ли угол датчиков с угломером', ['Бланд–Альтман', 'ICC', 'CSV']], ['sec-lab', '20-lab.jpg', 'Лаборатория научения', 'Как результат меняется с практикой', ['6 инструментов', 'двойник']], ['sec-coord', '27e-coord-strategies.jpg', 'Координация и стратегии', 'Разные способы при одинаковом результате', ['стратегии A/B', 'синтетика']]]]
+  ];
+  document.getElementById('groups').innerHTML = GROUPS.map(function (g) {
+    return '<div class="group"><h3>' + g[0] + '</h3><div class="tiles">' + g[1].map(function (t) {
+      return '<button class="tile" data-id="' + t[0] + '"><img src="img/' + t[1] + '" alt="" loading="lazy"><div class="tile__t"><b>' + t[2] + '</b><span>' + t[3] + '</span><div class="tile__k">' + t[4].map(function (k) { return '<span class="chip">' + k + '</span>'; }).join('') + '</div></div></button>';
+    }).join('') + '</div></div>';
+  }).join('');
+
+  // ── Адреса ───────────────────────────────────────────────────────────────────────────
+  var ROUTES = [['Стартовая', '#/', 'Лендинг: «Попробовать демо» или «Открыть пространство клиники»'], ['Главная', '#/overview', 'Рабочий стол специалиста на сегодня'], ['Пациенты', '#/patients', 'Список; карточка — #/patients/<id>, вкладки ?tab=sessions, ?tab=goals'], ['Новый тест', '#/session/new?patient=demo-p01&protocol=upper_quick', 'Выбор пациента и протокола'], ['Идёт тест', '#/session/run', 'Датчики, калибровка, тест'], ['Сеансы и отчёт', '#/sessions', 'История и отчёт; /print — для печати'], ['Аналитика', '#/analytics', 'Сводка по всем пациентам'], ['Реабилитация', '#/rehab', 'Панель; участник — #/rehab/p/<id>?tab=…'], ['Библиотека занятий', '#/rehab/activities', 'Занятия, версии, статусы'], ['Пилотные исследования', '#/rehab/studies', 'Этика, согласие, обезличенная выгрузка'], ['Страница семьи', '#/home/demo-p01', 'Занятия дома и отчёт «как прошло»'], ['Режим ребёнка', '#/play/demo-p01', 'Крупные карточки занятий'], ['Исследования', '#/research', 'Сеансы проверки угломером, вход в лабораторию'], ['Протоколы проверки', '#/research/protocols', 'Версии протоколов'], ['Новая проверка угломером', '#/research/new', 'Запуск проверки'], ['Наборы данных', '#/research/datasets', 'Выгрузка CSV и JSON'], ['Лаборатория', '#/research/lab', 'Все инструменты лаборатории'], ['Обозреватель научения', '#/research/learning', 'Модели изменения результата'], ['Двойник', '#/research/twin/demo-p01', 'Индивидуальная модель'], ['Анализ движения', '#/research/movement', 'Сырые сигналы 100 Гц'], ['Координация', '#/research/coordination', 'Стратегии движения по всем датчикам'], ['Конструктор исследований', '#/research/designer', 'Протоколы научения'], ['Отчёты лаборатории', '#/research/runs', 'Замороженные анализы'], ['Готовность к модели', '#/research/readiness', 'Чего не хватает данным'], ['Датчики', '#/devices', 'Подключение комплекта'], ['Настройки', '#/settings', 'Язык, пространство, синхронизация, этот гид']];
+  var routeList = document.getElementById('routeList');
+  function renderRoutes(q) {
+    // Русские окончания меняются («семья» — «семьи»): ищем по основе — слово без последних букв
+    var stems = (q || '').trim().toLowerCase().replace(/ё/g, 'е').split(/\s+/).filter(Boolean).map(function (w) { return w.length > 4 ? w.slice(0, Math.max(4, w.length - 2)) : w; });
+    var hit = ROUTES.filter(function (r) { var hay = (r[0] + ' ' + r[1] + ' ' + r[2]).toLowerCase().replace(/ё/g, 'е'); return stems.every(function (s) { return hay.indexOf(s) >= 0; }); });
+    routeList.innerHTML = hit.length ? hit.map(function (r) { return '<a class="route" href="' + A(r[1]) + '" target="_blank" rel="noopener"><b>' + r[0] + '</b><code>' + r[1] + '</code><span>' + r[2] + '</span></a>'; }).join('') : '<p class="sub">Ничего не нашлось. Попробуйте одно слово: «тест», «семья», «данные».</p>';
+  }
+  document.getElementById('q').addEventListener('input', function (e) { renderRoutes(e.target.value); });
+  renderRoutes('');
+
+  // ── Статус ───────────────────────────────────────────────────────────────────────────
+  var S = { good: ['готово', 'реализовано, автотесты проходят'], warn: ['не на железе', 'в софте и на симуляторе, с комплектом не проверено'], exp: ['эксперимент', 'работает с оговорками'], bad: ['не сделано', ''] };
+  var STATUS = [['Тест, отчёт, карточка, аналитика, демо и гид', 'good', 'Симулятор, USB, Bluetooth, повтор CSV через один интерфейс'], ['Хранение и восстановление', 'good', 'Пропажа сеансов исправлена: карантин вместо удаления, подтверждённая запись'], ['Сервер и синхронизация', 'good', 'Проверено на PGlite; с живой базой и Upstash ещё не запускалось'], ['Проверка угломером', 'warn', 'Процесс и статистика протестированы; точность устройства ещё не измерена'], ['Захват по пику повтора', 'exp', 'Рекомендуемый режим — удержание'], ['Поворот предплечья, наклон туловища', 'exp', 'Подъём плеча и сгибание локтя — рабочие'], ['Реабилитация, семья, режим ребёнка', 'good', 'Правила и содержание занятий должны подтвердить специалисты'], ['Датчики в режиме ребёнка', 'warn', 'Только показ, не сохраняется'], ['ИИ-черновик сводки', 'exp', 'Выключен по умолчанию; проверен на поддельном клиенте'], ['Лаборатория научения', 'good', 'Модели проверены на синтетике; реальных продольных данных нет'], ['Координация и стратегии', 'good', '16 из 19 критериев на синтетике; реальные дети — следующий шаг'], ['Корпуса v4', 'warn', '78 проверок корпусов и 12 проверок подробных моделей проходят; ещё не печаталось'], ['Сырые кадры в проверке угломером', 'bad', 'Пересчитать проверку новым алгоритмом нельзя'], ['Экраны тест–ретест и межэкспертной надёжности', 'bad', 'Расчёт есть, интерфейса нет'], ['Управление командой в интерфейсе', 'bad', 'Сотрудников добавляют через API'], ['Казахский язык', 'exp', 'Семья, ребёнок, демо, лаборатория переведены; нужна проверка носителем']];
+  var active = null;
+  function renderStatus() {
+    var counts = { good: 0, warn: 0, exp: 0, bad: 0 };
+    STATUS.forEach(function (s) { counts[s[1]]++; });
+    document.getElementById('bar').innerHTML = Object.keys(counts).map(function (k) { return '<i class="s-' + k + '" style="width:' + (100 * counts[k] / STATUS.length) + '%;background:var(--c)" title="' + S[k][0] + ': ' + counts[k] + '"></i>'; }).join('');
+    document.getElementById('filters').innerHTML = Object.keys(counts).map(function (k) { return '<button class="f s-' + k + '" data-f="' + k + '" aria-pressed="' + (active === k) + '"><i style="background:var(--c)"></i>' + S[k][0] + ' · ' + counts[k] + '</button>'; }).join('');
+    document.getElementById('board').innerHTML = STATUS.filter(function (s) { return !active || s[1] === active; }).map(function (s) { return '<div class="st s-' + s[1] + '"><b>' + s[0] + '</b><span class="pill">' + S[s[1]][0] + '</span><p>' + s[2] + '</p></div>'; }).join('');
+  }
+  document.getElementById('filters').addEventListener('click', function (e) { var b = e.target.closest('[data-f]'); if (!b) return; active = active === b.dataset.f ? null : b.dataset.f; renderStatus(); });
+  renderStatus();
+  document.getElementById('next').innerHTML = ['Проверка угломером на стенде и на взрослых с настоящим комплектом', 'Живая база PostgreSQL на Vercel, миграции, первая команда', 'Исследование повторного надевания: сколько градусов даёт само переодевание', 'Псевдонимные коды вместо имён детей до включения синхронизации'].map(function (t) { return '<div>Следующий шаг: ' + t + '</div>'; }).join('');
+
+  // ── Чек-листы ────────────────────────────────────────────────────────────────────────
+  var CHECKS = [
+    ['quick', 'После выкладки', '10 минут', [['Стартовая открывается, «Попробовать демо» ведёт на Главную с полосой «ДЕМО»', 'без ошибок в консоли'], ['Все 8 пунктов меню открываются', 'ни одной пустой страницы и «Не найдено»'], ['Быстрая проверка на Алихане проходит до итога', 'около минуты; сеанс есть в «Сеансах» и в карточке'], ['Языки RU, KZ, EN переключаются', 'нет английских «дыр» в русском'], ['«Сбросить демо» возвращает исходные данные', 'Алихан снова 144°, расписание 0 из 3'], ['Ширина телефона (~400 px): нет горизонтальной прокрутки', 'широкие таблицы прокручиваются внутри карточек']]],
+    ['sim', 'Тест с симулятором', 'демо', [['Все протоколы открывают правильный план', ''], ['«Начать тест» неактивна, пока датчики не на связи', ''], ['Калибровка повторяется, если «ребёнок» двигался', ''], ['Обрыв связи через гид', 'пауза, прерванный повтор не засчитан, «Продолжить» работает'], ['Пауза, «Следующий шаг», «Экран для пациента», «Завершить»', 'делают то, что написано'], ['Обновить вкладку посреди теста', 'тест предложат восстановить'], ['Итог: «Печать / PDF» и «Отчёт для семьи»', 'открываются'], ['Повтор записи CSV проходит как вживую', 'Датчики → «Выбрать файл CSV»']]],
+    ['hw', 'С настоящими датчиками', 'Chrome или Edge', [['Пространство «Клиника»', 'симулятор недоступен'], ['Датчики → USB: порт, паспорт устройства, 3 датчика на связи', 'у каждого уровень сигнала'], ['Надеть: черта к кисти, крышка наружу; на груди черта вниз', 'надет наоборот — предупреждение «датчик перевёрнут»'], ['Фигурка повторяет движение', 'если нет — датчик не там или сполз'], ['Выдернуть датчик во время теста', 'пауза; после возврата можно продолжить'], ['Bluetooth: каждый блок отдельно', 'потери пакетов видны в полноте данных'], ['Полнота данных близка к 100 %', 'сеанс «с сырыми данными»']]],
+    ['gonio', 'Проверка угломером', 'двое участников', [['Протокол из шаблона — версия 1; правка — версия 2', ''], ['После «Записать значение IMU» фокус в поле угломера', 'новая запись недоступна до сохранения'], ['Enter сохраняет, счётчик растёт', '1 / 20 …'], ['«Недействительным» и «Пропустить» требуют причину', ''], ['Перезагрузка посреди сеанса', 'прогресс и незавершённая запись восстанавливаются'], ['Стенд с фиксированными углами', 'ошибка и MAE в пределах порога протокола'], ['«Завершить сеанс» → отчёт, CSV и JSON', 'сеанс есть в «Наборах данных»']]],
+    ['rehab', 'Реабилитация, семья, ребёнок', 'демо', [['Новая цель сохраняется и видна в Обзоре', ''], ['Программа: новая версия требует причину', 'старая версия не меняется'], ['Семья: «Остановили» + «Было больно»', '«остановите занятие»; событие безопасности первым на панели'], ['Событие безопасности рассматривается один раз', ''], ['Режим ребёнка: «Перерыв» и «Стоп» всегда видны', 'нет рейтингов и мест'], ['Выход из режима ребёнка — удержанием', ''], ['«Датчики (для взрослого)» не пишут в «Движение»', '']]],
+    ['lab', 'Лаборатория и координация', 'демо', [['Плашка «Синтетические демонстрационные данные» на всех страницах', ''], ['«Без изменений» всегда среди моделей', ''], ['Анализ движения открывает сеанс с симулятора', 'качество сигнала и события'], ['Синтетическая демонстрация координации совпадает с таблицей', ''], ['Сеанс с 3 повторами → «недостаточно данных»', 'а не выдуманные стратегии'], ['Повторный анализ тех же данных — те же числа', '']]],
+    ['case', 'Корпуса после печати', 'железо', [['Проба: датчик с колодкой ложится, крышка щёлкает', 'не снимается без ногтя'], ['Ремешок 5 см проходит сквозь туннель', 'потолок туннеля не провис'], ['ESP32 с макетной платой: гнездо USB-C входит в окно', 'штекер входит до упора'], ['Три кабеля в ложбинках, дверца прижимает', 'дёрнули — колодка упирается в стенку']]]
+  ];
+  var KEY = 'nm-guide-checks-v2', state = {};
   try { state = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { state = {}; }
-  document.querySelectorAll('.check').forEach(function (box) {
-    var name = box.getAttribute('data-list');
-    box.querySelectorAll('input[type=checkbox]').forEach(function (cb, i) {
-      var id = name + '-' + i; cb.id = id;
-      cb.checked = !!state[id];
-      cb.addEventListener('change', function () { state[id] = cb.checked; try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} });
-    });
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function ring(done, total) {
+    var C = 2 * Math.PI * 22, off = C * (1 - (total ? done / total : 0));
+    return '<svg class="ring" viewBox="0 0 54 54" aria-hidden="true"><circle class="bg" cx="27" cy="27" r="22"/><circle class="fg" cx="27" cy="27" r="22" stroke-dasharray="' + C + '" stroke-dashoffset="' + off + '"/><text x="27" y="27">' + done + '/' + total + '</text></svg>';
+  }
+  function renderChecks() {
+    document.getElementById('checkCards').innerHTML = CHECKS.map(function (c) {
+      var done = c[3].filter(function (_, i) { return state[c[0] + i]; }).length;
+      return '<button class="ck" data-check="' + c[0] + '">' + ring(done, c[3].length) + '<div><b>' + c[1] + '</b><span>' + c[2] + '</span></div></button>';
+    }).join('');
+  }
+  renderChecks();
+  function checkBody(c) {
+    return '<ul class="cl">' + c[3].map(function (it, i) { var id = c[0] + i; return '<li><input type="checkbox" id="c-' + id + '" data-k="' + id + '"' + (state[id] ? ' checked' : '') + '><span><label for="c-' + id + '">' + it[0] + '</label>' + (it[1] ? '<small>' + it[1] + '</small>' : '') + '</span></li>'; }).join('') + '</ul><button class="btn" data-reset="' + c[0] + '">Снять отметки</button>';
+  }
+
+  // ── Команды и код ────────────────────────────────────────────────────────────────────
+  var CMDS = [['npm run dev', 'Сервер разработки'], ['npx tsc -b', 'Проверка типов: приложение, node, сервер'], ['npx eslint .', 'Линтер'], ['npm test', 'Все модульные и интеграционные тесты, около 475'], ['npm run e2e', 'Сквозные тесты в Chrome на собранном сайте'], ['npm run build', 'Сборка; npm run build:demo — демо одним файлом'], ['npm run build:api', 'Пересобрать api/index.js после правок сервера — тест упадёт, если забыть'], ['npm run db:migrate', 'Миграции PostgreSQL, нужен DATABASE_URL']];
+  document.getElementById('cmds').innerHTML = CMDS.map(function (c) { return '<button data-copy="' + c[0] + '"><code>' + c[0] + '</code><em>копировать</em><small>' + c[1] + '</small></button>'; }).join('');
+  var CODE = [['src/core', 'Сырые числа, ориентация, углы, повторы, метрики'], ['src/session, src/state', 'Движок теста, контроллер сеанса, хранилище'], ['src/devices, src/simulation', 'USB, Bluetooth, повтор, симулятор'], ['src/data, src/sync, server/', 'IndexedDB, очередь синхронизации, сервер'], ['src/research', 'Проверка угломером: модель, статистика, выгрузки'], ['src/rehab', 'Реабилитация: модель, правила, политики'], ['src/lab, src/lab/coord', 'Лаборатория и движок координации'], ['src/features/*', 'Экраны по разделам'], ['docs/, ../research/', 'Отчёты, оси и знаки, научные документы'], ['../hardware/', 'Корпуса, схемы, сборка датчиков'], ['../firmware/', 'Прошивка ESP32 (заморожена)'], ['public/guide/', 'Этот гид']];
+  document.getElementById('codeMap').innerHTML = CODE.map(function (c) { return '<div><code>' + c[0] + '</code>' + c[1] + '</div>'; }).join('');
+
+  // ── Панель, увеличение, копирование ──────────────────────────────────────────────────
+  var drawer = document.getElementById('drawer'), scrim = document.getElementById('scrim'), dTitle = document.getElementById('dTitle'), dBody = document.getElementById('dBody');
+  var lastFocus = null, onNode = null;
+  function open(title, html, from) {
+    lastFocus = from || document.activeElement;
+    dTitle.textContent = title; dBody.innerHTML = html; dBody.scrollTop = 0;
+    scrim.hidden = false; requestAnimationFrame(function () { scrim.classList.add('open'); drawer.classList.add('open'); });
+    drawer.setAttribute('aria-hidden', 'false');
+    document.getElementById('dClose').focus();
+  }
+  function close() {
+    scrim.classList.remove('open'); drawer.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true');
+    setTimeout(function () { scrim.hidden = true; }, 220);
+    if (onNode) { onNode.classList.remove('on'); onNode = null; }
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  function openId(id, el) {
+    var d = D[id]; if (!d) return;
+    if (el && el.classList.contains('n')) { if (onNode) onNode.classList.remove('on'); onNode = el; el.classList.add('on'); }
+    open(d.t, d.h, el);
+  }
+  document.addEventListener('click', function (e) {
+    var z = e.target.closest('[data-zoom]');
+    if (z) { document.getElementById('lbImg').src = z.dataset.zoom; document.getElementById('lb').hidden = false; return; }
+    var n = e.target.closest('[data-id]');
+    if (n) { openId(n.dataset.id, n); return; }
+    var c = e.target.closest('[data-check]');
+    if (c) { var cc = CHECKS.filter(function (x) { return x[0] === c.dataset.check; })[0]; open(cc[1] + ' — ' + cc[2], checkBody(cc), c); return; }
+    var r = e.target.closest('[data-reset]');
+    if (r) { var cr = CHECKS.filter(function (x) { return x[0] === r.dataset.reset; })[0]; cr[3].forEach(function (_, i) { delete state[cr[0] + i]; }); save(); renderChecks(); dBody.innerHTML = checkBody(cr); return; }
+    var cp = e.target.closest('[data-copy]');
+    if (cp) { var em = cp.querySelector('em'); (navigator.clipboard ? navigator.clipboard.writeText(cp.dataset.copy) : Promise.reject()).then(function () { em.textContent = 'скопировано'; }, function () { em.textContent = 'выделите вручную'; }); setTimeout(function () { em.textContent = 'копировать'; }, 1600); }
   });
-  document.getElementById('reset-checks').addEventListener('click', function () {
-    state = {}; try { localStorage.removeItem(KEY); } catch (e) {}
-    document.querySelectorAll('.check input').forEach(function (cb) { cb.checked = false; });
+  dBody.addEventListener('change', function (e) { var k = e.target.dataset && e.target.dataset.k; if (!k) return; state[k] = e.target.checked; if (!state[k]) delete state[k]; save(); renderChecks(); });
+  document.querySelectorAll('.map .n').forEach(function (g) { g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openId(g.dataset.id, g); } }); });
+  scrim.addEventListener('click', close);
+  document.getElementById('dClose').addEventListener('click', close);
+  document.getElementById('lb').addEventListener('click', function () { this.hidden = true; });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var lb = document.getElementById('lb');
+    if (!lb.hidden) { lb.hidden = true; return; }
+    if (drawer.classList.contains('open')) close();
   });
 
-  // Active section in the table of contents
-  var links = Array.prototype.slice.call(document.querySelectorAll('#toc-list a'));
+  // Подсветка пункта навигации у текущего раздела
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav a'));
   if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) links.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id); });
-      });
-    }, { rootMargin: '-30% 0px -60% 0px' });
-    document.querySelectorAll('main section[id]').forEach(function (s) { io.observe(s); });
+    var io = new IntersectionObserver(function (es) { es.forEach(function (en) { if (en.isIntersecting) navLinks.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id); }); }); }, { rootMargin: '-40% 0px -55% 0px' });
+    navLinks.forEach(function (a) { var t = document.querySelector(a.getAttribute('href')); if (t) io.observe(t); });
   }
 })();
 </script>

@@ -1131,6 +1131,7 @@ export const en: typeof ru = {
     teamGuide: 'Team guide',
     teamGuideText: 'Internal guide for developers and testers: what is on the site and where, how to run a test and a goniometer check, testing checklists and what is done. With screenshots from the demo (in Russian).',
     teamGuideOpen: 'Open the guide',
+    enclosure3dOpen: 'Enclosures in 3D',
     title: 'Settings',
     language: 'Interface language',
     profile: 'Clinician profile',
