@@ -15,6 +15,8 @@ import { newId } from '../lib/ids';
 import type { EngineResult } from '../session/types';
 import { makeOp } from '../sync/ops';
 import { labRecordProblem } from './integrity';
+import type { RawFrame } from '../devices/types';
+import { buildManifest, syncModelFor, timelineFromEvents } from './coord/provenance';
 import { sealTrialSet, type PracticeTrial, type PracticeTrialSet } from './records';
 
 /** Step flags that make every repetition of the sitting unreliable (same blocking list as rehab/movement.ts). */
@@ -31,6 +33,11 @@ export function trialSetFromEngine(o: {
   endedAt: Date;
   consentId: string | null;
   simulated: boolean;
+  /**
+   * Raw frames of the sitting and the device facts needed to analyse them later (MCSE). Only passed when trial
+   * recording is enabled under consent — the same gate as the trials themselves.
+   */
+  raw?: { frames: readonly RawFrame[]; rateHz: number; deviceKind: string; accCalibrated: boolean };
 }): PracticeTrialSet | null {
   const step = o.result.steps[0];
   if (!step) return null;
@@ -62,13 +69,47 @@ export function trialSetFromEngine(o: {
     consentId: o.consentId,
     simulated: o.simulated,
     createdAt: o.endedAt.toISOString(),
+    ...(o.raw && o.raw.frames.length
+      ? {
+          rawManifest:
+            buildManifest(o.raw.frames, {
+              rateHz: o.raw.rateHz,
+              sync: syncModelFor(o.raw.deviceKind, o.simulated),
+              accCalibrated: o.raw.accCalibrated,
+              timeline: timelineFromEvents(o.result.events, [{ exercise: o.exercise, side: o.side }]),
+              algorithm: ALGORITHM_VERSION,
+              app: APP_VERSION,
+              now: o.endedAt,
+            }) ?? undefined,
+        }
+      : {}),
   });
 }
 
 /** Write a trial set (and, in the clinic, its outbox op) in one transaction. Refuses invalid or simulated clinic data. */
-export async function storeTrialSet(storage: DataStorage, set: PracticeTrialSet): Promise<boolean> {
+export async function storeTrialSet(storage: DataStorage, set0: PracticeTrialSet, frames?: readonly RawFrame[]): Promise<boolean> {
+  let set = set0;
   if (labRecordProblem(set)) return false;
   if (set.workspace === 'clinic' && set.simulated) return false;
+  // Raw frames first (local only — the server accepts raw chunks for sessions). If they cannot be stored, the
+  // trial set is stored WITHOUT a manifest, so it never points at raw data that does not exist.
+  if (set.rawManifest && frames?.length) {
+    const ok = await storage.putRaw(set.id, frames).then(
+      () => true,
+      () => false,
+    );
+    if (!ok) {
+      const { rawManifest: _drop, contentHash: _h, ...rest } = set;
+      void _drop;
+      void _h;
+      set = sealTrialSet(rest);
+    }
+  } else if (set.rawManifest) {
+    const { rawManifest: _drop, contentHash: _h, ...rest } = set;
+    void _drop;
+    void _h;
+    set = sealTrialSet(rest);
+  }
   await storage.putResearchBatch('lab', [set], set.workspace === 'clinic' ? [makeOp('lab_record', set.id, set)] : []);
   return true;
 }

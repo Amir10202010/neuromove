@@ -34,6 +34,7 @@ export type Route =
   | { name: 'labRuns' }
   | { name: 'labRun'; id: string }
   | { name: 'labReadiness' }
+  | { name: 'labCoordination'; participant: string | null; exercise: string | null }
   | { name: 'rehab' }
   | { name: 'rehabParticipant'; id: string; tab: RehabTab; review: string | null }
   | { name: 'rehabActivities' }
@@ -100,6 +101,7 @@ export function parseHash(hash: string): Route {
       if (b === 'runs' && !c) return { name: 'labRuns' };
       if (b === 'runs' && c && parts.length === 3) return { name: 'labRun', id: c };
       if (b === 'readiness' && !c) return { name: 'labReadiness' };
+      if (b === 'coordination' && !c) return { name: 'labCoordination', participant: q.get('p'), exercise: q.get('ex') };
       return { name: 'notFound' };
     // Functional Progression System: professional workspace, family workspace, child practice
     case 'rehab': {
@@ -194,6 +196,13 @@ export function href(r: Route): string {
       return `#/research/runs/${e(r.id)}`;
     case 'labReadiness':
       return '#/research/readiness';
+    case 'labCoordination': {
+      const q = new URLSearchParams();
+      if (r.participant) q.set('p', r.participant);
+      if (r.exercise) q.set('ex', r.exercise);
+      const qs = q.toString();
+      return `#/research/coordination${qs ? `?${qs}` : ''}`;
+    }
     case 'rehab':
       return '#/rehab';
     case 'rehabActivities':

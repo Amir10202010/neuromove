@@ -1,0 +1,19 @@
+/* Coordination & Strategy workspace (features/motorlab/coordination). co- prefix: no collisions with lab/rehab classes. */
+.cogrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 12px; margin-top: 12px; }
+.cosub { margin-top: 12px; }
+.cochart__legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--text-muted, inherit); padding: 2px 4px 0; }
+.cochart__legend i, .cokey { display: inline-block; width: 12px; height: 3px; vertical-align: middle; margin-right: 4px; border-radius: 2px; }
+.cokey { height: 10px; width: 10px; }
+.cochart__marker { stroke: var(--axis); stroke-dasharray: 3 3; }
+.cochart__uncert { fill: var(--muted-series); opacity: 0.18; }
+.cochart__region { fill: var(--warn); opacity: 0.14; }
+.cochart__point { cursor: pointer; }
+.cochart__point:focus-visible { outline: none; }
+.cochart__point:focus-visible circle, .cochart__point:focus-visible rect, .cochart__point:focus-visible path { stroke: var(--text); stroke-width: 2; }
+.cochart__selected { fill: none; stroke: var(--text); stroke-width: 2; }
+.cochart__pick { font-size: 12px; font-weight: 600; fill: var(--text); }
+.costrip { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 8px; }
+.costrip__cell { min-width: 22px; height: 26px; border: 0; border-radius: 4px; color: var(--surface); font-size: 12px; font-weight: 600; cursor: pointer; padding: 0 4px; }
+.costrip__cell.is-newsession { margin-left: 10px; }
+.costrip__cell.is-selected { outline: 2px solid var(--text); outline-offset: 1px; }
+.costrip__cell:focus-visible { outline: 2px solid var(--text); }

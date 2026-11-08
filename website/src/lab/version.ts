@@ -19,6 +19,13 @@ export const LAB_VERSIONS = {
   learning: 'nm-lab-learning 1.0.0',
 } as const;
 
+/**
+ * Motor Coordination & Strategy Discovery Engine (lab/coord): channels, segmentation, alignment, coordination
+ * components, strategy discovery, dissociation, longitudinal strategy analysis. Kept OUT of LAB_VERSIONS so that a
+ * change here never marks frozen learning-analysis runs as computed by a different engine.
+ */
+export const COORD_VERSION = 'nm-lab-coord 1.0.0';
+
 export type LabComponent = keyof typeof LAB_VERSIONS;
 
 /** One string for the whole engine — shown in reports. */

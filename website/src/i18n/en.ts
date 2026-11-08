@@ -1130,6 +1130,9 @@ export const en: typeof ru = {
   },
 
   settings: {
+    teamGuide: 'Team guide',
+    teamGuideText: 'Internal guide for developers and testers: what is on the site and where, how to run a test and a goniometer check, testing checklists and what is done. With screenshots from the demo (in Russian).',
+    teamGuideOpen: 'Open the guide',
     title: 'Settings',
     language: 'Interface language',
     profile: 'Clinician profile',

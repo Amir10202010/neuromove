@@ -11,6 +11,7 @@ import type { ProtocolId } from '../core/protocols';
 import type { AccCalibration } from '../core/imu';
 import type { DeviceKind, Placement, Side } from '../devices/types';
 import type { QualityStats, SessionEvent, StepResult } from '../session/types';
+import type { RawManifest } from '../lab/coord/provenance';
 
 export type Workspace = 'demo' | 'clinic';
 
@@ -101,6 +102,11 @@ export interface Session {
   demo: boolean;
   /** Сохранены ли сырые отсчёты (выгрузка CSV). */
   hasRaw: boolean;
+  /**
+   * Manifest of the stored raw stream (hash, placements, sync model, timeline) — sessions from 2026-11-08 on.
+   * Older sessions have none; their raw frames are still analysed, reported as "unverified".
+   */
+  rawManifest?: RawManifest;
 }
 
 /** Сеанс на смоделированных данных — симулятор или повтор выгрузки из демо. В клинику не попадает. */

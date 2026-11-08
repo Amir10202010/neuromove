@@ -2,7 +2,7 @@
 // raw availability, frozen runs and protocols, with entry points to every workspace. Counts only — no model is fitted
 // here, so the page is fast and shows no estimate without its context.
 
-import { BookOpenCheck, ClipboardList, Database, LineChart, Network, Waves } from 'lucide-react';
+import { BookOpenCheck, ClipboardList, Database, LineChart, Network, Waves, Workflow } from 'lucide-react';
 import { useMemo } from 'react';
 import { href } from '../../app/router';
 import { PageHeader } from '../../layout/PageHeader';
@@ -12,10 +12,12 @@ import { EmptyState } from '../../ui/EmptyState';
 import { SimulatedBanner, useLabData } from './common';
 import { ReliabilitySection } from './ReliabilitySection';
 import { useLT } from './i18n';
+import { useCT } from './coordination/i18n';
 import { useLabRecords } from './store';
 
 export function LabOverviewPage() {
   const lt = useLT();
+  const ct = useCT();
   const { ws, patients, sessions, practice, includeSimulated } = useLabData();
   const { runs, protocols } = useLabRecords(ws);
   const rows = useMemo(
@@ -56,6 +58,7 @@ export function LabOverviewPage() {
         <Tile icon={<Waves />} title={lt('Movement Analysis Lab')} text={lt('Raw 100 Hz signals, quality, velocity events and movement features.')} to={href({ name: 'labMovement', sessionId: null })} />
         <Tile icon={<ClipboardList />} title={lt('Study Designer')} text={`${lt('Versioned learning-study protocols with a pre-specified analysis plan.')} (${protocols.length})`} to={href({ name: 'labDesigner' })} />
         <Tile icon={<BookOpenCheck />} title={lt('Research reports')} text={`${lt('Frozen, reproducible analysis runs and pseudonymised exports.')} (${runs.length})`} to={href({ name: 'labRuns' })} />
+        <Tile icon={<Workflow />} title={ct('Coordination & Strategy Lab')} text={ct('Multi-segment coordination, movement strategies and performance–strategy dissociation from raw sensor frames.')} to={href({ name: 'labCoordination', participant: rows[0]?.p.id ?? null, exercise: null })} />
         <Tile icon={<Database />} title={lt('Foundation-model readiness')} text={lt('What the dataset would need before a movement representation model could be trained.')} to={href({ name: 'labReadiness' })} />
       </section>
       <section className="mlsection">

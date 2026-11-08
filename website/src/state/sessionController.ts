@@ -17,6 +17,8 @@ import { SerialDevice } from '../devices/SerialDevice';
 import { SimulatorDevice } from '../devices/SimulatorDevice';
 import { SinglePlacementDevice } from '../devices/SinglePlacementDevice';
 import { emptyStatus, placementOf, type DeviceKind, type DeviceStatus, type NeuroMoveDevice, type Placement } from '../devices/types';
+import { buildManifest, syncModelFor, timelineFromEvents } from '../lab/coord/provenance';
+import { ALGORITHM_VERSION, APP_VERSION } from '../core/version';
 import { buildSession } from '../session/buildSession';
 import { expectedRomFn } from '../session/compare';
 import { SessionEngine, type EngineOptions } from '../session/SessionEngine';
@@ -230,6 +232,17 @@ export class SessionController {
       demo: this.setup.workspace === 'demo' || this.device.kind === 'simulator' || info?.simulated === true,
       hasRaw: raw.length > 0,
     });
+    // Raw-stream manifest: content hash, placements, sync model and timeline of exactly the frames that will be
+    // stored — makes the stored observations verifiable (research/coordination-feasibility.md §4)
+    const manifest = buildManifest(raw, {
+      rateHz: info?.rateHz ?? 100,
+      sync: syncModelFor(this.device.kind, session.device.simulated),
+      accCalibrated: !!info?.accCal && Object.keys(info.accCal).length > 0,
+      timeline: timelineFromEvents(result.events, this.setup.steps),
+      algorithm: ALGORITHM_VERSION,
+      app: APP_VERSION,
+    });
+    if (manifest) session.rawManifest = manifest;
     // The recovery record is NOT cleared here: the caller clears it only after the session write is
     // confirmed by IndexedDB (appStore.flush). Clearing it first meant a failed write lost the session.
     if (this.recoveryTimer) clearInterval(this.recoveryTimer);

@@ -1,0 +1,617 @@
+{
+ "generatedAt": "2026-11-08T10:06:40.698Z",
+ "replicates": 20,
+ "criteria": {
+  "V1_inclination_error_deg": 1,
+  "V1_heading_drift_zero_bias_deg_per_10s": 0.5,
+  "V2_upper_elev_rmse_deg": 2,
+  "V2_trunk_pitch_rmse_deg": 1.5,
+  "V2_humerothoracic_rmse_deg": 3,
+  "V2_elbow_rmse_deg": 4,
+  "V3_detection_rate": 0.95,
+  "V3_onset_median_abs_ms": 30,
+  "V4_pc1_truth_congruence": 0.9,
+  "V5_power_n48_balanced": 0.8,
+  "V5_ari_n48_balanced": 0.8,
+  "V6_false_strategy_rate": 0.05,
+  "V6_outcome_bimodal_false_rate_adjusted": 0.1,
+  "V7_dissociation_power": 0.8,
+  "V7_false_dissociation_rate": 0.05,
+  "V7_outcome_difference_flagged": 0.95,
+  "V8_change_power": 0.8,
+  "V8_false_change_rate": 0.1,
+  "V10_insufficient_rate": 1
+ },
+ "v1": {
+  "cases": [
+   {
+    "name": "vertical-axis 30°/s, no bias, 10 s",
+    "inclinationMaxDeg": 0.032668168627004945,
+    "headingDriftDeg": 0.0657210352103785
+   },
+   {
+    "name": "tilted-axis 60°/s, no bias, 10 s",
+    "inclinationMaxDeg": 0.3936304935362145,
+    "headingDriftDeg": 0.21632771937818066
+   },
+   {
+    "name": "vertical-axis 30°/s, bias 0.2°/s, 10 s",
+    "inclinationMaxDeg": 0.03343277092262298,
+    "headingDriftDeg": 1.8007493750125867
+   },
+   {
+    "name": "still, bias 0.2°/s on z, 60 s",
+    "inclinationMaxDeg": 0.03307130836427774,
+    "headingDriftDeg": 10.390573956369597
+   }
+  ]
+ },
+ "v2": [
+  {
+   "condition": "nominal, right, flexion",
+   "rmse": {
+    "upper_elev": 0.8846446016693177,
+    "trunk_pitch": 0.3722491090191456,
+    "trunk_roll": 0.26914334469314066,
+    "humerothoracic": 1.0488427732264722,
+    "elbow_flex": 2.7122883601694596
+   }
+  },
+  {
+   "condition": "nominal, left, flexion",
+   "rmse": {
+    "upper_elev": 0.9069331763699363,
+    "trunk_pitch": 0.3851499566911615,
+    "trunk_roll": 0.24684233632183136,
+    "humerothoracic": 1.0577262263886447,
+    "elbow_flex": 2.53897923620983
+   }
+  },
+  {
+   "condition": "nominal, right, abduction",
+   "rmse": {
+    "upper_elev": 1.1366849736841955,
+    "trunk_pitch": 0.3722491090191456,
+    "trunk_roll": 0.26914334469314066,
+    "humerothoracic": 1.7235163434457723,
+    "elbow_flex": 7.055009863940911
+   }
+  },
+  {
+   "condition": "noise ×3",
+   "rmse": {
+    "upper_elev": 0.8770009256122147,
+    "trunk_pitch": 0.3786182604662123,
+    "trunk_roll": 0.2814907073356044,
+    "humerothoracic": 0.9836040155603369,
+    "elbow_flex": 2.7101247607574455
+   }
+  },
+  {
+   "condition": "extra misalignment 8°",
+   "rmse": {
+    "upper_elev": 0.8836949760262292,
+    "trunk_pitch": 0.3636604331382081,
+    "trunk_roll": 0.9949837781044911,
+    "humerothoracic": 1.0952564250297367,
+    "elbow_flex": 2.7111584703101945
+   }
+  },
+  {
+   "condition": "gyro bias walk 0.05 °/s/√s",
+   "rmse": {
+    "upper_elev": 1.0149825400330152,
+    "trunk_pitch": 0.3956641507407484,
+    "trunk_roll": 0.23386490598810108,
+    "humerothoracic": 1.2527072143341762,
+    "elbow_flex": 2.7481433570205676
+   }
+  }
+ ],
+ "v3": [
+  {
+   "noise": 1,
+   "detection": 1,
+   "falsePositives": 0,
+   "onsetMedAbsMs": 19.99999999999602,
+   "onsetP95AbsMs": 20.000000000003126,
+   "offsetMedAbsMs": 9.999999999999787,
+   "truthReps": 36
+  },
+  {
+   "noise": 3,
+   "detection": 1,
+   "falsePositives": 0,
+   "onsetMedAbsMs": 10.000000000001563,
+   "onsetP95AbsMs": 20.000000000003126,
+   "offsetMedAbsMs": 10.000000000001563,
+   "truthReps": 36
+  },
+  {
+   "noise": 6,
+   "detection": 1,
+   "falsePositives": 0,
+   "onsetMedAbsMs": 9.999999999999787,
+   "onsetP95AbsMs": 20.000000000003126,
+   "offsetMedAbsMs": 19.999999999999574,
+   "truthReps": 36
+  }
+ ],
+ "v4": [
+  {
+   "condition": "nominal",
+   "k": 2,
+   "status": "supported",
+   "pc1TruthCongruence": 0.9977388177928057,
+   "explained1": 0.8060232706195047,
+   "alignmentCongruence": 0.9666228138423639
+  },
+  {
+   "condition": "noise ×3",
+   "k": 2,
+   "status": "supported",
+   "pc1TruthCongruence": 0.9968585712026115,
+   "explained1": 0.8023846382839196,
+   "alignmentCongruence": 0.9664656887336649
+  },
+  {
+   "condition": "noise ×6",
+   "k": 2,
+   "status": "supported",
+   "pc1TruthCongruence": 0.99650663845688,
+   "explained1": 0.7998976040804178,
+   "alignmentCongruence": 0.9631306293397176
+  },
+  {
+   "condition": "dropped frames 2 %",
+   "k": 2,
+   "status": "supported",
+   "pc1TruthCongruence": 0.9971865806974535,
+   "explained1": 0.7834156147949137,
+   "alignmentCongruence": 0.9625301251769245
+  },
+  {
+   "condition": "misalignment 8° + bias walk",
+   "k": 2,
+   "status": "supported",
+   "pc1TruthCongruence": 0.9974014487857318,
+   "explained1": 0.7996942447875175,
+   "alignmentCongruence": 0.9652629979916548
+  },
+  {
+   "condition": "trunk sensor missing",
+   "k": 2,
+   "status": "supported",
+   "pc1TruthCongruence": 0.29316793211305375,
+   "explained1": 0.8647335788608664,
+   "alignmentCongruence": 0.6653602798089382
+  }
+ ],
+ "v5": [
+  {
+   "n": 12,
+   "fracB": 0.5,
+   "verdicts": {
+    "single_pattern": 12,
+    "multiple_strategies": 8
+   },
+   "power": 0.4,
+   "medianAri": 0
+  },
+  {
+   "n": 12,
+   "fracB": 0.25,
+   "verdicts": {
+    "inconclusive": 12,
+    "single_pattern": 8
+   },
+   "power": 0,
+   "medianAri": 0
+  },
+  {
+   "n": 24,
+   "fracB": 0.5,
+   "verdicts": {
+    "multiple_strategies": 13,
+    "single_pattern": 7
+   },
+   "power": 0.65,
+   "medianAri": 1
+  },
+  {
+   "n": 24,
+   "fracB": 0.25,
+   "verdicts": {
+    "multiple_strategies": 19,
+    "inconclusive": 1
+   },
+   "power": 0.95,
+   "medianAri": 1
+  },
+  {
+   "n": 48,
+   "fracB": 0.5,
+   "verdicts": {
+    "multiple_strategies": 19,
+    "single_pattern": 1
+   },
+   "power": 0.95,
+   "medianAri": 1
+  },
+  {
+   "n": 48,
+   "fracB": 0.25,
+   "verdicts": {
+    "multiple_strategies": 20
+   },
+   "power": 1,
+   "medianAri": 1
+  }
+ ],
+ "v6": [
+  {
+   "condition": "one strategy (arm), adjusted",
+   "n": 24,
+   "verdicts": {
+    "single_pattern": 20
+   },
+   "falseRate": 0
+  },
+  {
+   "condition": "one strategy (arm), adjusted",
+   "n": 48,
+   "verdicts": {
+    "single_pattern": 20
+   },
+   "falseRate": 0
+  },
+  {
+   "condition": "one strategy (trunk-assisted), adjusted",
+   "n": 24,
+   "verdicts": {
+    "single_pattern": 20
+   },
+   "falseRate": 0
+  },
+  {
+   "condition": "one strategy (trunk-assisted), adjusted",
+   "n": 48,
+   "verdicts": {
+    "single_pattern": 20
+   },
+   "falseRate": 0
+  },
+  {
+   "condition": "one strategy, two outcome levels (95° / 120°), adjusted",
+   "n": 24,
+   "verdicts": {
+    "single_pattern": 20
+   },
+   "falseRate": 0
+  },
+  {
+   "condition": "one strategy, two outcome levels (95° / 120°), adjusted",
+   "n": 48,
+   "verdicts": {
+    "single_pattern": 20
+   },
+   "falseRate": 0
+  },
+  {
+   "condition": "one strategy, two outcome levels (95° / 120°), ABSOLUTE representation",
+   "n": 24,
+   "verdicts": {
+    "single_pattern": 17,
+    "multiple_strategies": 3
+   },
+   "falseRate": 0.15
+  },
+  {
+   "condition": "one strategy, two outcome levels (95° / 120°), ABSOLUTE representation",
+   "n": 48,
+   "verdicts": {
+    "multiple_strategies": 10,
+    "single_pattern": 9,
+    "inconclusive": 1
+   },
+   "falseRate": 0.5
+  }
+ ],
+ "v7": [
+  {
+   "condition": "equal outcome, arm vs trunk-assisted (one session)",
+   "verdicts": {
+    "dissociation": 12,
+    "outcome_not_equivalent": 8
+   },
+   "rate": 0.6,
+   "target": "dissociation"
+  },
+  {
+   "condition": "equal outcome, trunk-assisted vs trunk-leading — timing only (one session)",
+   "verdicts": {
+    "dissociation": 14,
+    "outcome_not_equivalent": 6
+   },
+   "rate": 0.7,
+   "target": "dissociation"
+  },
+  {
+   "condition": "same strategy, two random sets (one session)",
+   "verdicts": {
+    "no_coordination_difference": 11,
+    "outcome_not_equivalent": 9
+   },
+   "rate": 0.55,
+   "target": "no_coordination_difference"
+  },
+  {
+   "condition": "same strategy, outcome 120° vs 96° (one session)",
+   "verdicts": {
+    "outcome_not_equivalent": 20
+   },
+   "rate": 1,
+   "target": "outcome_not_equivalent"
+  },
+  {
+   "condition": "same strategy, two sessions with re-attached sensors (cross-session rule)",
+   "verdicts": {
+    "within_replacement_margin": 18,
+    "outcome_not_equivalent": 2
+   },
+   "rate": 1,
+   "target": "not_dissociation"
+  }
+ ],
+ "v8": [
+  {
+   "condition": "gradual switch trunk-assisted → arm over 5 sessions",
+   "lastSessionChangeRate": 1,
+   "persistenceRate": 0,
+   "replicates": 20
+  },
+  {
+   "condition": "stationary 50/50 mix, 5 sessions",
+   "lastSessionChangeRate": 0.05,
+   "persistenceRate": 0,
+   "replicates": 20
+  },
+  {
+   "condition": "stationary single strategy, 5 sessions",
+   "lastSessionChangeRate": 0.15,
+   "persistenceRate": 0,
+   "replicates": 20
+  }
+ ],
+ "v9": {
+  "participantWiseRmse": 3.2983886624761602,
+  "recordWiseRmse": 2.0862021378255062,
+  "inflation": 1.5810494115944786,
+  "participants": 6
+ },
+ "v10": [
+  {
+   "n": 6,
+   "verdicts": {
+    "insufficient_data": 10
+   },
+   "componentStatus": {
+    "insufficient_data": 10
+   }
+  },
+  {
+   "n": 9,
+   "verdicts": {
+    "insufficient_data": 10
+   },
+   "componentStatus": {
+    "insufficient_data": 10
+   }
+  }
+ ],
+ "v11": {
+  "margin95": 2.7118714385305718,
+  "values": [
+   1.0616574712398383,
+   1.5464553428590686,
+   1.2776533302130872,
+   3.0399338166773653,
+   2.675605246474732,
+   1.8400348912760343,
+   2.2727293456525084,
+   1.5664973220851743,
+   1.7477301659868747,
+   0.8762703933081295,
+   1.357831912197476,
+   0.6843244947547287,
+   1.4403200748523466,
+   1.6785781765212024,
+   0.9317701131681468,
+   0.9302115380688218,
+   1.7516052523606158,
+   1.1118712251964902,
+   1.927609298844178,
+   0.6517559986310849,
+   2.314405863732951,
+   0.7537427951456888,
+   0.5789565160432357,
+   1.9155236120936088,
+   2.2294396582383347,
+   0.835046107413524,
+   1.088322006747759,
+   0.6429687533469485,
+   0.3105706522934684,
+   1.655319818085977,
+   2.1929347939618915,
+   1.626940051690039,
+   2.042558390052844,
+   1.461647163205226,
+   1.2371864492896767,
+   1.5434212871406443,
+   1.7455163996029417,
+   0.588086541809106,
+   1.4013123022132243,
+   0.5279721884978047,
+   1.089374966044094,
+   1.0753704467878273,
+   1.4858446433012225,
+   1.4068683111958826,
+   1.5439996857975289,
+   2.0140134285963414,
+   1.3635000585353598,
+   1.5709899308097814,
+   2.6969812056599274,
+   2.4182214690902897,
+   3.0688308573859224,
+   5.335810722563194,
+   1.5032469572108398,
+   1.2414409710729624,
+   1.7891388350240875,
+   1.1272692409986182,
+   1.7159692509599032,
+   1.678594325788219,
+   2.4896351970166792,
+   1.5579785275201887,
+   2.484609700500199,
+   1.809238575123526,
+   1.4315723297740788,
+   1.4989812783383978,
+   1.089750300691935,
+   1.55264189180004,
+   1.2664931255042533,
+   1.2674382749028286,
+   1.6343732304027654,
+   1.2988035955240338,
+   0.809219538756245,
+   0.9096319292245162,
+   1.1973571446885716,
+   2.381979574311252,
+   2.2849131118647548,
+   2.9947858630728295,
+   1.988241551726051,
+   1.6895457553617361,
+   0.4249894265079479,
+   0.9404305522911232
+  ],
+  "replicates": 10
+ },
+ "checks": [
+  {
+   "id": "V1a",
+   "criterion": "inclination error ≤ 1° (all analytic cases)",
+   "value": 0.3936304935362145,
+   "pass": true
+  },
+  {
+   "id": "V1b",
+   "criterion": "heading drift ≤ 0.5° per 10 s without bias",
+   "value": 0.21632771937818066,
+   "pass": true
+  },
+  {
+   "id": "V2a",
+   "criterion": "upper_elev RMSE ≤ 2° (nominal)",
+   "value": 1.1366849736841955,
+   "pass": true
+  },
+  {
+   "id": "V2b",
+   "criterion": "trunk_pitch RMSE ≤ 1.5° (nominal)",
+   "value": 0.3851499566911615,
+   "pass": true
+  },
+  {
+   "id": "V2c",
+   "criterion": "humerothoracic RMSE ≤ 3° within repetitions (nominal)",
+   "value": 1.7235163434457723,
+   "pass": true
+  },
+  {
+   "id": "V2d",
+   "criterion": "elbow_flex RMSE ≤ 4° (nominal)",
+   "value": 7.055009863940911,
+   "pass": false
+  },
+  {
+   "id": "V3a",
+   "criterion": "repetition detection ≥ 0.95 (nominal noise)",
+   "value": 1,
+   "pass": true
+  },
+  {
+   "id": "V3b",
+   "criterion": "median |onset error| ≤ 30 ms (nominal noise)",
+   "value": 19.99999999999602,
+   "pass": true
+  },
+  {
+   "id": "V4",
+   "criterion": "PC1 congruence with the true strategy-difference direction ≥ 0.9 (nominal)",
+   "value": 0.9977388177928057,
+   "pass": true
+  },
+  {
+   "id": "V5a",
+   "criterion": "strategy-recovery power ≥ 0.8 (n = 48, 50/50)",
+   "value": 0.95,
+   "pass": true
+  },
+  {
+   "id": "V5b",
+   "criterion": "median ARI ≥ 0.8 (n = 48, 50/50)",
+   "value": 1,
+   "pass": true
+  },
+  {
+   "id": "V6a",
+   "criterion": "false \"multiple strategies\" rate ≤ 0.05 (single-strategy data, every n)",
+   "value": 0,
+   "pass": true
+  },
+  {
+   "id": "V6b",
+   "criterion": "false strategies from outcome differences alone ≤ 0.1 (performance-adjusted)",
+   "value": 0,
+   "pass": true
+  },
+  {
+   "id": "V7a",
+   "criterion": "dissociation power ≥ 0.8 (arm vs trunk-assisted, ≈12 per group, one session)",
+   "value": 0.6,
+   "pass": false
+  },
+  {
+   "id": "V7b",
+   "criterion": "false dissociation rate ≤ 0.05",
+   "value": 0,
+   "pass": true
+  },
+  {
+   "id": "V7c",
+   "criterion": "outcome difference flagged ≥ 0.95",
+   "value": 1,
+   "pass": true
+  },
+  {
+   "id": "V8a",
+   "criterion": "change from baseline detected at the last session ≥ 0.8 (gradual switch)",
+   "value": 1,
+   "pass": true
+  },
+  {
+   "id": "V8b",
+   "criterion": "false change-from-baseline rate ≤ 0.1 (stationary)",
+   "value": 0.15,
+   "pass": false
+  },
+  {
+   "id": "V10",
+   "criterion": "n < 12 always reported as insufficient_data",
+   "value": 1,
+   "pass": true
+  }
+ ],
+ "evaluationNotes": [
+  "2026-11-08T10:07:49.843Z: checks re-evaluated after correcting the V7b formula (false dissociation = share of 'dissociation' verdicts). Experiment data unchanged. Before: V1a:true V1b:true V2a:true V2b:true V2c:true V2d:false V3a:true V3b:true V4:true V5a:true V5b:true V6a:true V6b:true V7a:false V7b:false V7c:true V8a:true V8b:false V10:true"
+ ]
+}

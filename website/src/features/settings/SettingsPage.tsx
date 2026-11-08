@@ -1,4 +1,4 @@
-import { Building2, Database, Download, ExternalLink, FlaskConical, RotateCcw, Trash2, Upload } from 'lucide-react';
+import { BookOpen, Building2, Database, Download, ExternalLink, FlaskConical, RotateCcw, Trash2, Upload } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { navigate } from '../../app/router';
 import { ALGORITHM_VERSION, APP_VERSION, BUILD_DATE } from '../../core/version';
@@ -182,6 +182,23 @@ export function SettingsPage() {
               </Button>
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="card">
+        <div className="card__header">
+          <h2 className="card__title">{t('settings.teamGuide')}</h2>
+        </div>
+        <div className="card__body stack">
+          <p className="secondary" style={{ fontSize: 'var(--fs-sm)' }}>
+            {t('settings.teamGuideText')}
+          </p>
+          <div>
+            {/* Static page shipped with the site (public/guide): opens in a new tab, works offline from the demo file too */}
+            <a className="btn btn--secondary" href="guide/index.html" target="_blank" rel="noopener" style={{ textDecoration: 'none' }}>
+              <BookOpen aria-hidden /> {t('settings.teamGuideOpen')}
+            </a>
+          </div>
         </div>
       </section>
 

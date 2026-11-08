@@ -17,6 +17,7 @@ import { hashOf } from './hash';
 import { labRecordProblem } from './integrity';
 import type { LearningProtocolVersion } from './protocol';
 import type { AnalysisRun } from './runs';
+import type { RawManifest } from './coord/provenance';
 
 export interface PracticeTrial {
   /** 1-based repetition index within the sitting. */
@@ -53,6 +54,8 @@ export interface PracticeTrialSet {
   consentId: string | null;
   simulated: boolean;
   createdAt: string;
+  /** Manifest of the raw frames of the sitting, stored locally under this record's id (consent-gated); absent before 2026-11-08 or when the frames could not be stored. */
+  rawManifest?: RawManifest;
   /** SHA-256 of the record without this field — detects any later change. */
   contentHash: string;
 }

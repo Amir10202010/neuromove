@@ -113,9 +113,9 @@ function LiveRun({ patient, target, kind, onClose, reduceMotion }: { patient: Pa
     const engine = controller.engine;
     const st = useAppStore.getState().storage();
     if (recording?.enabled && engine && st) {
-      const set = trialSetFromEngine({ result: engine.result(), workspace: patient.workspace, participantId: patient.id, exercise: target.exercise, side: target.side, targetDeg: target.targetDeg, startedAt: startedAt.current, endedAt: new Date(), consentId: recording.consent?.id ?? null, simulated: kind === 'simulator' || state?.device.info?.simulated === true });
+      const set = trialSetFromEngine({ result: engine.result(), workspace: patient.workspace, participantId: patient.id, exercise: target.exercise, side: target.side, targetDeg: target.targetDeg, startedAt: startedAt.current, endedAt: new Date(), consentId: recording.consent?.id ?? null, simulated: kind === 'simulator' || state?.device.info?.simulated === true, raw: { frames: engine.rawFrames, rateHz: state?.device.info?.rateHz ?? 100, deviceKind: kind, accCalibrated: !!state?.device.info?.accCal && Object.keys(state.device.info.accCal).length > 0 } });
       if (set) {
-        const ok = await storeTrialSet(st, set).catch(() => false);
+        const ok = await storeTrialSet(st, set, engine.rawFrames).catch(() => false);
         if (!ok) {
           setSaveFailed(true);
           return;

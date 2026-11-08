@@ -1,0 +1,76 @@
+{
+ "versions": {
+  "python": "3.14.5",
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "scikit-learn": "1.9.1",
+  "tslearn": "0.10.0",
+  "ahrs": "0.4.0"
+ },
+ "svd": {
+  "max_rel_singular_value_error": 6.555710849563519e-15,
+  "loading_congruence_first3": [
+   1.0000000000000002,
+   1.0000000000000002,
+   1.0000000000000002
+  ],
+  "ts_ms": 43.32239999999999,
+  "numpy_ms": 3.613900000345893
+ },
+ "madgwick": {
+  "max_orientation_difference_deg": 2.9575586669421963e-06,
+  "median_deg": 0.0,
+  "ts_ms": 2.065999999999974,
+  "ahrs_ms": 51.54239999683341
+ },
+ "dtw_equal_length_banded": {
+  "max_abs_diff_sakoe_chiba_r5": 0.0,
+  "note": "unequal lengths: tslearn widens the unscaled diagonal by |n-m| (width = |n-m| + r); NeuroMove uses the slope-scaled diagonal +- r. MCSE applies DTW to equal-length (101-sample) curves only."
+ },
+ "dtw": {
+  "max_abs_diff_unconstrained": 0.0,
+  "max_abs_diff_sakoe_chiba_r5": 4.530578847819286,
+  "ts_banded_first5": [
+   2.1185132976296144,
+   2.543955879471886,
+   3.346074713874286,
+   5.378420487319073,
+   9.067435685607384
+  ],
+  "tslearn_banded_first5": [
+   2.1185132976296144,
+   2.543955879471886,
+   3.346074713874286,
+   4.89533485725589,
+   7.33267562884089
+  ],
+  "ts_ms_unconstrained": 3.885600000000011,
+  "tslearn_ms_both": 4531.295500004489
+ },
+ "gmm": {
+  "sklearn_bic": [
+   841.7635828324476,
+   779.8505677289633,
+   711.7276898569372,
+   723.0997714340141
+  ],
+  "ts_bic": [
+   841.7635828324476,
+   779.8505695192911,
+   711.7276900765587,
+   726.7951670851214
+  ],
+  "max_abs_loglik_diff": 1.8476978255536665,
+  "ari_labels_K3_vs_sklearn": 1.0,
+  "bic_argmin_ts": 3,
+  "bic_argmin_sklearn": 3,
+  "ts_ms": 39.04730000000001,
+  "sklearn_ms": 279.5542999956524
+ },
+ "ward": {
+  "ari_vs_scipy": 1.0
+ },
+ "ari": {
+  "abs_diff_vs_sklearn": 0.0
+ }
+}

@@ -21,6 +21,9 @@ Hardware (ESP32 + 3 × MPU-6050) and firmware were not changed.
 | Study design | [experimental-protocols.md](experimental-protocols.md) | `website/src/lab/protocol.ts`, `#/research/designer` |
 | Foundation model | [foundation-model-roadmap.md](foundation-model-roadmap.md), [dataset-specification.md](dataset-specification.md), [model-evaluation-plan.md](model-evaluation-plan.md) | `website/src/lab/{readiness,representation}.ts` |
 | Architecture and lineage | [../website/docs/architecture/computational-motor-learning.md](../website/docs/architecture/computational-motor-learning.md), [data-lineage.md](../website/docs/architecture/data-lineage.md) | `website/src/lab/runs.ts`, `hash.ts` |
+| Coordination & strategy engine (MCSE) | [mcse-report.md](mcse-report.md), [coordination-feasibility.md](coordination-feasibility.md), [mcse-validation.md](mcse-validation.md), [data/mcse-validation.json](data/mcse-validation.json) | `website/src/lab/coord/`, `#/research/coordination` |
+| MCSE guide for developers and testers (RU) | [../website/docs/MCSE_GUIDE.md](../website/docs/MCSE_GUIDE.md) | — |
+| MCSE prior art and dependencies | [open-source-landscape.md](open-source-landscape.md), [prior-art-analysis.md](prior-art-analysis.md), [algorithm-benchmarking.md](algorithm-benchmarking.md), [software-dependency-decisions.md](software-dependency-decisions.md) | `research/benchmarks/` |
 | Final report | [FINAL_REPORT.md](FINAL_REPORT.md) | — |
 
 ## Running

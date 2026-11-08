@@ -8,6 +8,7 @@ import { ReadinessPage } from './ReadinessPage';
 import { RunReportPage, RunsPage } from './RunsPage';
 import { StudyDesignerPage } from './StudyDesignerPage';
 import { TwinPage } from './TwinPage';
+import { CoordinationPage } from './coordination/CoordinationPage';
 
 export default function MotorLabRoute({ route }: { route: Route }) {
   switch (route.name) {
@@ -27,6 +28,8 @@ export default function MotorLabRoute({ route }: { route: Route }) {
       return <RunReportPage id={route.id} />;
     case 'labReadiness':
       return <ReadinessPage />;
+    case 'labCoordination':
+      return <CoordinationPage participant={route.participant} exercise={route.exercise} />;
     default:
       return null;
   }

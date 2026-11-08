@@ -1,0 +1,50 @@
+{
+ "generatedAt": "2026-11-08T10:09:16.866Z",
+ "note": "POST-HOC characterisation, nPer = 24, 20 replicates, same seeds scheme as V7",
+ "v7": [
+  {
+   "condition": "equal outcome, arm vs trunk-assisted (one session)",
+   "verdicts": {
+    "dissociation": 19,
+    "outcome_not_equivalent": 1
+   },
+   "rate": 0.95,
+   "target": "dissociation"
+  },
+  {
+   "condition": "equal outcome, trunk-assisted vs trunk-leading — timing only (one session)",
+   "verdicts": {
+    "dissociation": 19,
+    "outcome_not_equivalent": 1
+   },
+   "rate": 0.95,
+   "target": "dissociation"
+  },
+  {
+   "condition": "same strategy, two random sets (one session)",
+   "verdicts": {
+    "no_coordination_difference": 19,
+    "outcome_not_equivalent": 1
+   },
+   "rate": 0.95,
+   "target": "no_coordination_difference"
+  },
+  {
+   "condition": "same strategy, outcome 120° vs 96° (one session)",
+   "verdicts": {
+    "outcome_not_equivalent": 20
+   },
+   "rate": 1,
+   "target": "outcome_not_equivalent"
+  },
+  {
+   "condition": "same strategy, two sessions with re-attached sensors (cross-session rule)",
+   "verdicts": {
+    "within_replacement_margin": 19,
+    "outcome_not_equivalent": 1
+   },
+   "rate": 1,
+   "target": "not_dissociation"
+  }
+ ]
+}

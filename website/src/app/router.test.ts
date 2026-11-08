@@ -29,6 +29,8 @@ describe('маршруты', () => {
       { name: 'labRuns' },
       { name: 'labRun', id: 'run_abc' },
       { name: 'labReadiness' },
+      { name: 'labCoordination', participant: 'p_1', exercise: 'shoulder_flexion' },
+      { name: 'labCoordination', participant: null, exercise: null },
     ];
     for (const route of routes) expect(parseHash(href(route))).toEqual(route);
   });
