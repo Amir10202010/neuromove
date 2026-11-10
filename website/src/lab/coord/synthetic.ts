@@ -65,6 +65,25 @@ export interface Perturbations {
   dropProbability?: number;
   /** Sensor removed from the whole recording. */
   removeSensor?: Placement | null;
+  /**
+   * Sensor strapped at a different place on its segment: displacement in metres along the sensor's own axes
+   * (X = along the bone). Used by the re-attachment study (lab/measure/placement.ts).
+   */
+  sensorShiftM?: Partial<Record<Placement, Vec3>>;
+  /**
+   * The participant does NOT reproduce the calibration posture: during the calibration window the instrumented arm
+   * is held this many degrees away from hanging (flexion = forward, abduction = sideways) and the trunk is pitched
+   * this much; the posture relaxes to the true resting pose between calibration end (4.0 s) and the first movement.
+   */
+  calibrationPosture?: { flexion?: number; abduction?: number; trunkPitch?: number };
+  /**
+   * Fixed seed of the sensor set (mount misalignment, gyroscope and accelerometer bias). By default every session
+   * draws a new mount (sensors re-attached); the same value in several sessions keeps the SAME mount, so that a
+   * within-mount comparison is possible.
+   */
+  mountSeed?: number;
+  /** Independent per-sample sensor noise for the same mount (requires nothing else); default: one generator for both. */
+  noiseSeed?: number;
 }
 
 export interface SynthSessionSpec {
@@ -159,8 +178,17 @@ export function generateSession(spec: SynthSessionSpec): SynthRecording {
   const total = t + 1.5;
   const flex = spec.exercise === 'shoulder_flexion';
 
+  const cp = spec.perturb?.calibrationPosture;
   const poseAt = (time: number): Pose => {
     const pose = restingPose();
+    if (cp && time < 4.45) {
+      // held during calibration (which ends at 4.0 s), relaxed by a minimum-jerk transition before the first movement
+      const w = time <= 4 ? 1 : 1 - minJerk((time - 4) / 0.45);
+      const arm = spec.side === 'right' ? pose.right : pose.left;
+      arm.flexion += w * (cp.flexion ?? 0);
+      arm.abduction += w * (cp.abduction ?? 0);
+      pose.trunkPitch += w * (cp.trunkPitch ?? 0);
+    }
     for (const p of plans) {
       const s = p.spec;
       const outEnd = Math.max(p.dur, p.trunkDelay + p.dur * s.trunkDurScale, p.elbowDelay + p.dur * s.elbowDurScale);
@@ -185,8 +213,9 @@ export function generateSession(spec: SynthSessionSpec): SynthRecording {
 
   // ── sensors ──
   const placements: Placement[] = ['trunk', spec.side === 'right' ? 'upper_r' : 'upper_l', spec.side === 'right' ? 'fore_r' : 'fore_l'];
-  const imu = new ImuSimulator(spec.seed ^ 0x9e3779b9, rate);
   const pr = spec.perturb ?? {};
+  const imu = new ImuSimulator(pr.mountSeed !== undefined ? pr.mountSeed : spec.seed ^ 0x9e3779b9, rate, pr.noiseSeed);
+  if (pr.sensorShiftM) for (const p of placements) imu.setPositionShift(p, pr.sensorShiftM[p] ?? null);
   if (pr.noiseFactor && pr.noiseFactor !== 1) for (const p of placements) imu.setNoiseFactor(p, pr.noiseFactor);
   const extra: Partial<Record<Placement, Mat3>> = {};
   if (pr.extraMisalignDeg) for (const p of placements) extra[p] = rotAxis([rng.normal(), rng.normal(), rng.normal()], pr.extraMisalignDeg * DEG);

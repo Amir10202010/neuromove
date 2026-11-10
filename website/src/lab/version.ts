@@ -26,6 +26,27 @@ export const LAB_VERSIONS = {
  */
 export const COORD_VERSION = 'nm-lab-coord 1.0.0';
 
+/**
+ * Research-frontier engines added on 2026-11-10: measurement science (lab/measure), strategy profiles and
+ * flexibility (lab/coord/profile.ts, flexibility.ts), the learning observatory (lab/observatory), the layered twin
+ * and population model (lab/twin), the ground-truth scenario engine and benchmark registry (lab/scenario), the
+ * discovery layer (lab/discovery) and measurement planning (lab/design). Kept OUT of LAB_VERSIONS for the same reason
+ * as COORD_VERSION: none of them changes a number of a frozen learning-analysis run.
+ *
+ * Rule (same as above): bump a component whenever its numbers can change for the same input.
+ */
+export const FRONTIER_VERSIONS = {
+  measure: 'nm-lab-measure 1.0.0',
+  strategy: 'nm-lab-strategy 1.0.0',
+  observatory: 'nm-lab-observatory 1.0.0',
+  twin: 'nm-lab-twin 1.0.0',
+  scenario: 'nm-lab-scenario 1.0.0',
+  discovery: 'nm-lab-discovery 1.0.0',
+  design: 'nm-lab-design 1.0.0',
+} as const;
+
+export type FrontierComponent = keyof typeof FRONTIER_VERSIONS;
+
 export type LabComponent = keyof typeof LAB_VERSIONS;
 
 /** One string for the whole engine — shown in reports. */

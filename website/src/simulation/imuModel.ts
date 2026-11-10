@@ -6,7 +6,7 @@
 import { ACC_LSB_PER_G, GYRO_LSB_PER_DPS, INT16_MAX } from '../core/imu';
 import { PLACEMENTS, type Placement, type RawFrame } from '../devices/types';
 import { createRng, type Rng } from '../lib/random';
-import { DEG, applyT, mul, rotAxis, transpose, type Mat3, type Vec3 } from '../lib/vec3';
+import { DEG, add, apply, applyT, mul, rotAxis, transpose, type Mat3, type Vec3 } from '../lib/vec3';
 import { bodyKinematics, type Pose } from './kinematics';
 
 const G = 9.81;
@@ -33,15 +33,25 @@ interface SensorState {
   /** Номер последнего кадра, где датчик считался: пропуск — прошлые значения не годятся. */
   lastSeq: number;
   noiseFactor: number;
+  /** Displacement of the sensor from its nominal place on the segment, metres, in the sensor's own axes; null = nominal. */
+  shift: Vec3 | null;
 }
 
 export class ImuSimulator {
   private readonly rng: Rng;
+  /** Source of the per-sample sensor noise. The same generator as the mount unless a separate noise seed is given. */
+  private readonly noiseRng: Rng;
   private readonly sensors: Record<Placement, SensorState>;
   readonly rateHz: number;
 
-  constructor(seed: number, rateHz = 100) {
+  /**
+   * `noiseSeed` (optional): draw the per-sample noise from its own generator, so that the SAME mount (misalignment,
+   * biases — from `seed`) can be recorded with independent noise realisations (uncertainty validation,
+   * lab/measure/uncertainty.ts). Without it the behaviour is exactly as before: one generator for everything.
+   */
+  constructor(seed: number, rateHz = 100, noiseSeed?: number) {
     this.rng = createRng(seed);
+    this.noiseRng = noiseSeed === undefined ? this.rng : createRng(noiseSeed);
     this.rateHz = rateHz;
     const s = {} as Record<Placement, SensorState>;
     for (const p of PLACEMENTS) {
@@ -55,6 +65,7 @@ export class ImuSimulator {
         prevP2: null,
         lastSeq: -2,
         noiseFactor: 1,
+        shift: null,
       };
     }
     this.sensors = s;
@@ -63,6 +74,15 @@ export class ImuSimulator {
   /** Сбой «шумный датчик»: плохо прилегает ремешок, помехи. factor = 1 — норма. */
   setNoiseFactor(p: Placement, factor: number): void {
     this.sensors[p].noiseFactor = factor;
+  }
+
+  /**
+   * Sensor strapped at a different place on the segment (re-attachment study, lab/measure/placement.ts): `shift` is
+   * the displacement in metres along the sensor's own axes (X = along the bone). Orientation is unchanged — only the
+   * linear acceleration the accelerometer sees changes. Default: nominal position (output identical to before).
+   */
+  setPositionShift(p: Placement, shift: Vec3 | null): void {
+    this.sensors[p].shift = shift && (shift[0] !== 0 || shift[1] !== 0 || shift[2] !== 0) ? shift : null;
   }
 
   /** После обрыва связи прошлые отсчёты не годятся для производных. */
@@ -89,7 +109,7 @@ export class ImuSimulator {
       }
       st.lastSeq = seq;
       const R = mul(kin[p].R, st.misalign);
-      const pos = kin[p].p;
+      const pos = st.shift ? add(kin[p].p, apply(kin[p].R, st.shift)) : kin[p].p;
 
       // Линейное ускорение — вторая разность положения
       let a: Vec3 = [0, 0, 0];
@@ -121,8 +141,8 @@ export class ImuSimulator {
       const nf = st.noiseFactor;
       const raw = new Int16Array(6);
       for (let i = 0; i < 3; i++) {
-        const av = (acc[i] as number) + (st.accBias[i] as number) + this.rng.normal(0, NORMAL_NOISE.acc * nf);
-        const gv = (gyro[i] as number) + (st.gyroBias[i] as number) + this.rng.normal(0, NORMAL_NOISE.gyro * nf);
+        const av = (acc[i] as number) + (st.accBias[i] as number) + this.noiseRng.normal(0, NORMAL_NOISE.acc * nf);
+        const gv = (gyro[i] as number) + (st.gyroBias[i] as number) + this.noiseRng.normal(0, NORMAL_NOISE.gyro * nf);
         raw[i] = quantize(av * ACC_LSB_PER_G);
         raw[i + 3] = quantize(gv * GYRO_LSB_PER_DPS);
       }
