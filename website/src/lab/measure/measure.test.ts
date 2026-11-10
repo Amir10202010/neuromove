@@ -137,13 +137,17 @@ describe('sensor placement', () => {
     expect(comparePlacement(mount, mount).level).toBe('high');
     // strap tilted by 8° about the sensor Y axis → calibration "up" moves 8° → worst-case angle bias 11°
     const tilted = virtualRemount(base.frames, 'upper_r', rotAxis([0, 1, 0], 8 * DEG));
-    const ft = recordingFeatures(tilted, base.meta, 'shoulder_flexion');
+    // a separate recording (its own id): within ONE recording there is no re-attachment to allow for
+    const ft = recordingFeatures(tilted, { ...base.meta, id: 'syn-remounted' }, 'shoulder_flexion');
     const c = comparePlacement(mount, mountDiagnostics(tilted, ft.cs, ft.reps, 'shoulder_flexion'));
     const up = c.sensors.find((s) => s.role === 'upper')!;
     expect(up.deltaTiltDeg!).toBeGreaterThan(7);
     expect(up.deltaTiltDeg!).toBeLessThan(9);
     expect(c.level).toBe('low');
-    expect(c.expectedBias.find((b) => b.quantity.startsWith('upper-arm'))!.value).toBeGreaterThan(9);
+    const bias = c.expectedBias.find((b) => b.quantity.startsWith('upper-arm'))!;
+    expect(bias.value).toBeGreaterThan(9);
+    // the attribution bound adds the strap-tilt allowance (tilt and posture can cancel)
+    expect(bias.attributionBound).toBeCloseTo(bias.value + 1.4 * 5, 6);
     // …and yet the measured outcome did not change at all (rotation-invariant): the bound is about POSTURE, which
     // the sensors cannot tell from tilt — the confidence is honest about not knowing which it was.
     expect(Math.abs(ft.reps[0]!.values.outcome! - fb.reps[0]!.values.outcome!)).toBeLessThan(0.05);

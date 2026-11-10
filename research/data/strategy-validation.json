@@ -1,0 +1,238 @@
+{
+ "started": "2026-11-10T17:28:01.280Z",
+ "finished": "2026-11-10T17:30:42.739Z",
+ "full": true,
+ "node": "v24.16.0",
+ "records": [
+  {
+   "id": "S1a",
+   "name": "Same outcome, different strategy: detection",
+   "purpose": "When two blocks reach the same arm inclination with different trunk involvement, do the profiles differ in the trunk features?",
+   "assumptions": "Arm-dominant vs trunk-assisted repetitions (both ≈ 120° world arm inclination), 12 per block, same sensors on, MPU-6050 noise",
+   "groundTruth": "Strategies differ by 18° of trunk pitch; the task outcome is equal by construction",
+   "metric": "share of replicates where trunk pitch excursion AND trunk contribution are \"beyond_noise\"",
+   "criterion": "≥ 0.9",
+   "cases": 40,
+   "value": 1,
+   "detail": {
+    "ci95": "[0.912, 1]",
+    "outcome_equivalent_within_5deg": 0.35,
+    "trunk_roll_called_different": 0
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "a strategy difference in a channel the sensors do not observe (scapula, wrist) is invisible",
+    "outcome equivalence needs ≥ ≈ 12 repetitions per block at 6° outcome SD"
+   ],
+   "mode": "full",
+   "component": "strategy",
+   "version": "nm-lab-strategy 1.0.0"
+  },
+  {
+   "id": "S1b",
+   "name": "Same outcome, different strategy: the outcome is not called different",
+   "purpose": "Is the task outcome falsely reported as changed when only the strategy differs, and are trunk features falsely different when nothing differs?",
+   "assumptions": "As S1a; plus a null comparison of two blocks of the same strategy",
+   "groundTruth": "Equal outcome; identical strategy in the null comparison",
+   "metric": "largest of: share with outcome \"beyond_noise\"; share of null comparisons with a trunk feature \"beyond_noise\"",
+   "criterion": "≤ 0.1",
+   "cases": 80,
+   "value": 0.05,
+   "detail": {
+    "outcome_called_different": 0,
+    "null_trunk_called_different": 0.05
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "per-feature tests at 5 % each: with 15 features about one spurious \"beyond_noise\" per two comparisons is expected somewhere — only pre-named features should be read"
+   ],
+   "mode": "full",
+   "component": "strategy",
+   "version": "nm-lab-strategy 1.0.0"
+  },
+  {
+   "id": "S2",
+   "name": "No change, sensors re-attached",
+   "purpose": "When the movement is unchanged but the sensors are re-attached and the calibration posture is off by 3–8°, is a change of the movement reported?",
+   "assumptions": "Identical movement plan in both sessions; new strap misalignment, offsets and biases; arm held 3–8° forward in the second calibration",
+   "groundTruth": "No change of the movement; the measured outcome shifts by about the posture error",
+   "metric": "largest of: share where the outcome difference is \"beyond_noise\" (not attributed to placement); share where 4 re-attached sessions are said to exceed measurement explanations",
+   "criterion": "≤ 0.1",
+   "cases": 80,
+   "value": 0.125,
+   "detail": {
+    "outcome_beyond_noise": 0.125,
+    "placement_flagged_not_high": 1,
+    "partition_exceeds": 0,
+    "mean_outcome_shift_deg": -5.66,
+    "replacement_margin_deg": 2.5
+   },
+   "pass": false,
+   "knownFailureModes": [
+    "the guard works by REFUSING to attribute: a real change of the same size as the placement bound is also reported as \"within_placement\"",
+    "a posture error that leaves the calibration tilt unchanged (e.g. compensated by strap tilt) is not flagged"
+   ],
+   "mode": "full",
+   "component": "strategy",
+   "version": "nm-lab-strategy 1.0.0"
+  },
+  {
+   "id": "S3a",
+   "name": "Flexibility index: no false adaptation under pure scaling",
+   "purpose": "If the child reaches a higher target with the SAME organisation scaled up, is \"condition-dependent organisation\" reported?",
+   "assumptions": "Two target heights interleaved in one session, 12 repetitions each; the low-target movement is the high-target movement at 75 % amplitude; share curves",
+   "groundTruth": "Organisation identical (shares equal)",
+   "metric": "share of replicates with verdict condition_dependent_organisation",
+   "criterion": "≤ 0.1",
+   "cases": 40,
+   "value": 0.025,
+   "detail": {
+    "median_index_under_scaling": 0,
+    "ci95": "[0.004, 0.129]"
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "forearm inclination and elbow flexion are excluded: their dynamic error grows with speed² and faked adaptation in 3 of 8 development sessions",
+    "a fixed (non-scaling) movement component, e.g. a constant trunk sway, makes shares differ between amplitudes and is read as adaptation",
+    "timing differences between conditions survive landmark registration only partly"
+   ],
+   "mode": "full",
+   "component": "strategy",
+   "version": "nm-lab-strategy 1.0.0"
+  },
+  {
+   "id": "S3b",
+   "name": "Flexibility index: power for a real change of organisation",
+   "purpose": "If the low target is reached with the arm alone and the high target with trunk assistance, is it detected?",
+   "assumptions": "As S3a; low target arm-only (0° trunk), high target trunk-assisted (18° trunk)",
+   "groundTruth": "Organisation differs between conditions",
+   "metric": "share of replicates with verdict condition_dependent_organisation",
+   "criterion": "≥ 0.8",
+   "cases": 40,
+   "value": 1,
+   "detail": {
+    "median_index": 6.95,
+    "conditions_in_separate_sessions_called_confounded": 1
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "conditions recorded in different sessions are refused (confounded with re-attachment) however large the difference"
+   ],
+   "mode": "full",
+   "component": "strategy",
+   "version": "nm-lab-strategy 1.0.0"
+  },
+  {
+   "id": "S4",
+   "name": "Trunk–outcome trade-off: recovery of the pass-through",
+   "purpose": "Is the share of trunk variation that passes into the task outcome recovered when the arm fully compensates (0) and when it does not (1)?",
+   "assumptions": "Sagittal arm raising, 24 repetitions, trunk pitch SD 5°; planar chain outcome = arm relative to trunk − trunk pitch; trunk noise 0.04°",
+   "groundTruth": "pass-through 0 (shoulder = 120° + pitch) and 1 (shoulder independent of pitch)",
+   "metric": "largest |mean estimated pass-through − truth| over the two designs",
+   "criterion": "≤ 0.25",
+   "cases": 80,
+   "value": 0.027,
+   "detail": {
+    "mean_compensated": 0.027,
+    "mean_independent": 0.999,
+    "ci95_coverage": 0.938,
+    "compensated:outcome_preserved_against_trunk_variation": 40,
+    "independent:trunk_variation_passes_into_outcome": 32,
+    "independent:between": 7,
+    "independent:reinforcing": 1
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "out-of-plane arm movement breaks the planar model (refused below planarity 0.9)",
+    "if the trunk barely varies the slope is undefined (refused below 1° SD)",
+    "a common drive (both trunk and arm larger on \"effortful\" repetitions) is read as pass-through > 1, not as compensation"
+   ],
+   "mode": "full",
+   "component": "strategy",
+   "version": "nm-lab-strategy 1.0.0"
+  },
+  {
+   "id": "S5a",
+   "name": "Movement signature: identification across re-attached sessions",
+   "purpose": "Is a participant's second session matched to their own first session when participants differ in their movement organisation?",
+   "assumptions": "8 synthetic participants with individual shoulder/trunk/elbow amplitudes, trunk timing and speed; 2 sessions × 8 repetitions; sensors re-attached between sessions",
+   "groundTruth": "Each participant has their own generating parameters",
+   "metric": "mean identification rate (chance = 1 / participants)",
+   "criterion": "≥ 0.6",
+   "cases": 20,
+   "value": 0.956,
+   "detail": {
+    "chance": 0.125,
+    "significant_share": 1,
+    "most_person_specific_feature": "shoulder_flexion:exc_trunk_pitch"
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "synthetic participants differ far more cleanly than real children; real identification is unknown",
+    "features sensitive to placement (elbow, trunk roll) would masquerade as signature if a participant always wore the sensors the same wrong way"
+   ],
+   "mode": "full",
+   "component": "strategy",
+   "version": "nm-lab-strategy 1.0.0"
+  },
+  {
+   "id": "S5b",
+   "name": "Movement signature: no signature when participants do not differ",
+   "purpose": "Is a signature reported when every participant moves by the same generating parameters?",
+   "assumptions": "8 participants with identical parameters; only repetition variability and re-attachment differ",
+   "groundTruth": "No person-specific information",
+   "metric": "share of replicates with verdict reproducible_signature",
+   "criterion": "≤ 0.1",
+   "cases": 20,
+   "value": 0,
+   "detail": {},
+   "pass": true,
+   "knownFailureModes": [],
+   "mode": "full",
+   "component": "strategy",
+   "version": "nm-lab-strategy 1.0.0"
+  },
+  {
+   "id": "S6a",
+   "name": "Strategy shift: false alarms under a stable mixture",
+   "purpose": "With one stable 50/50 mixture of two strategies over 5 sessions, how often is a shift reported?",
+   "assumptions": "5 sessions × 10 confidently assigned repetitions, independent assignments",
+   "groundTruth": "Constant share 0.5",
+   "metric": "share of replicates with verdict shift_detected",
+   "criterion": "≤ 0.1",
+   "cases": 400,
+   "value": 0.038,
+   "detail": {
+    "ci95": "[0.023, 0.061]"
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "assignments within a session are not independent if strategies persist in runs: the permutation is then anti-conservative"
+   ],
+   "mode": "full",
+   "component": "strategy",
+   "version": "nm-lab-strategy 1.0.0"
+  },
+  {
+   "id": "S6b",
+   "name": "Strategy shift: power for a switch",
+   "purpose": "Is a change of the share from 0.2 to 0.8 between sessions 2 and 3 detected?",
+   "assumptions": "As S6a",
+   "groundTruth": "Share 0.2, 0.2, 0.8, 0.8, 0.8",
+   "metric": "share of replicates with verdict shift_detected",
+   "criterion": "≥ 0.8",
+   "cases": 400,
+   "value": 0.963,
+   "detail": {
+    "power_for_a_gradual_change_0_2_to_0_8": 0.763
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "a single split describes a gradual change poorly: power is lower and the split position is not meaningful"
+   ],
+   "mode": "full",
+   "component": "strategy",
+   "version": "nm-lab-strategy 1.0.0"
+  }
+ ]
+}

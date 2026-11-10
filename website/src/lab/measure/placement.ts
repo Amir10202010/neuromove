@@ -221,10 +221,27 @@ export interface PlacementConfidence {
     /** Angle between the functional axes, degrees (null when either is missing). */
     deltaAxisDeg: number | null;
   }[];
-  /** Worst-case bias each difference could cause, in the units of the affected quantity. */
-  expectedBias: { quantity: string; value: number; unit: string; basis: string }[];
+  /**
+   * Bias each observed difference indicates (`value`), and the bound below which a difference between the two
+   * recordings cannot be attributed to the movement (`attributionBound` = value computed with the strap-tilt
+   * allowance added to the observed tilt difference), in the units of the affected quantity.
+   */
+  expectedBias: { quantity: string; value: number; attributionBound: number; unit: string; basis: string }[];
   reasons: string[];
 }
+
+/**
+ * Strap tilt and calibration posture both move the calibration "up" direction, and they can CANCEL: a posture error
+ * of 7° with a strap tilted 3° the other way shows as a 4° difference. The difference seen in the recording
+ * therefore UNDER-states the posture error by up to the change of strap tilt. Found by benchmark S2 (run 1,
+ * 2026-11-10: 5 of 40 unchanged, re-attached sessions had an outcome shift larger than 1.4 × the observed
+ * difference). The allowance is the largest strap misalignment of the simulator's mount model (2–5° per mount) —
+ * PROVISIONAL, like REPLACEMENT_MARGIN_DEG: a real re-donning study must replace it.
+ * Consequence, stated plainly: between two separately mounted sessions, an angle difference below about
+ * 1.4 × (observed tilt difference + 5°) ≈ 7° or more cannot be attributed to the movement from two sessions alone.
+ * A series of sessions does not need this bound — the person's own day-to-day SD (measure/envelope.ts) covers it.
+ */
+export const STRAP_TILT_ALLOWANCE_DEG = 5;
 
 /** Thresholds are the engine's existing margins — no new constant: re-placement margin (2.5°) and equivalence margin (5°). */
 export const PLACEMENT_RULE = { highDeg: REPLACEMENT_MARGIN_DEG, mediumDeg: DEFAULT_DISSOCIATION.marginDeg } as const;
@@ -251,18 +268,20 @@ export function comparePlacement(reference: MountDiagnostics | null, current: Mo
     if (s.deltaTiltDeg !== null) {
       known = true;
       const v = REATTACHMENT_SENSITIVITY.anglePerPostureDeg * s.deltaTiltDeg;
-      expectedBias.push({ quantity: s.role === 'trunk' ? 'trunk tilt' : `${s.role === 'upper' ? 'upper-arm' : 'forearm'} inclination and range of motion`, value: v, unit: '°', basis: 'if the calibration-pose difference is posture rather than strap tilt (the two cannot be told apart), in-plane angles shift by up to this much' });
+      const same = reference.recordingId === current.recordingId;
+      expectedBias.push({ quantity: s.role === 'trunk' ? 'trunk tilt' : `${s.role === 'upper' ? 'upper-arm' : 'forearm'} inclination and range of motion`, value: v, attributionBound: same ? 0 : REATTACHMENT_SENSITIVITY.anglePerPostureDeg * (s.deltaTiltDeg + STRAP_TILT_ALLOWANCE_DEG), unit: '°', basis: 'if the calibration-pose difference is posture rather than strap tilt (the two cannot be told apart), in-plane angles shift by up to this much' });
       worst = Math.max(worst, v);
     }
     if (s.deltaAxisDeg !== null && s.role === 'upper') {
       const v = elbowErrorBound(s.deltaAxisDeg);
-      expectedBias.push({ quantity: 'elbow flexion excursion', value: v, unit: '°', basis: 'if the axis difference is rotation of the upper-arm sensor about the bone rather than a different movement plane' });
+      expectedBias.push({ quantity: 'elbow flexion excursion', value: v, attributionBound: v, unit: '°', basis: 'if the axis difference is rotation of the upper-arm sensor about the bone rather than a different movement plane' });
       worst = Math.max(worst, v);
     }
   }
   if (!known || reasons.length) return { level: 'unknown', reference: reference.recordingId, sensors, expectedBias, reasons: reasons.length ? reasons : ['no_common_calibrated_sensor'] };
   if (sensors.some((s) => s.deltaAxisDeg === null && s.role !== 'trunk')) reasons.push('functional_axis_not_comparable_(needs_the_same_exercise_with_≥_3_repetitions_in_both_recordings)');
   reasons.push('trunk_sensor_rotation_about_the_vertical_is_not_observable');
+  reasons.push('strap_tilt_and_posture_can_cancel_in_the_calibration_direction:_high_means_consistent_with_unchanged_placement,_not_proof_of_it');
   const level: PlacementLevel = worst <= PLACEMENT_RULE.highDeg ? 'high' : worst <= PLACEMENT_RULE.mediumDeg ? 'medium' : 'low';
   if (level !== 'high') reasons.push(`worst_case_bias_${worst.toFixed(1)}°_exceeds_${level === 'medium' ? PLACEMENT_RULE.highDeg : PLACEMENT_RULE.mediumDeg}°`);
   return { level, reference: reference.recordingId, sensors, expectedBias, reasons };
