@@ -1,0 +1,320 @@
+{
+ "started": "2026-11-10T17:49:31.233Z",
+ "finished": "2026-11-10T17:52:54.395Z",
+ "full": true,
+ "node": "v24.16.0",
+ "records": [
+  {
+   "id": "O1",
+   "name": "Change detection: false alarms under no change",
+   "purpose": "How often does the primary detector signal a change in a series that has none, when the level and spread are learned from the series itself?",
+   "assumptions": "Independent normal session means, no change; 10 or 20 sessions; self-starting residuals",
+   "groundTruth": "No change",
+   "metric": "largest series-wise false-alarm probability of the CUSUM over the two horizons",
+   "criterion": "≤ 0.06 (nominal 0.05)",
+   "cases": 8000,
+   "value": 0.057,
+   "detail": {
+    "cusum_h10": 0.057,
+    "ewma_h10": 0.057,
+    "shewhart_h10": 0.053,
+    "cusum_h20": 0.053,
+    "ewma_h20": 0.056,
+    "shewhart_h20": 0.052
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "autocorrelated or heavy-tailed day-to-day variation (O4, O5)",
+    "series longer than the design horizon"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  },
+  {
+   "id": "O2",
+   "name": "Change detection: power and delay for a step",
+   "purpose": "How large must a lasting change of level be, and how many sessions does it take, before it is signalled?",
+   "assumptions": "20 sessions, step after session 8, in units of the day-to-day SD of a session mean",
+   "groundTruth": "Step of 1–3 SD",
+   "metric": "power for a 2 SD step (alarm at or after the change)",
+   "criterion": "≥ 0.8",
+   "cases": 20000,
+   "value": 0.769,
+   "detail": {
+    "power_step_1sd": 0.26,
+    "median_delay_sessions_1sd": 6,
+    "power_step_1.5sd": 0.503,
+    "median_delay_sessions_1.5sd": 6,
+    "power_step_2sd": 0.769,
+    "median_delay_sessions_2sd": 5,
+    "power_step_3sd": 0.97,
+    "median_delay_sessions_3sd": 4,
+    "power_step_2sd_10_sessions_after_4": 0.354
+   },
+   "pass": false,
+   "knownFailureModes": [
+    "a self-starting chart absorbs an undetected shift into its own mean and spread: small steps are missed permanently",
+    "with 10 sessions and a change after the 4th the power is low — \"no signal\" is not evidence of stability"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  },
+  {
+   "id": "O3",
+   "name": "Change detection: missing sessions",
+   "purpose": "Do missing sessions create false alarms, and how much do they hide a real decline — especially when poor sessions are the ones that go missing?",
+   "assumptions": "20 planned sessions; 30 % missing at random, or sessions more than 0.5 SD below the starting level missed with probability 0.6; nothing is interpolated",
+   "groundTruth": "No change, or a decline of 2 SD after session 8",
+   "metric": "false-alarm probability with 30 % of sessions missing at random",
+   "criterion": "≤ 0.06",
+   "cases": 20000,
+   "value": 0.029,
+   "detail": {
+    "power_decline_all_sessions": 0.79,
+    "power_decline_30pct_missing_at_random": 0.408,
+    "false_alarm_missing_when_poor": 0.036,
+    "power_decline_missing_when_poor": 0.416
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "sessions missed BECAUSE performance was poor hide a decline: the power falls and nothing in the data reveals it — the reason for a missed session must be recorded"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  },
+  {
+   "id": "O4",
+   "name": "Change detection: autocorrelated day-to-day variation",
+   "purpose": "What happens to the false-alarm probability when consecutive sessions are correlated (AR(1), ρ = 0.5) — a violation of the detector's assumption?",
+   "assumptions": "Stationary AR(1) session means, ρ = 0.5, no change of level",
+   "groundTruth": "No change",
+   "metric": "false-alarm probability of the CUSUM",
+   "criterion": "descriptive",
+   "cases": 4000,
+   "value": 0.341,
+   "detail": {
+    "nominal": 0.05
+   },
+   "pass": null,
+   "knownFailureModes": [
+    "slowly wandering performance is signalled as a change far more often than 5 %: a signal says \"not one stable level\", which a slow wander is not either"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  },
+  {
+   "id": "O5",
+   "name": "Change detection: heavy-tailed session noise",
+   "purpose": "What happens to the false-alarm probability when single sessions are occasionally far off (Student-t, 3 df)?",
+   "assumptions": "Independent t(3) session deviations scaled to unit variance, no change of level",
+   "groundTruth": "No change",
+   "metric": "false-alarm probability of the CUSUM",
+   "criterion": "descriptive",
+   "cases": 4000,
+   "value": 0.096,
+   "detail": {
+    "nominal": 0.05
+   },
+   "pass": null,
+   "knownFailureModes": [
+    "an outlying session early in the series inflates the running SD and reduces power afterwards"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  },
+  {
+   "id": "O6",
+   "name": "Bayesian change point: calibration and position",
+   "purpose": "Is strong posterior support for a change rare when there is none, and is the position of a real change recovered?",
+   "assumptions": "16 independent normal sessions; prior probability ½ of a change, uniform over its position, standardised shift ~ N(0, 1)",
+   "groundTruth": "No change, or a 2 SD step after session 8",
+   "metric": "share of unchanged series with posterior probability of a change ≥ 0.9; share of changed series with the most likely position within ±1 session",
+   "criterion": "≤ 0.05 and ≥ 0.7",
+   "cases": 4000,
+   "value": 0.004,
+   "detail": {
+    "median_posterior_no_change": 0.421,
+    "strong_support_when_changed": 0.473,
+    "position_within_1_session": 0.846
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "the posterior depends on the prior scale of the shift: it is always reported at three scales",
+    "a single change is assumed: a gradual change is described as a step somewhere in the middle"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  },
+  {
+   "id": "O7",
+   "name": "Change detection: five features monitored together",
+   "purpose": "When five features of the same sessions are monitored, is the chance of ANY false alarm still about 5 %?",
+   "assumptions": "Five independent unchanged series of 20 sessions; thresholds for α/5",
+   "groundTruth": "No change in any feature",
+   "metric": "probability that at least one of the five signals",
+   "criterion": "≤ 0.06",
+   "cases": 2000,
+   "value": 0.047,
+   "detail": {},
+   "pass": true,
+   "knownFailureModes": [
+    "real features are positively correlated: the correction is then conservative (less power), not wrong"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  },
+  {
+   "id": "O8",
+   "name": "Change detection: gradual drift",
+   "purpose": "Is a slow, steady change (0.2 SD per session from session 6) signalled, and when?",
+   "assumptions": "20 sessions; linear drift reaching 2.8 SD at the last session",
+   "groundTruth": "Drift from session 6",
+   "metric": "probability of a signal",
+   "criterion": "descriptive",
+   "cases": 4000,
+   "value": 0.865,
+   "detail": {
+    "median_sessions_from_drift_start_to_signal": 11
+   },
+   "pass": null,
+   "knownFailureModes": [
+    "a self-starting chart partly learns a slow drift as part of the normal spread"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  },
+  {
+   "id": "O9",
+   "name": "Change detection: a step caused by measurement conditions",
+   "purpose": "If the sensor-placement protocol changes at session 10 and shifts the metric by 1.5 SD, does the detector signal it?",
+   "assumptions": "The movement does not change; a constant measurement bias of 1.5 SD from session 10 (e.g. a different operator or strap position)",
+   "groundTruth": "No change of the movement",
+   "metric": "probability of a signal",
+   "criterion": "descriptive",
+   "cases": 4000,
+   "value": 0.583,
+   "detail": {},
+   "pass": null,
+   "knownFailureModes": [
+    "the detector cannot tell a change of measurement conditions from a change of the movement: every signal must be checked against placement confidence and the session log before it is interpreted (lab/discovery/explanations.ts)"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  },
+  {
+   "id": "W1",
+   "name": "Within-session pattern: none",
+   "purpose": "With no change across the repetitions of a sitting, how often is a pattern reported?",
+   "assumptions": "24 repetitions, four independent features, normal repetition noise",
+   "groundTruth": "No trend",
+   "metric": "share of sittings with any pattern other than no_trend_detected",
+   "criterion": "≤ 0.1",
+   "cases": 400,
+   "value": 0.057,
+   "detail": {
+    "insufficient_repetitions": 0,
+    "no_trend_detected": 377,
+    "practice_like": 6,
+    "decline_like": 4,
+    "rise_then_decline": 7,
+    "mixed": 6
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "run 1 failed (12.1 %): shapes were chosen by AICc alone; a permutation test per feature, Holm-adjusted, now decides whether a feature moves",
+    "features of one movement are correlated; the Holm correction assumes nothing about that and stays valid"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  },
+  {
+   "id": "W2",
+   "name": "Within-session pattern: practice-like",
+   "purpose": "Is a steady improvement of 2 repetition-SDs across a sitting recognised?",
+   "assumptions": "24 repetitions; every feature moves 2 SD in the \"up\" direction, linearly",
+   "groundTruth": "Monotone improvement",
+   "metric": "share classified practice_like",
+   "criterion": "≥ 0.8",
+   "cases": 400,
+   "value": 0.855,
+   "detail": {
+    "insufficient_repetitions": 0,
+    "no_trend_detected": 21,
+    "practice_like": 342,
+    "decline_like": 0,
+    "rise_then_decline": 1,
+    "mixed": 36
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "with 8–12 repetitions the power is much lower"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  },
+  {
+   "id": "W4",
+   "name": "Within-session pattern: decline-like",
+   "purpose": "Is a steady decline of 2 repetition-SDs across a sitting recognised — and reported as a pattern, not as fatigue?",
+   "assumptions": "As W2, in the \"down\" direction",
+   "groundTruth": "Monotone decline",
+   "metric": "share classified decline_like",
+   "criterion": "≥ 0.8",
+   "cases": 400,
+   "value": 0.858,
+   "detail": {
+    "insufficient_repetitions": 0,
+    "no_trend_detected": 19,
+    "practice_like": 0,
+    "decline_like": 343,
+    "rise_then_decline": 20,
+    "mixed": 18
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "fatigue, loss of attention, discomfort and boredom give the same pattern"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  },
+  {
+   "id": "W3",
+   "name": "Within-session pattern: rise then decline",
+   "purpose": "Is an improvement followed by a decline (2.5 SD up over the first half, back down over the second) recognised?",
+   "assumptions": "30 repetitions, symmetric rise and fall in every feature",
+   "groundTruth": "Rise then decline, slope change at the middle",
+   "metric": "share classified rise_then_decline",
+   "criterion": "≥ 0.6",
+   "cases": 400,
+   "value": 0.978,
+   "detail": {
+    "insufficient_repetitions": 0,
+    "no_trend_detected": 9,
+    "practice_like": 0,
+    "decline_like": 0,
+    "rise_then_decline": 391,
+    "mixed": 0,
+    "ci95": "[0.958, 0.988]"
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "a rise and fall of equal size has no linear trend: with fewer than 12 repetitions it is reported as no trend"
+   ],
+   "mode": "full",
+   "component": "observatory",
+   "version": "nm-lab-observatory 1.0.0"
+  }
+ ]
+}

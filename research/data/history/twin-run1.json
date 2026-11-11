@@ -1,0 +1,166 @@
+{
+ "started": "2026-11-10T17:58:50.316Z",
+ "finished": "2026-11-10T18:08:10.514Z",
+ "full": true,
+ "node": "v24.16.0",
+ "records": [
+  {
+   "id": "T1",
+   "name": "Population model: parameter recovery",
+   "purpose": "Does the EM fit of the random-intercept-and-slope model recover the mean change, the spread of individual levels and slopes, and the residual SD?",
+   "assumptions": "40 participants × 8 weekly sessions; normal random effects (SD 10 and 0.8/week, correlation −0.2), residual SD 3",
+   "groundTruth": "β = (100, 1.5), D and σ as stated",
+   "metric": "largest relative error of the mean estimate over replicates (ML variance estimates are biased low by ≈ 1/participants)",
+   "criterion": "≤ 0.15",
+   "cases": 200,
+   "value": 0.04,
+   "detail": {
+    "rel_error_slope": 0.012,
+    "rel_error_intercept_var": 0.02,
+    "rel_error_slope_var": 0.04,
+    "rel_error_residual_var": 0.005,
+    "converged": 200,
+    "replicates": 200
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "with ≈ 10 participants the slope variance is poorly determined",
+    "non-linear individual trajectories are forced onto lines (T2b)"
+   ],
+   "mode": "full",
+   "component": "twin",
+   "version": "nm-lab-twin 1.0.0"
+  },
+  {
+   "id": "T2",
+   "name": "Held-out participants, future sessions: calibration",
+   "purpose": "For a participant the model has never seen, are sessions 4–10 predicted from sessions 1–3 with calibrated 95 % intervals, and better than without the population?",
+   "assumptions": "30 participants × 10 weekly sessions; leave-one-participant-out; own sessions 1–3 given; linear truth",
+   "groundTruth": "Simulated future sessions of the held-out participant",
+   "metric": "coverage of the 95 % prediction intervals over all held-out future observations",
+   "criterion": "coverage within [0.9, 0.98], calibration slope within [0.85, 1.15], MAE below the individual-only line",
+   "cases": 6300,
+   "value": 0.96,
+   "detail": {
+    "coverage_ci95": "[0.955, 0.964]",
+    "mae": 4.15,
+    "mae_individual_only_line": 8.99,
+    "mae_same_as_last_session": 6.98,
+    "mae_population_only": 8.5,
+    "calibration_slope": 0.985
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "only valid for participants exchangeable with the sample the model was fitted on",
+    "synthetic participants: says nothing about real children"
+   ],
+   "mode": "full",
+   "component": "twin",
+   "version": "nm-lab-twin 1.0.0"
+  },
+  {
+   "id": "T2b",
+   "name": "Held-out participants, future sessions: misspecified shape",
+   "purpose": "What happens to the same predictions when individual trajectories level off but the model assumes straight lines?",
+   "assumptions": "30 participants × 10 weekly sessions; leave-one-participant-out; own sessions 1–3 given; saturating truth (time constant 4 weeks)",
+   "groundTruth": "Simulated future sessions of the held-out participant",
+   "metric": "coverage of the 95 % prediction intervals over all held-out future observations",
+   "criterion": "descriptive",
+   "cases": 5691,
+   "value": 0.973,
+   "detail": {
+    "coverage_ci95": "[0.968, 0.977]",
+    "mae": 3.13,
+    "mae_individual_only_line": 9.7,
+    "mae_same_as_last_session": 4.07,
+    "mae_population_only": 8.73,
+    "calibration_slope": 0.993
+   },
+   "pass": null,
+   "knownFailureModes": [
+    "a linear population model extrapolates a saturating child upwards: intervals under-cover late sessions"
+   ],
+   "mode": "full",
+   "component": "twin",
+   "version": "nm-lab-twin 1.0.0"
+  },
+  {
+   "id": "T3",
+   "name": "Prediction engine: coverage of issued intervals",
+   "purpose": "Do the model-averaged 95 % intervals for the next session contain it about 95 % of the time, whatever the true shape — and is a forecast refused when there is too little data?",
+   "assumptions": "10 weekly sessions × 3 repetitions (σε 4, σs 2.5), next session one week later; truth stationary, linear or exponential",
+   "groundTruth": "Mean of the simulated 11th session",
+   "metric": "coverage of the 95 % interval over all issued predictions",
+   "criterion": "within [0.88, 0.99] and every 4-session series refused",
+   "cases": 950,
+   "value": 0.899,
+   "detail": {
+    "stationary_coverage": 0.923,
+    "stationary_issued": 0.993,
+    "stationary_refused_interval_uninformative": 0.007,
+    "linear_coverage": 0.91,
+    "linear_issued": 1,
+    "exponential_coverage": 0.863,
+    "exponential_issued": 1,
+    "four_sessions_refused": 1
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "coverage is conditional on the day-to-day variation staying as it was",
+    "refusals remove the hardest cases from the coverage figure — the refusal rates are part of the result"
+   ],
+   "mode": "full",
+   "component": "twin",
+   "version": "nm-lab-twin 1.0.0"
+  },
+  {
+   "id": "T4",
+   "name": "Identifiability is detected, not hidden",
+   "purpose": "When two parameters or two explanations cannot be told apart from the data, does the analysis say so instead of reporting precise-looking values?",
+   "assumptions": "(a) learning with forgetting on a regular weekly schedule with constant dose; (b) a slow exponential curve (τ = 60 d) observed for 8 weekly sessions",
+   "groundTruth": "(a) forgetting and saturation are confounded by design; (b) the time constant is not bounded by 8 weeks of data",
+   "metric": "share of (a) flagged \"confounded_by_schedule\"; share of (b) with an open profile interval for the time constant",
+   "criterion": "(a) = 1; (b) ≥ 0.6; no selected model with an open interval without a warning",
+   "cases": 120,
+   "value": 1,
+   "detail": {
+    "confounded_flagged": 1,
+    "time_constant_open_interval": 0.733,
+    "selected_unidentifiable_without_warning": "never"
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "profile likelihood detects parameters the data do not bound; it does not detect a wrong model form"
+   ],
+   "mode": "full",
+   "component": "twin",
+   "version": "nm-lab-twin 1.0.0"
+  },
+  {
+   "id": "T5",
+   "name": "Learning with forgetting: retention kept apart from performance",
+   "purpose": "With known learning, a no-practice interval and a designated retention session, are immediate performance and the retained change represented separately, and is the forgetting half-life recovered with honest uncertainty?",
+   "assumptions": "Single-rate learning with forgetting (half-life 21 d, gain 0.3 units/min), 10 sessions × 5 repetitions, varying dose, breaks of 4 and 6 weeks, practice log available",
+   "groundTruth": "half-life 21 d; true retention ratio after the 6-week break 0.25",
+   "metric": "coverage of the true half-life by the 95 % profile interval; share of runs in which the designated session is a retention test without recorded practice",
+   "criterion": "coverage ≥ 0.8; retention test recognised in 100 %",
+   "cases": 60,
+   "value": 0.917,
+   "detail": {
+    "retention_test_recognised": 1,
+    "median_abs_error_of_retention_ratio": 0.06,
+    "true_retention_ratio": 0.25,
+    "median_end_of_practice_minus_retention_level": 28.7,
+    "true_difference": 27.7
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "the retention ratio of ONE session pair is noisy (session noise in numerator and denominator)",
+    "\"no practice in the delay\" comes from the practice log: reported, not observed"
+   ],
+   "mode": "full",
+   "component": "twin",
+   "version": "nm-lab-twin 1.0.0"
+  }
+ ]
+}
