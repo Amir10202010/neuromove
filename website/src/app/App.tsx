@@ -71,6 +71,7 @@ function routeTitle(route: Route, t: TFunction, codeOf: (id: string) => string |
       case 'labRun':
       case 'labReadiness':
       case 'labCoordination':
+      case 'labFrontier':
         return t('nav.research');
       case 'rehab':
       case 'rehabActivities':

@@ -596,6 +596,22 @@ const RU = {
   'insufficient (< 10 participants)': 'недостаточно (< 10 участников)',
   'limited (10–29)': 'ограниченно (10–29)',
   'adequate (≥ 30)': 'достаточно (≥ 30)',
+  // research-frontier tiles of the overview (10 Nov 2026)
+  'Research frontier': 'Передний край исследований',
+  'Measurement & observability': 'Измерение и наблюдаемость',
+  'What the sensors can and cannot observe; sensor error and placement behind every number.': 'Что датчики могут и чего не могут наблюдать; погрешность и установка датчиков за каждым числом.',
+  'Learning observatory': 'Обсерватория научения',
+  'Change detection against the personal envelope, competing explanations, what the data can separate.': 'Обнаружение изменений относительно личного коридора, конкурирующие объяснения и то, что данные способны разделить.',
+  'Strategy atlas': 'Атлас стратегий',
+  'How each raw recording was organised across trunk and arm, and what survives sensor re-attachment.': 'Как каждая сырая запись организована между туловищем и рукой и что сохраняется после переустановки датчиков.',
+  'Twin workspace': 'Рабочее пространство двойника',
+  'Twin layers, maturity level and predictions that are issued with calibration or refused.': 'Слои двойника, уровень зрелости и прогнозы, которые выдаются с калибровкой либо в которых отказывается.',
+  'Scientific sandbox': 'Научная песочница',
+  'Ground-truth scenarios and the benchmark registry, including failed criteria.': 'Сценарии с известной истиной и реестр тестов, включая невыполненные критерии.',
+  'Hypotheses': 'Гипотезы',
+  'Formal hypotheses with null, test and falsification condition, against the data that exist.': 'Формальные гипотезы с нулевой гипотезой, критерием и условием опровержения — в сопоставлении с имеющимися данными.',
+  'Report builder': 'Конструктор отчётов',
+  'Reports from frozen runs with every statement traced to its evidence.': 'Отчёты по замороженным прогонам, где каждое утверждение прослежено до свидетельств.',
 } as const;
 
 export type LKey = keyof typeof RU;

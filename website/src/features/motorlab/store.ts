@@ -21,10 +21,13 @@ import { labRecordProblem, labTransitionProblem } from '../../lab/integrity';
 import { canTransition, makeVersion, validateProtocol, type LearningProtocolDef, type LearningProtocolVersion } from '../../lab/protocol';
 import { isLabRecord, type LabRecord, type PracticeTrialSet, type TrialRecordingSetting } from '../../lab/records';
 import { createRun, type AnalysisRun } from '../../lab/runs';
+import { evidenceAllowed, evidenceRecordProblem, isEvidenceRecord, type EvidenceRecord } from '../../lab/discovery/evidenceRecord';
 
 interface LabState {
   loaded: boolean;
   records: LabRecord[];
+  /** Sealed evidence records (twin snapshots, research reports): local to this device, never synced. */
+  evidence: EvidenceRecord[];
   /** Stored records that failed the shape or hash check (kept in the database, not shown). */
   unreadable: number;
   error: string | null;
@@ -37,6 +40,8 @@ interface LabActions {
   freezeRun(o: { workspace: Workspace; participantId: string; title: string; author: string; series: readonly LearningSeries[]; config: AnalysisConfig; protocol: LearningProtocolVersion | null }): Promise<AnalysisRun | null>;
   setTrialRecording(o: { workspace: Workspace; participantId: string; enabled: boolean; consentId: string | null; author: string }): Promise<boolean>;
   saveTrialSet(set: PracticeTrialSet): Promise<boolean>;
+  /** Store a sealed evidence record locally (insert-only; no outbox op — see lab/discovery/evidenceRecord.ts). */
+  saveEvidence(rec: EvidenceRecord): Promise<boolean>;
 }
 
 const storage = () => useAppStore.getState().storage();
@@ -69,6 +74,7 @@ export const useLabStore = create<LabState & LabActions>((set, get) => {
   return {
     loaded: false,
     records: [],
+    evidence: [],
     unreadable: 0,
     error: null,
 
@@ -78,7 +84,8 @@ export const useLabStore = create<LabState & LabActions>((set, get) => {
       try {
         const all = await s.getAllResearch('lab');
         const ok = all.filter(isLabRecord);
-        set({ records: ok, unreadable: all.length - ok.length, loaded: true, error: null });
+        const evidence = all.filter(isEvidenceRecord);
+        set({ records: ok, evidence, unreadable: all.length - ok.length - evidence.length, loaded: true, error: null });
       } catch (e) {
         set({ loaded: true, error: e instanceof Error ? e.message : String(e) });
       }
@@ -119,6 +126,30 @@ export const useLabStore = create<LabState & LabActions>((set, get) => {
     async saveTrialSet(trialSet) {
       return put(trialSet, null);
     },
+
+    async saveEvidence(rec) {
+      const s = storage();
+      if (!s) return false;
+      if (evidenceRecordProblem(rec) || !evidenceAllowed(rec)) {
+        set({ error: 'invalid_record' });
+        return false;
+      }
+      // insert-only: an id is never reused for different content
+      const existing = get().evidence.find((e) => e.id === rec.id);
+      if (existing) {
+        if (existing.contentHash === rec.contentHash) return true;
+        set({ error: 'immutable' });
+        return false;
+      }
+      try {
+        await s.putResearchBatch('lab', [rec], []);
+      } catch (e) {
+        set({ error: e instanceof Error ? e.message : String(e) });
+        return false;
+      }
+      set({ evidence: [...get().evidence, rec], error: null });
+      return true;
+    },
   };
 });
 
@@ -130,6 +161,11 @@ remoteListeners.add((ch) => {
   const r = ch.payload;
   useLabStore.setState({ records: s.records.some((x) => x.id === r.id) ? s.records.map((x) => (x.id === r.id ? r : x)) : [...s.records, r] });
 });
+
+export function useEvidence(ws: Workspace): EvidenceRecord[] {
+  const evidence = useLabStore((s) => s.evidence);
+  return useMemo(() => evidence.filter((e) => e.workspace === ws).sort((a, b) => b.createdAt.localeCompare(a.createdAt)), [evidence, ws]);
+}
 
 export function useLabRecords(ws: Workspace) {
   const records = useLabStore((s) => s.records);

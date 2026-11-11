@@ -21,7 +21,8 @@
     "build:api": "node scripts/build-api.mjs",
     "check:api": "node scripts/build-api.mjs --check",
     "db:migrate": "node scripts/db-migrate.mjs",
-    "coord:validate": "COORD_VALIDATE_FULL=1 COORD_VALIDATE_OUT=../research/data/mcse-validation.json vitest run src/lab/coord/validation.node.test.ts"
+    "coord:validate": "COORD_VALIDATE_FULL=1 COORD_VALIDATE_OUT=../research/data/mcse-validation.json vitest run src/lab/coord/validation.node.test.ts",
+    "frontier:validate": "FRONTIER_FULL=1 FRONTIER_LATEST=1 FRONTIER_OUT=../research/data/frontier-benchmarks.json vitest run src/lab/scenario/benchmarks.node.test.ts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

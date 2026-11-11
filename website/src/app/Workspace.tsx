@@ -81,6 +81,7 @@ function Page({ route }: { route: Route }) {
     case 'labRun':
     case 'labReadiness':
     case 'labCoordination':
+    case 'labFrontier':
       return (
         <Suspense fallback={<div className="page" aria-busy="true" />}>
           <MotorLabRoute route={route} />

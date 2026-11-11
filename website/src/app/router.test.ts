@@ -31,6 +31,9 @@ describe('маршруты', () => {
       { name: 'labReadiness' },
       { name: 'labCoordination', participant: 'p_1', exercise: 'shoulder_flexion' },
       { name: 'labCoordination', participant: null, exercise: null },
+      { name: 'labFrontier', view: 'measurement', participant: null },
+      { name: 'labFrontier', view: 'observatory', participant: 'p 1/2' },
+      { name: 'labFrontier', view: 'reports', participant: null },
     ];
     for (const route of routes) expect(parseHash(href(route))).toEqual(route);
   });
@@ -39,6 +42,12 @@ describe('маршруты', () => {
     const route: Route = { name: 'patient', id: 'P 01/2', tab: 'sessions' };
     expect(parseHash(href(route))).toEqual(route);
     expect(parseHash('#/session/new?patient=P01&protocol=upper_quick')).toEqual({ name: 'sessionNew', patientId: 'P01', protocol: 'upper_quick' });
+  });
+
+  it('research frontier: the bare address opens the first workspace; an unknown workspace is not found', () => {
+    expect(parseHash('#/research/frontier')).toEqual({ name: 'labFrontier', view: 'measurement', participant: null });
+    expect(parseHash('#/research/frontier/nope')).toEqual({ name: 'notFound' });
+    expect(parseHash('#/research/frontier/twin/extra')).toEqual({ name: 'notFound' });
   });
 
   it('битые адреса — «не найдено», а не падение', () => {
