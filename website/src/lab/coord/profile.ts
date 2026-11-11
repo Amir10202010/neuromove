@@ -211,7 +211,7 @@ export interface ProfileDifference {
   /** Worst-case placement bias for this quantity from the placement comparison, when it applies. */
   placementBound: number | null;
   /**
-   * beyond_noise       |Δ| exceeds 1.96 × √(SE² + u²) AND the placement bound
+   * beyond_noise       |Δ| exceeds t(0.975; Welch df) × √(SE² + u²) AND the placement bound
    * within_placement   exceeds repetition and sensor noise, but a placement/posture difference could produce it
    * within_noise       not distinguishable from repetition variability and sensor error
    * not_assessable     fewer than 2 repetitions on a side
@@ -253,10 +253,19 @@ export function compareProfiles(a: MotorStrategyProfile, b: MotorStrategyProfile
     const se = fa.sd !== null && fb.sd !== null ? Math.sqrt(fa.sd ** 2 / fa.n + fb.sd ** 2 / fb.n) : null;
     const u = fa.uMeasurement !== null && fb.uMeasurement !== null ? Math.sqrt(fa.uMeasurement ** 2 + fb.uMeasurement ** 2) : null;
     const bound = sameRecording ? 0 : placementBoundFor(fb.id, placement);
+    // Welch-Satterthwaite degrees of freedom of the repetition part (sensor uncertainty is added in quadrature)
+    let df: number | null = null;
+    if (se !== null && fa.sd !== null && fb.sd !== null) {
+      const va = fa.sd ** 2 / fa.n;
+      const vb = fb.sd ** 2 / fb.n;
+      df = Math.max(1, va + vb > 0 ? (va + vb) ** 2 / (va ** 2 / Math.max(1, fa.n - 1) + vb ** 2 / Math.max(1, fb.n - 1)) : fa.n + fb.n - 2);
+    }
     let verdict: ProfileDifference['verdict'];
-    if (se === null) verdict = 'not_assessable';
+    if (se === null || df === null) verdict = 'not_assessable';
     else {
-      const noise = 1.959963984540054 * Math.sqrt(se ** 2 + (u ?? 0) ** 2);
+      // two-sided 5 % Welch test. (Until strategy-validation run 1 the multiplier was the normal quantile 1.96,
+      // which is anti-conservative with a dozen repetitions per block: about 6 % instead of 5 % at 22 df.)
+      const noise = tQuantile(0.975, df) * Math.sqrt(se ** 2 + (u ?? 0) ** 2);
       const isAngle = fb.unit === '°';
       if (Math.abs(delta) <= noise) verdict = 'within_noise';
       // an angle compared across recordings without a placement comparison cannot be cleared of placement
@@ -264,12 +273,8 @@ export function compareProfiles(a: MotorStrategyProfile, b: MotorStrategyProfile
       else verdict = 'beyond_noise';
     }
     let ci90: [number, number] | null = null;
-    if (se !== null && fa.sd !== null && fb.sd !== null) {
-      // Welch–Satterthwaite degrees of freedom of the repetition part; sensor uncertainty added in quadrature
-      const va = fa.sd ** 2 / fa.n;
-      const vb = fb.sd ** 2 / fb.n;
-      const df = va + vb > 0 ? (va + vb) ** 2 / (va ** 2 / Math.max(1, fa.n - 1) + vb ** 2 / Math.max(1, fb.n - 1)) : fa.n + fb.n - 2;
-      const half = tQuantile(0.95, Math.max(1, df)) * Math.sqrt(se ** 2 + (u ?? 0) ** 2);
+    if (se !== null && df !== null) {
+      const half = tQuantile(0.95, df) * Math.sqrt(se ** 2 + (u ?? 0) ** 2);
       ci90 = [delta - half, delta + half];
     }
     out.push({ id: fb.id, unit: fb.unit, delta, se, ci90, uMeasurement: u, placementBound: bound, verdict });

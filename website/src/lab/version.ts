@@ -34,10 +34,17 @@ export const COORD_VERSION = 'nm-lab-coord 1.0.0';
  * as COORD_VERSION: none of them changes a number of a frozen learning-analysis run.
  *
  * Rule (same as above): bump a component whenever its numbers can change for the same input.
+ *
+ * Changes:
+ *   measure 1.0.1   placement comparison reports an attribution bound that adds the strap-tilt allowance a
+ *                   recording cannot reveal (found by strategy benchmark S2, run 1: 12.5 % of re-attachments were
+ *                   called a change of the movement)
+ *   strategy 1.0.1  profile comparison tests with the Welch t quantile instead of the normal 1.96 (anti-conservative
+ *                   with a dozen repetitions per block; found when scenario 3 was built)
  */
 export const FRONTIER_VERSIONS = {
-  measure: 'nm-lab-measure 1.0.0',
-  strategy: 'nm-lab-strategy 1.0.0',
+  measure: 'nm-lab-measure 1.0.1',
+  strategy: 'nm-lab-strategy 1.0.1',
   observatory: 'nm-lab-observatory 1.0.0',
   twin: 'nm-lab-twin 1.0.0',
   scenario: 'nm-lab-scenario 1.0.0',

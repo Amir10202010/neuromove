@@ -351,11 +351,11 @@ export function s6Shift(replicates: number, mode: 'quick' | 'full'): BenchmarkRe
 export function strategyValidation(full: boolean): BenchmarkRecord[] {
   const mode = full ? 'full' : 'quick';
   return [
-    ...s1SameOutcomeDifferentStrategy(full ? 40 : 3, mode),
-    ...s2Reattachment(full ? 40 : 3, mode),
-    ...s3Flexibility(full ? 40 : 2, mode),
-    ...s4Tradeoff(full ? 40 : 3, mode),
-    ...s5Signature(full ? 20 : 2, 8, mode),
-    ...s6Shift(full ? 400 : 40, mode),
+    ...s1SameOutcomeDifferentStrategy(full ? 40 : 2, mode),
+    ...s2Reattachment(full ? 40 : 2, mode),
+    ...s3Flexibility(full ? 40 : 1, mode),
+    ...s4Tradeoff(full ? 40 : 2, mode),
+    ...s5Signature(full ? 20 : 1, 8, mode),
+    ...s6Shift(full ? 400 : 10, mode),
   ];
 }

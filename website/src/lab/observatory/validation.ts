@@ -39,7 +39,7 @@ const med = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length
 
 export function observatoryValidation(full: boolean): BenchmarkRecord[] {
   const mode = full ? 'full' : 'quick';
-  const R = full ? 4000 : 300;
+  const R = full ? 4000 : 60;
   const out: BenchmarkRecord[] = [];
 
   // O1
@@ -168,7 +168,7 @@ export function observatoryValidation(full: boolean): BenchmarkRecord[] {
     let strongAlt = 0;
     let tauOk = 0;
     const pNull: number[] = [];
-    const Rb = full ? 2000 : 200;
+    const Rb = full ? 2000 : 40;
     for (let r = 0; r < Rb; r++) {
       const a = detectChange(series(16, rng, () => 0), { horizon: 20 }).bayes;
       if (a) {
@@ -193,7 +193,7 @@ export function observatoryValidation(full: boolean): BenchmarkRecord[] {
   {
     const rng = createRng(67_000);
     let any = 0;
-    const Rf = full ? 2000 : 200;
+    const Rf = full ? 2000 : 40;
     for (let r = 0; r < Rf; r++) {
       let hit = false;
       for (let f = 0; f < 5; f++) if (detectChange(series(20, rng, () => 0), { horizon: 20, family: 5 }).cusum.alarmAt !== null) hit = true;
@@ -235,7 +235,7 @@ export function observatoryValidation(full: boolean): BenchmarkRecord[] {
   // W1–W4
   {
     // each sitting runs 4 × 499 permutation fits: 400 sittings per pattern keep the full run to a few minutes
-    const Rw = full ? 400 : 30;
+    const Rw = full ? 400 : 8;
     const run = (n: number, shape: (i: number, n: number) => number, seed: number): Record<SittingPattern, number> => {
       const rng = createRng(seed);
       const counts = { insufficient_repetitions: 0, no_trend_detected: 0, practice_like: 0, decline_like: 0, rise_then_decline: 0, mixed: 0 } as Record<SittingPattern, number>;

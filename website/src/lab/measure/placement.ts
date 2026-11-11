@@ -169,7 +169,7 @@ export function mountDiagnostics(frames: readonly RawFrame[], cs: ChannelSet, re
 /**
  * How far a re-attachment moves the quantities that are NOT invariant to it. MEASURED by reattachmentStudy()
  * (measure/reattachment.ts) through the app's IMU measurement model on synthetic shoulder flexion / abduction to
- * ≈ 120° (experiments M2–M4, research/data/measurement-validation.json, 2026-11-10) and copied here;
+ * ≈ 120° (experiments M2–M4, research/data/frontier-benchmarks.json; earlier runs in research/data/history/, 2026-11-10) and copied here;
  * measure.node.test.ts recomputes them and fails if they no longer bound the measured values.
  *
  *   M3  calibration posture: calibration-referenced angles and excursions shift by 0.9–1.4° per degree of posture

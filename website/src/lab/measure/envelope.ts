@@ -58,6 +58,9 @@ export interface MeasurementEnvelope {
  *   provisional           the t-quantile exceeds 1.5 × the normal quantile (K ≤ 4): usable but very wide
  *   usable                otherwise
  */
+/** Sessions taken as the baseline when no protocol designates one (twin learning layer, observatory). */
+export const BASELINE_SESSIONS = 5;
+
 export const ENVELOPE_RULE = { minSessions: 3, trendAlpha: 0.05, provisionalInflation: 1.5 } as const;
 
 export function buildEnvelope(baseline: readonly EnvelopeSession[], o: { includesReattachment: boolean } = { includesReattachment: true }): MeasurementEnvelope {

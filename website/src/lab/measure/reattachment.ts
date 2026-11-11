@@ -9,7 +9,7 @@
 // Several movement seeds can be pooled: the elbow error in particular depends on the individual repetitions.
 //
 // Every comparison is PAIRED repetition by repetition against the unperturbed recording of the same seed, so the
-// differences are the effect of the placement alone. Results: research/data/measurement-validation.json.
+// differences are the effect of the placement alone. Results: research/data/frontier-benchmarks.json (earlier runs: research/data/history/).
 
 import type { Placement, RawFrame } from '../../devices/types';
 import { DEG, rotAxis, type Vec3 } from '../../lib/vec3';

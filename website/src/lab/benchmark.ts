@@ -49,3 +49,28 @@ export function wilson(successes: number, n: number, z = 1.959963984540054): [nu
   const h = z * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n));
   return [Math.max(0, (c - h) / d), Math.min(1, (c + h) / d)];
 }
+
+/** Result of one run of the whole registry (scenario/benchmarks.ts → research/data/frontier-benchmarks.json). */
+export interface BenchmarkSummary {
+  generatedAt: string;
+  mode: 'quick' | 'full';
+  /** Component versions that produced the records (a stored run may be older than the current engine). */
+  versions: Record<FrontierComponent, string>;
+  total: number;
+  withCriterion: number;
+  passed: number;
+  failed: string[];
+  descriptive: number;
+  /** Simulation runs / test cases executed over all records. */
+  cases: number;
+  records: BenchmarkRecord[];
+}
+
+/** The earlier suites keep their own runners and files; listed so that the registry is complete. */
+export const EXISTING_SUITES = [
+  { suite: 'learning models', ids: 'E1–E8, R1', code: 'src/lab/experiments.ts', data: 'research/data/model-validation.json', document: 'research/model-validation.md' },
+  { suite: 'coordination and strategy engine', ids: 'V1–V11', code: 'src/lab/coord/validation.ts', data: 'research/data/mcse-validation.json', document: 'research/mcse-validation.md' },
+] as const;
+
+/** Failures that are documented findings (research/SCIENTIFIC_VALIDATION.md): asserted as STILL failing in full mode. */
+export const DOCUMENTED_FAILURES: readonly string[] = ['M2a', 'O2'];
