@@ -54,6 +54,7 @@ export const kk: typeof ru = {
     sessions: 'Сеанстар',
     analytics: 'Талдау',
     devices: 'Датчиктер',
+    check: 'Гониометрмен тексеру',
     settings: 'Баптаулар',
     newSession: 'Жаңа тест',
     sessionShort: 'Тест',

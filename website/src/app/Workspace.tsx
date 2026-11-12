@@ -4,6 +4,7 @@
 
 import { AnalyticsPage } from '../features/analytics/AnalyticsPage';
 import { DevicesPage } from '../features/devices/DevicesPage';
+import { QuickCheckPage } from '../features/devices/QuickCheckPage';
 import { NotFoundPage } from '../features/NotFoundPage';
 import { OnboardingPage } from '../features/onboarding/OnboardingPage';
 import { OverviewPage } from '../features/overview/OverviewPage';
@@ -60,6 +61,8 @@ function Page({ route }: { route: Route }) {
       return <AnalyticsPage />;
     case 'devices':
       return <DevicesPage />;
+    case 'check':
+      return <QuickCheckPage />;
     case 'settings':
       return <SettingsPage />;
     case 'research':
