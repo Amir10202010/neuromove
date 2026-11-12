@@ -1,0 +1,279 @@
+{
+ "started": "2026-11-10T17:01:17.646Z",
+ "finished": "2026-11-10T17:03:36.478Z",
+ "full": true,
+ "node": "v24.16.0",
+ "records": [
+  {
+   "id": "M2a",
+   "name": "Rotation re-mount: invariant features",
+   "purpose": "Do calibration-referenced features change when a sensor is strapped on rotated?",
+   "assumptions": "Rigid sensor, fixed rotation of 2–20° about each sensor axis, same raw stream (virtual re-mount), calibration pose reproduced",
+   "groundTruth": "Identical movement: any difference is a placement artefact",
+   "metric": "largest |Δ| of any invariant feature over all repetitions, sensors, axes and offsets",
+   "criterion": "≤ 0.05 (metric units)",
+   "cases": 384,
+   "value": 0.1964,
+   "detail": {
+    "features": "outcome exc_upper_elev exc_fore_elev dur_outbound dur_return peak_rate time_to_peak_fraction sparc_outbound"
+   },
+   "pass": false,
+   "knownFailureModes": [
+    "does not cover soft-tissue motion or a strap that slips during the recording"
+   ],
+   "mode": "full",
+   "component": "measure",
+   "version": "nm-lab-measure 1.0.0"
+  },
+  {
+   "id": "M2b",
+   "name": "Rotation re-mount: elbow hinge",
+   "purpose": "How wrong is elbow flexion when the upper-arm sensor is rotated about the bone, and does the stored bound hold?",
+   "assumptions": "Elbow modelled as a hinge about the upper-arm sensor Z axis (core/pipeline.ts); shoulder flexion to ≈ 120°",
+   "groundTruth": "Same movement, un-rotated sensor",
+   "metric": "95th percentile of the elbow excursion error on seeds disjoint from the calibration seeds ÷ stored 95th-percentile table (REATTACHMENT_SENSITIVITY)",
+   "criterion": "ratio ≤ 1.25 at every tabulated offset (the stored table still describes the error)",
+   "cases": 576,
+   "value": 0.968,
+   "detail": {
+    "p95_error_at_2deg": 0.35,
+    "max_error_at_2deg": 0.59,
+    "p95_error_at_5deg": 1.01,
+    "max_error_at_5deg": 4.26,
+    "p95_error_at_10deg": 3,
+    "max_error_at_10deg": 10.63,
+    "p95_error_at_20deg": 11.86,
+    "max_error_at_20deg": 20.07
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "strongly non-linear and heavy-tailed: single repetitions err by 10–20° at a 10–20° rotation",
+    "needs many repetitions to estimate: descriptive in quick mode",
+    "not evaluated for elbow-flexion tasks with a moving upper arm"
+   ],
+   "mode": "full",
+   "component": "measure",
+   "version": "nm-lab-measure 1.0.0"
+  },
+  {
+   "id": "M2c",
+   "name": "Rotation re-mount: trunk pitch/roll cross-talk",
+   "purpose": "How much pitch appears as roll when the trunk sensor is rotated about the vertical?",
+   "assumptions": "Trunk forward direction taken from the sensor Z axis (mount rule); trunk-assisted repetitions with ≈ 18° of pitch in the set",
+   "groundTruth": "Same movement, un-rotated sensor",
+   "metric": "mean |Δ roll excursion| per degree of rotation (slope through the origin, 2–10°)",
+   "criterion": "descriptive",
+   "cases": 8,
+   "value": 0.18,
+   "detail": {
+    "roll_error_at_2deg": 0.36,
+    "roll_error_at_5deg": 0.9,
+    "roll_error_at_10deg": 1.78,
+    "roll_error_at_20deg": 3.51,
+    "pitch_error_at_2deg": 0.05,
+    "pitch_error_at_5deg": 0.12,
+    "pitch_error_at_10deg": 0.27,
+    "pitch_error_at_20deg": 0.71
+   },
+   "pass": null,
+   "knownFailureModes": [
+    "the rotation of the trunk sensor about the vertical cannot be observed from a recording, so this error cannot be detected or bounded per session"
+   ],
+   "mode": "full",
+   "component": "measure",
+   "version": "nm-lab-measure 1.0.0"
+  },
+  {
+   "id": "M3",
+   "name": "Calibration posture not reproduced",
+   "purpose": "How far does a different arm posture in the calibration pose shift the task outcome?",
+   "assumptions": "Arm held 2–10° forward or sideways during the 3 s calibration, then relaxed; same movement and sensor noise",
+   "groundTruth": "Same movement with the nominal calibration posture",
+   "metric": "bias of the task outcome per degree of posture difference (largest and smallest over movement × direction)",
+   "criterion": "all slopes within [0.8, 1.4] and ≤ the stored bound 1.4",
+   "cases": 12,
+   "value": 1.387,
+   "detail": {
+    "shoulder_flexion|arm_forward": 1.154,
+    "shoulder_flexion|arm_sideways": 1.05,
+    "shoulder_abduction|arm_forward": 0.986,
+    "shoulder_abduction|arm_sideways": 1.387
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "posture cannot be told from strap tilt in the recording: the bias is bounded (placement.ts), never corrected",
+    "a posture behind the vertical leaves the excursion unchanged but adds to the maximum angle"
+   ],
+   "mode": "full",
+   "component": "measure",
+   "version": "nm-lab-measure 1.0.0"
+  },
+  {
+   "id": "M4",
+   "name": "Sensor moved along the bone",
+   "purpose": "Does strapping a sensor 2–4 cm further along the segment change the task outcome?",
+   "assumptions": "Rigid segment; only the linear acceleration seen by the accelerometer changes",
+   "groundTruth": "Same movement, nominal sensor position",
+   "metric": "largest |Δ outcome| over repetitions, sensors and shifts",
+   "criterion": "≤ 0.5°",
+   "cases": 12,
+   "value": 0.401,
+   "detail": {},
+   "pass": true,
+   "knownFailureModes": [
+    "faster movements than the simulated ≈ 1.2 s reach raise the centripetal term"
+   ],
+   "mode": "full",
+   "component": "measure",
+   "version": "nm-lab-measure 1.0.0"
+  },
+  {
+   "id": "U1",
+   "name": "Noise propagation vs independent realisations",
+   "purpose": "Does injecting the stated sensor noise into ONE recording reproduce the spread a feature shows over independent noise realisations?",
+   "assumptions": "White accelerometer (0.004 g) and gyroscope (0.08 °/s) noise per axis; same movement and mount; 12 repetitions",
+   "groundTruth": "SD of each repetition feature over 40 independent noise realisations of the same movement",
+   "metric": "share of features flagged \"validated\" whose ratio propagated/true lies in the range",
+   "criterion": "every validated feature within [0.7, 1.4]",
+   "cases": 100,
+   "value": 0.923,
+   "detail": {
+    "outcome": 0.95,
+    "exc_trunk_pitch": 0.98,
+    "exc_trunk_roll": 1,
+    "exc_upper_elev": 0.89,
+    "exc_fore_elev": 0.74,
+    "exc_elbow_flex": 0.03,
+    "exc_humerothoracic": 0.92,
+    "trunk_contribution": 0.98,
+    "dur_outbound": 0.84,
+    "dur_return": 0.92,
+    "peak_rate": 0.97,
+    "time_to_peak_fraction": 0.91,
+    "sparc_outbound": 0.59,
+    "onset_lag_trunk_ms": 1.5,
+    "onset_lag_fore_ms": 0.95
+   },
+   "pass": false,
+   "knownFailureModes": [
+    "SPARC: injection under-states the spread (flagged \"underestimates\")",
+    "quantised onset lags: conservative",
+    "non-smooth steps (elbow branch) jump under added noise — trimmed and reported as jumpShare"
+   ],
+   "mode": "full",
+   "component": "measure",
+   "version": "nm-lab-measure 1.0.0"
+  },
+  {
+   "id": "U2",
+   "name": "Systematic budget vs re-mounted sensors",
+   "purpose": "Does the propagated uncertainty of a session mean match how much the mean varies when the sensors are re-mounted (new offsets and biases)?",
+   "assumptions": "Accelerometer zero offset 0.01 g SD, strap misalignment 2–5°, same movement, calibration posture reproduced",
+   "groundTruth": "SD of the recording mean of each feature over 40 re-mounted recordings",
+   "metric": "share of rotation-invariant validated features with ratio propagated/true in the range",
+   "criterion": "every such feature within [0.5, 2]",
+   "cases": 40,
+   "value": 0.857,
+   "detail": {
+    "outcome": 1.08,
+    "exc_trunk_pitch": 1.06,
+    "exc_trunk_roll": 0.08,
+    "exc_upper_elev": 1.02,
+    "exc_fore_elev": 1.14,
+    "exc_elbow_flex": 1.43,
+    "exc_humerothoracic": 0.78,
+    "trunk_contribution": 1.13,
+    "dur_outbound": 1.1,
+    "dur_return": 0.48,
+    "peak_rate": 0.97,
+    "time_to_peak_fraction": 1.36,
+    "sparc_outbound": 0.73,
+    "onset_lag_fore_ms": 1.06,
+    "outcome_u_session_mean_deg": 0.852
+   },
+   "pass": false,
+   "knownFailureModes": [
+    "trunk roll and elbow flexion vary more than the budget says: their mount sensitivity (M2) is not a sensor-noise term",
+    "calibration posture is held fixed here; in practice it adds ≈ 1° per degree (M3)"
+   ],
+   "mode": "full",
+   "component": "measure",
+   "version": "nm-lab-measure 1.0.0"
+  },
+  {
+   "id": "E1a",
+   "name": "Personal envelope: coverage under no change",
+   "purpose": "Does the 95 % envelope contain an unchanged new session 95 % of the time, with few baseline sessions and unequal session lengths?",
+   "assumptions": "Normal repetition (SD 4) and day-to-day (SD 2.5) variation, stationary baseline; a baseline flagged as trending yields no interval",
+   "groundTruth": "New session drawn from the same distribution",
+   "metric": "coverage of the 95 % interval per design (K baseline sessions × n repetitions, new session of m repetitions); value = the coverage furthest from 0.95",
+   "criterion": "every design within [0.93, 0.97]",
+   "cases": 25000,
+   "value": 0.966,
+   "detail": {
+    "K3_n3_m3": 0.966,
+    "K5_n3_m3": 0.963,
+    "K8_n3_m3": 0.958,
+    "K5_n3_m8": 0.937,
+    "K5_n6_m2": 0.945
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "non-normal or autocorrelated day-to-day variation is not covered",
+    "the stability pre-check discards ≈ 5 % of stationary baselines"
+   ],
+   "mode": "full",
+   "component": "measure",
+   "version": "nm-lab-measure 1.0.0"
+  },
+  {
+   "id": "E1b",
+   "name": "Personal envelope: power for a shifted session",
+   "purpose": "How often is a session outside the envelope after a true shift?",
+   "assumptions": "As E1a; the shift is 8 or 15 units (≈ 2.3 or 4.4 SD of a session mean)",
+   "groundTruth": "Shift applied to the new session only",
+   "metric": "share of shifted sessions outside the 95 % envelope",
+   "criterion": "≥ 0.8 for a 15-unit shift with 5 baseline sessions",
+   "cases": 20000,
+   "value": 0.85,
+   "detail": {
+    "K3_shift15": 0.547,
+    "K5_shift15": 0.85,
+    "K5_shift8": 0.355,
+    "K8_shift8": 0.469,
+    "K5_shift15_ci95": "[0.84, 0.86]"
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "with 3 baseline sessions the interval is so wide that even a 15-unit shift is usually inside"
+   ],
+   "mode": "full",
+   "component": "measure",
+   "version": "nm-lab-measure 1.0.0"
+  },
+  {
+   "id": "R1",
+   "name": "Test–retest variance components",
+   "purpose": "Are participant, session and repetition variances recovered without bias from a nested test–retest design?",
+   "assumptions": "60 participants × 2 occasions × 3 repetitions, normal effects, stable occasions",
+   "groundTruth": "σp = 10, σs = 2.5, σε = 4",
+   "metric": "largest relative error of the mean estimated variance over replicates (truncation at 0 biases the session variance upwards in small samples)",
+   "criterion": "≤ 0.15",
+   "cases": 300,
+   "value": 0.01,
+   "detail": {
+    "rel_error_participant": 0.01,
+    "rel_error_session": 0.009,
+    "rel_error_repetition": 0.002,
+    "participants": 60
+   },
+   "pass": true,
+   "knownFailureModes": [
+    "with ≈ 10 participants the session variance is often estimated as 0 (truncated) or too large: the estimate is unreliable, as its wide CI shows"
+   ],
+   "mode": "full",
+   "component": "measure",
+   "version": "nm-lab-measure 1.0.0"
+  }
+ ]
+}

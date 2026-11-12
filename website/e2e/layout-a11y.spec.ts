@@ -38,6 +38,14 @@ const ROUTES = [
   '#/research/designer',
   '#/research/runs',
   '#/research/readiness',
+  // research-frontier workspaces
+  '#/research/frontier/measurement',
+  '#/research/frontier/observatory?p=demo-p01',
+  '#/research/frontier/strategy?p=demo-p01',
+  '#/research/frontier/twin?p=demo-p01',
+  '#/research/frontier/sandbox',
+  '#/research/frontier/hypotheses',
+  '#/research/frontier/reports',
 ];
 
 /** Что вылезает за правый край: селектор и на сколько пикселей. */
@@ -76,7 +84,7 @@ test('нет горизонтальной прокрутки на ширинах
   expect(problems).toEqual([]);
 });
 
-const AXE_ROUTES = ['#/', '#/overview', '#/patients/demo-p01', '#/session/new?patient=demo-p01', '#/sessions/demo-p01-s9', '#/analytics', '#/devices', '#/settings', '#/onboarding', '#/rehab', '#/rehab/p/demo-p01?tab=goals', '#/rehab/p/demo-p01?tab=movement', '#/rehab/p/demo-p01?tab=review', '#/rehab/activities', '#/home/demo-p01', '#/play/demo-p01', '#/research/lab', '#/research/learning?p=demo-p01&task=shoulder_flexion%3Aright&metric=rom', '#/research/twin/demo-p04', '#/research/designer', '#/research/readiness'];
+const AXE_ROUTES = ['#/', '#/overview', '#/patients/demo-p01', '#/session/new?patient=demo-p01', '#/sessions/demo-p01-s9', '#/analytics', '#/devices', '#/settings', '#/onboarding', '#/rehab', '#/rehab/p/demo-p01?tab=goals', '#/rehab/p/demo-p01?tab=movement', '#/rehab/p/demo-p01?tab=review', '#/rehab/activities', '#/home/demo-p01', '#/play/demo-p01', '#/research/lab', '#/research/learning?p=demo-p01&task=shoulder_flexion%3Aright&metric=rom', '#/research/twin/demo-p04', '#/research/designer', '#/research/readiness', '#/research/frontier/measurement', '#/research/frontier/observatory?p=demo-p01', '#/research/frontier/sandbox', '#/research/frontier/hypotheses'];
 
 test('доступность: нет серьёзных и критичных нарушений WCAG 2.1 AA и автоматических правил 2.2 AA', async ({ page }) => {
   test.setTimeout(180_000);

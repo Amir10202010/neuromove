@@ -13,6 +13,7 @@ import type { Placement, RawFrame } from '../devices/types';
 import type { ProtocolVersion, Trial, ValidationSession } from '../research/model';
 import type { RehabRecord } from '../rehab/model';
 import type { LabRecord } from '../lab/records';
+import type { EvidenceRecord } from '../lab/discovery/evidenceRecord';
 import type { OutboxOp, SyncStateRow } from '../sync/types';
 import type { Alert, Note, Patient, Session, Workspace, WorkspaceData } from './models';
 
@@ -30,7 +31,12 @@ export interface ResearchRecords {
   vsessions: ValidationSession;
   trials: Trial;
   rehab: RehabRecord;
-  lab: LabRecord;
+  /**
+   * Lab records (synced) and, since 10 Nov 2026, sealed evidence records (kind 'evidence_record': twin snapshots,
+   * research reports). Evidence records are LOCAL ONLY — written without an outbox op, never sent to the server,
+   * and ignored by every reader that filters with isLabRecord. No schema version change: same store, same key.
+   */
+  lab: LabRecord | EvidenceRecord;
 }
 
 export interface DataStorage {

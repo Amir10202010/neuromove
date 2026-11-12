@@ -115,6 +115,8 @@ export default defineConfig(({ mode }) => {
     test: {
       include: ['src/**/*.test.ts', 'server/**/*.test.ts'],
       environment: 'node',
+      // raises the time limit of the server tests only (in-process PostgreSQL + slow password hash) — see the file
+      setupFiles: ['server/vitest.setup.ts'],
     },
   };
 });

@@ -2,7 +2,7 @@
 // raw availability, frozen runs and protocols, with entry points to every workspace. Counts only — no model is fitted
 // here, so the page is fast and shows no estimate without its context.
 
-import { BookOpenCheck, ClipboardList, Database, LineChart, Network, Waves, Workflow } from 'lucide-react';
+import { Activity, BookOpenCheck, ClipboardList, Database, Dices, FileText, Gauge, Layers, Lightbulb, LineChart, Network, Route as RouteIcon, Waves, Workflow } from 'lucide-react';
 import { useMemo } from 'react';
 import { href } from '../../app/router';
 import { PageHeader } from '../../layout/PageHeader';
@@ -44,6 +44,7 @@ export function LabOverviewPage() {
         .filter((r) => r.sessions > 0),
     [patients, sessions, includeSimulated, practice, runs],
   );
+  const first = rows[0]?.p.id ?? null;
   return (
     <div className="page">
       <PageHeader
@@ -60,6 +61,18 @@ export function LabOverviewPage() {
         <Tile icon={<BookOpenCheck />} title={lt('Research reports')} text={`${lt('Frozen, reproducible analysis runs and pseudonymised exports.')} (${runs.length})`} to={href({ name: 'labRuns' })} />
         <Tile icon={<Workflow />} title={ct('Coordination & Strategy Lab')} text={ct('Multi-segment coordination, movement strategies and performance–strategy dissociation from raw sensor frames.')} to={href({ name: 'labCoordination', participant: rows[0]?.p.id ?? null, exercise: null })} />
         <Tile icon={<Database />} title={lt('Foundation-model readiness')} text={lt('What the dataset would need before a movement representation model could be trained.')} to={href({ name: 'labReadiness' })} />
+      </section>
+      <section className="mlsection">
+        <h2 className="section-title">{lt('Research frontier')}</h2>
+        <div className="mlgrid mlgrid--3">
+          <Tile icon={<Gauge />} title={lt('Measurement & observability')} text={lt('What the sensors can and cannot observe; sensor error and placement behind every number.')} to={href({ name: 'labFrontier', view: 'measurement', participant: null })} />
+          <Tile icon={<Activity />} title={lt('Learning observatory')} text={lt('Change detection against the personal envelope, competing explanations, what the data can separate.')} to={href({ name: 'labFrontier', view: 'observatory', participant: first })} />
+          <Tile icon={<RouteIcon />} title={lt('Strategy atlas')} text={lt('How each raw recording was organised across trunk and arm, and what survives sensor re-attachment.')} to={href({ name: 'labFrontier', view: 'strategy', participant: first })} />
+          <Tile icon={<Layers />} title={lt('Twin workspace')} text={lt('Twin layers, maturity level and predictions that are issued with calibration or refused.')} to={href({ name: 'labFrontier', view: 'twin', participant: first })} />
+          <Tile icon={<Dices />} title={lt('Scientific sandbox')} text={lt('Ground-truth scenarios and the benchmark registry, including failed criteria.')} to={href({ name: 'labFrontier', view: 'sandbox', participant: null })} />
+          <Tile icon={<Lightbulb />} title={lt('Hypotheses')} text={lt('Formal hypotheses with null, test and falsification condition, against the data that exist.')} to={href({ name: 'labFrontier', view: 'hypotheses', participant: null })} />
+          <Tile icon={<FileText />} title={lt('Report builder')} text={lt('Reports from frozen runs with every statement traced to its evidence.')} to={href({ name: 'labFrontier', view: 'reports', participant: null })} />
+        </div>
       </section>
       <section className="mlsection">
         <h2 className="section-title">{lt('Participants and longitudinal coverage')}</h2>

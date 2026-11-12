@@ -92,7 +92,8 @@ export function CurveChart({ title, xLabel, yLabel, x, series, markers = [], reg
           <g key={`m${i}`}>
             {m.lo !== undefined && m.hi !== undefined && <rect className="cochart__uncert" x={sx(m.lo)} y={PAD.t} width={Math.max(1, sx(m.hi) - sx(m.lo))} height={height - PAD.t - PAD.b} />}
             <line className="cochart__marker" x1={sx(m.x)} x2={sx(m.x)} y1={PAD.t} y2={height - PAD.b} />
-            <text className="rchart__tick" x={sx(m.x) + 3} y={PAD.t + 10 + (i % 2) * 11}>{m.label}</text>
+            {/* a label near the right edge is written to the left of its line, so it is not cut off */}
+            <text className="rchart__tick" x={sx(m.x) + (sx(m.x) > W - PAD.r - 90 ? -3 : 3)} y={PAD.t + 10 + (i % 2) * 11} textAnchor={sx(m.x) > W - PAD.r - 90 ? 'end' : 'start'}>{m.label}</text>
           </g>
         ))}
         {series.map((s, i) =>

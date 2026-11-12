@@ -36,6 +36,8 @@ export type Route =
   | { name: 'labRun'; id: string }
   | { name: 'labReadiness' }
   | { name: 'labCoordination'; participant: string | null; exercise: string | null }
+  // Research-frontier workspaces (measurement, observatory, strategy atlas, twin, sandbox, hypotheses, reports)
+  | { name: 'labFrontier'; view: FrontierView; participant: string | null }
   | { name: 'rehab' }
   | { name: 'rehabParticipant'; id: string; tab: RehabTab; review: string | null }
   | { name: 'rehabActivities' }
@@ -43,6 +45,10 @@ export type Route =
   | { name: 'familyHome'; id: string }
   | { name: 'childPlay'; id: string }
   | { name: 'notFound' };
+
+/** Workspaces of the research frontier (features/motorlab/frontier). */
+export const FRONTIER_VIEWS = ['measurement', 'observatory', 'strategy', 'twin', 'sandbox', 'hypotheses', 'reports'] as const;
+export type FrontierView = (typeof FRONTIER_VIEWS)[number];
 
 /** Tabs of a participant's rehabilitation page. */
 export const REHAB_TABS = ['overview', 'goals', 'program', 'timeline', 'movement', 'assessments', 'family', 'review'] as const;
@@ -106,6 +112,10 @@ export function parseHash(hash: string): Route {
       if (b === 'runs' && c && parts.length === 3) return { name: 'labRun', id: c };
       if (b === 'readiness' && !c) return { name: 'labReadiness' };
       if (b === 'coordination' && !c) return { name: 'labCoordination', participant: q.get('p'), exercise: q.get('ex') };
+      if (b === 'frontier' && parts.length <= 3) {
+        if (!c) return { name: 'labFrontier', view: 'measurement', participant: q.get('p') };
+        return (FRONTIER_VIEWS as readonly string[]).includes(c) ? { name: 'labFrontier', view: c as FrontierView, participant: q.get('p') } : { name: 'notFound' };
+      }
       return { name: 'notFound' };
     // Functional Progression System: professional workspace, family workspace, child practice
     case 'rehab': {
@@ -209,6 +219,8 @@ export function href(r: Route): string {
       const qs = q.toString();
       return `#/research/coordination${qs ? `?${qs}` : ''}`;
     }
+    case 'labFrontier':
+      return `#/research/frontier/${r.view}${r.participant ? `?p=${e(r.participant)}` : ''}`;
     case 'rehab':
       return '#/rehab';
     case 'rehabActivities':

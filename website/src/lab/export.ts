@@ -23,7 +23,8 @@ export function sessionPseudonym(run: Pick<AnalysisRun, 'id'>, sessionId: string
   return `S-${sha256Hex(`${run.id}|${sessionId}`).slice(0, 10)}`;
 }
 
-function scrubber(run: AnalysisRun): (text: string) => string {
+/** Replaces the participant id and every session id of a run by their run-local pseudonyms, anywhere in a text. */
+export function identifierScrubber(run: Pick<AnalysisRun, 'id' | 'participantId' | 'inputs'>): (text: string) => string {
   const pairs: [string, string][] = run.inputs.map((x) => [x.sessionId, sessionPseudonym(run, x.sessionId)]);
   // longest first, so an id that is a prefix of another is not replaced inside it
   pairs.sort((a, b) => b[0].length - a[0].length);
@@ -43,7 +44,7 @@ export interface ExportOptions {
 
 export function runJson(run: AnalysisRun, o: ExportOptions = { includeDates: false }): string {
   const pseudo = pseudonymFor(run);
-  const sc = scrubber(run);
+  const sc = identifierScrubber(run);
   const scrub = <T extends object>(x: T): T => JSON.parse(sc(JSON.stringify(x)));
   const inputs = run.inputs.map((x) => ({ sessionId: sessionPseudonym(run, x.sessionId), studyDay: dayOf(run, x.startedAt), ...(o.includeDates ? { startedAt: x.startedAt } : {}), algorithmVersion: x.algorithmVersion, appVersion: x.appVersion }));
   const snapshot = run.snapshot.map((s) => scrub({ ...s, sessions: s.sessions.map((x) => ({ ...x, date: o.includeDates ? x.date : undefined, studyDay: dayOf(run, x.date) })) }));

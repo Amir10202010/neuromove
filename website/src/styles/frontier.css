@@ -1,0 +1,221 @@
+/* Research-frontier workspaces of the motor lab (features/motorlab/frontier). Classes are prefixed `fr-`.
+   Scientific verdicts are never coloured as good or bad: a tone marks what kind of statement it is
+   (signal, caution, refusal), not whether the movement improved. */
+
+.fr-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 4px;
+  padding: 0;
+  list-style: none;
+}
+.fr-tabs a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 14px;
+  background: var(--surface);
+}
+.fr-tabs a svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.fr-tabs a:hover {
+  color: var(--text);
+  border-color: var(--text-3);
+}
+.fr-tabs a[aria-current='page'] {
+  color: var(--text);
+  border-color: var(--text);
+  font-weight: 600;
+}
+.fr-tabs a:focus-visible {
+  outline: 2px solid var(--info);
+  outline-offset: 2px;
+}
+
+.fr-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-2);
+  background: var(--surface);
+  /* a short verdict stays on one line; a long one wraps inside the chip instead of widening a table column */
+  width: max-content;
+  max-width: min(17rem, 100%);
+  white-space: normal;
+  vertical-align: baseline;
+}
+
+/* Tables with prose cells. The lab's .mltable keeps every cell on one line, which suits numbers; here names,
+   evidence and reasons are sentences, so cells wrap and only numeric cells stay on one line. */
+.mltable.fr-wrap td,
+.mltable.fr-wrap th {
+  white-space: normal;
+  vertical-align: top;
+}
+.mltable.fr-wrap td.num,
+.mltable.fr-wrap td.fr-nowrap {
+  white-space: nowrap;
+}
+.mltable.fr-wrap th.num {
+  text-align: right;
+}
+.mltable.fr-wrap td {
+  overflow-wrap: break-word;
+}
+.mltable.fr-wrap caption {
+  caption-side: top;
+  text-align: left;
+  padding: 10px 12px 4px;
+  white-space: normal;
+}
+.fr-sub {
+  display: block;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--text-3);
+  overflow-wrap: anywhere;
+}
+.fr-chip--signal {
+  color: var(--info-text, var(--text));
+  border-color: var(--info);
+}
+.fr-chip--caution {
+  color: var(--warn-text);
+  border-color: var(--warn);
+}
+.fr-chip--refused {
+  color: var(--text-3);
+  border-style: dashed;
+}
+.fr-chip--met {
+  color: var(--good-text);
+  border-color: var(--good);
+}
+
+.fr-dl {
+  display: grid;
+  grid-template-columns: minmax(120px, max-content) 1fr;
+  gap: 4px 14px;
+  margin: 0;
+  font-size: 14px;
+}
+.fr-dl dt {
+  color: var(--text-3);
+}
+.fr-dl dd {
+  margin: 0;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 560px) {
+  .fr-dl {
+    grid-template-columns: 1fr;
+  }
+  .fr-dl dd {
+    margin-bottom: 6px;
+  }
+}
+
+.fr-detail {
+  background: var(--surface-2, var(--surface));
+}
+.fr-detail td {
+  padding-top: 10px;
+  padding-bottom: 14px;
+}
+.fr-rowbtn {
+  all: unset;
+  cursor: pointer;
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 3px;
+}
+.fr-rowbtn:hover {
+  text-decoration-color: var(--text-2);
+}
+.fr-rowbtn:focus-visible {
+  outline: 2px solid var(--info);
+  outline-offset: 2px;
+}
+
+.fr-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  color: var(--text-2);
+  font-size: 14px;
+}
+.fr-statement {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 10px;
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.fr-statement:last-child {
+  border-bottom: 0;
+}
+.fr-statement p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 560px) {
+  .fr-statement {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fr-ladder {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fr-ladder li {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 4px;
+}
+.fr-ladder li.is-met {
+  border-color: var(--good);
+}
+.fr-ladder li.is-current {
+  box-shadow: inset 3px 0 0 var(--text);
+}
+
+.fr-canonical {
+  font-size: 13px;
+  color: var(--text-3);
+}
+.fr-mono {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.fr-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  margin-right: 14px;
+}

@@ -2,7 +2,8 @@
 // Shows, for one participant and movement: provenance and data sufficiency, the multi-segment trajectories behind
 // every repetition, coordination components, strategy discovery (or its refusal), the strategy sequence,
 // performance–strategy dissociation, a two-repetition comparison and longitudinal strategy change.
-// The engine runs in a worker; nothing here computes a number.
+// The engine runs in a worker (or, where none can be started, in the same job function on the main thread);
+// nothing here computes a number.
 
 import { FlaskConical, Play } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -10,7 +11,7 @@ import { href } from '../../../app/router';
 import type { Side } from '../../../devices/types';
 import { isSimulatedSession } from '../../../data/models';
 import { CHANNELS, type ChannelId } from '../../../lab/coord/channels';
-import type { McseOptions, McseRecordingInput, McseResult, RepRecord } from '../../../lab/coord/engine';
+import type { McseRecordingInput, McseResult, RepRecord } from '../../../lab/coord/engine';
 import { SUPPORTED_EXERCISES } from '../../../lab/coord/engine';
 import { comparePair, type PairComparison } from '../../../lab/coord/dissociation';
 import { practiceInput, sessionAvailability, sessionHasExercise, sessionInput } from '../../../lab/coord/inputs';
@@ -18,7 +19,9 @@ import { PageHeader } from '../../../layout/PageHeader';
 import { useAppStore } from '../../../state/appStore';
 import { fmt, useDates, useLabData } from '../common';
 import { useLabRecords } from '../store';
-import McseWorker from '../../../lab/coord/mcse.worker?worker&inline';
+import type { McseRequest } from '../../../lab/coord/mcseJob';
+import McseWorker from '../../../lab/coord/mcse.worker?worker';
+import { startJob, type JobHandle } from '../../../lib/workerJob';
 import { CurveChart, ScatterChart, SequenceStrip, SERIES, UNCERTAIN } from './charts';
 import { useCT, type CT } from './i18n';
 import '../../../styles/coord.css';
@@ -47,8 +50,8 @@ export function CoordinationPage({ participant, exercise }: { participant: strin
   const getRaw = useAppStore((s) => s.getRaw);
   const [side, setSide] = useState<Side>('right');
   const [run, setRun] = useState<Run>({ state: 'idle' });
-  const worker = useRef<Worker | null>(null);
-  useEffect(() => () => worker.current?.terminate(), []);
+  const job = useRef<JobHandle | null>(null);
+  useEffect(() => () => job.current?.cancel(), []);
   const ex = exercise && (SUPPORTED_EXERCISES as readonly string[]).includes(exercise) ? exercise : 'shoulder_flexion';
   const pid = participant ?? patients[0]?.id ?? null;
   const mine = useMemo(() => sessions.filter((s) => s.patientId === pid && sessionHasExercise(s, ex, side)).sort((a, b) => a.startedAt.localeCompare(b.startedAt)), [sessions, pid, ex, side]);
@@ -57,17 +60,18 @@ export function CoordinationPage({ participant, exercise }: { participant: strin
   const practiceRaw = practiceSets.filter((t) => t.rawManifest);
   const go = (p: string | null, e: string) => (window.location.hash = href({ name: 'labCoordination', participant: p, exercise: e }));
 
-  const start = (req: { kind: 'analyse'; inputs: McseRecordingInput[]; options: McseOptions } | { kind: 'synthetic'; seed: number; options: McseOptions }, synthetic: boolean) => {
-    worker.current?.terminate();
-    const w = new McseWorker();
-    worker.current = w;
+  // The engine runs in a worker that is a file of the site (the content policy blocks blob: workers, which is what
+  // `?worker&inline` creates — the analysis never finished in the built site). Where no worker can be started
+  // (single-file demo opened from disk) the same job runs on the main thread: lib/workerJob.ts.
+  const start = (req: McseRequest, synthetic: boolean) => {
+    job.current?.cancel();
     setRun({ state: 'running', what: synthetic ? ct('Generating and analysing synthetic data…') : ct('Analysing raw recordings…') });
-    w.onmessage = (e: MessageEvent<{ ok: true; result: McseResult } | { ok: false; error: string }>) => {
-      if (e.data.ok) setRun({ state: 'done', result: e.data.result, synthetic });
-      else setRun({ state: 'error', message: e.data.error });
-      w.terminate();
-    };
-    w.postMessage(req);
+    job.current = startJob<McseRequest, McseResult>({
+      make: () => new McseWorker(),
+      local: (r) => import('../../../lab/coord/mcseJob').then((m) => m.runMcseJob(r)),
+      req,
+      done: (reply) => setRun(reply.ok ? { state: 'done', result: reply.result, synthetic } : { state: 'error', message: reply.error }),
+    });
   };
   const analyse = async () => {
     setRun({ state: 'running', what: ct('Reading raw frames…') });
