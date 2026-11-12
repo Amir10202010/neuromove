@@ -1,0 +1,107 @@
+/* Быстрая проверка с угломером (features/devices/QuickCheckPage.tsx). Все классы — с приставкой qc- */
+.qc-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: var(--space-4, 16px);
+}
+.qc > * + * {
+  margin-top: var(--space-4, 16px);
+}
+.qc-sensors {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+.qc-sensors li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.qc-side {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  font-weight: 600;
+}
+.qc-progress {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface-sunken);
+  overflow: hidden;
+  min-width: 80px;
+}
+.qc-progress__fill {
+  height: 100%;
+  background: var(--text);
+  transition: width 0.1s linear;
+}
+.qc-measure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 24px;
+}
+.qc-live {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 200px;
+}
+.qc-live__label {
+  color: var(--text-3);
+  font-size: var(--fs-sm, 14px);
+}
+.qc-live__value {
+  font-size: clamp(48px, 9vw, 80px);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.qc-entry {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.qc-entry__input {
+  width: 120px;
+  font-size: 24px;
+  height: 48px;
+}
+.qc-bad {
+  color: var(--critical, #b42318);
+  font-weight: 600;
+}
+.qc-warn {
+  color: var(--warn-text, #8a5a00);
+  font-size: var(--fs-sm, 14px);
+}
+.qc-main {
+  font-weight: 700;
+  font-size: 1.15em;
+}
+.qc-formulas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.qc-formulas li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.qc-formulas code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 15px;
+  color: var(--text);
+}
+.qc-formulas span {
+  color: var(--text-3);
+  font-size: var(--fs-sm, 14px);
+}

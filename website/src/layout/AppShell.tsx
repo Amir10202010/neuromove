@@ -3,7 +3,7 @@
 // и «Настройки» — ниже, отдельно: нужны не каждый день. Кто работает и в каком
 // пространстве (демо или клиника) — одна строка внизу панели.
 
-import { ChartNoAxesCombined, Cpu, FlaskConical, HeartHandshake, History, House, Menu, MonitorPlay, Plus, RotateCcw, Settings, UsersRound, WifiOff } from 'lucide-react';
+import { ChartNoAxesCombined, Cpu, FlaskConical, HeartHandshake, History, House, Menu, MonitorPlay, Plus, RotateCcw, Ruler, Settings, UsersRound, WifiOff } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { href, navigate, useRoute, type Route } from '../app/router';
 import { DemoGuide } from '../features/demo/DemoGuide';
@@ -33,6 +33,7 @@ const NAV_MAIN: NavDef[] = [
 ];
 const NAV_MORE: NavDef[] = [
   { route: { name: 'devices' }, match: ['devices'], label: 'nav.devices', icon: <Cpu aria-hidden /> },
+  { route: { name: 'check' }, match: ['check'], label: 'nav.check', icon: <Ruler aria-hidden /> },
   { route: { name: 'settings' }, match: ['settings'], label: 'nav.settings', icon: <Settings aria-hidden /> },
 ];
 

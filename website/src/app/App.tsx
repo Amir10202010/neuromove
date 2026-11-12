@@ -53,6 +53,8 @@ function routeTitle(route: Route, t: TFunction, codeOf: (id: string) => string |
         return t('nav.analytics');
       case 'devices':
         return t('nav.devices');
+      case 'check':
+        return t('nav.check');
       case 'settings':
         return t('nav.settings');
       case 'lab':

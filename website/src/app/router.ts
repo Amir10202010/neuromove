@@ -18,6 +18,7 @@ export type Route =
   | { name: 'sessionPrint'; id: string }
   | { name: 'analytics' }
   | { name: 'devices' }
+  | { name: 'check' }
   | { name: 'settings' }
   | { name: 'lab' }
   | { name: 'research' }
@@ -90,6 +91,9 @@ export function parseHash(hash: string): Route {
       return { name: 'analytics' };
     case 'devices':
       return { name: 'devices' };
+    // Быстрая проверка с угломером: подключение, ноль, замеры и ошибка на одной странице
+    case 'check':
+      return parts.length === 1 ? { name: 'check' } : { name: 'notFound' };
     case 'settings':
       return { name: 'settings' };
     // Research platform: goniometer validation, protocols, datasets
@@ -170,6 +174,8 @@ export function href(r: Route): string {
       return '#/analytics';
     case 'devices':
       return '#/devices';
+    case 'check':
+      return '#/check';
     case 'settings':
       return '#/settings';
     case 'lab':

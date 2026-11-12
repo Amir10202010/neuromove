@@ -51,6 +51,7 @@ export const ru = {
     sessions: 'Сеансы',
     analytics: 'Аналитика',
     devices: 'Датчики',
+    check: 'Проверка с угломером',
     settings: 'Настройки',
     newSession: 'Новый тест',
     sessionShort: 'Тест',

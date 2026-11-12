@@ -53,6 +53,7 @@ export const en: typeof ru = {
     sessions: 'Sessions',
     analytics: 'Analytics',
     devices: 'Sensors',
+    check: 'Goniometer check',
     settings: 'Settings',
     newSession: 'New test',
     sessionShort: 'Test',
