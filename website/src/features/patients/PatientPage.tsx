@@ -1,4 +1,4 @@
-import { Download, FileHeart, Pencil, Play, StickyNote, Target, Trash2 } from 'lucide-react';
+import { Download, FileHeart, FlaskConical, Pencil, Play, StickyNote, Target, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { href, navigate } from '../../app/router';
 import { Sparkline } from '../../charts/Sparkline';
@@ -6,7 +6,8 @@ import { downloadText, exportName, metricsCsv, stamp } from '../../data/export';
 import type { Patient, Session } from '../../data/models';
 import { useI18n } from '../../i18n';
 import { PageHeader } from '../../layout/PageHeader';
-import { useAppStore, useWorkspaceData } from '../../state/appStore';
+import { currentClinician, useAppStore, useWorkspaceData } from '../../state/appStore';
+import { generateSyntheticCourse } from '../../simulation/syntheticCourse';
 import { consistency, focusSide, metricSeries, patientSessions, sessionSymmetry, stepOf, weeksSince } from '../../session/compare';
 import { Button, LinkButton } from '../../ui/Button';
 import { Delta } from '../../ui/Delta';
@@ -82,6 +83,7 @@ export function PatientPage({ id, tab }: { id: string; tab: Tab }) {
         }
         actions={
           <>
+            <SyntheticCourseButton patient={patient} />
             <LinkButton href={href({ name: 'family', id: patient.id })} icon={<FileHeart />}>
               <span className="hide-sm">{t('profile.familyReport')}</span>
             </LinkButton>
@@ -398,5 +400,33 @@ function SessionsTable({ patient, list }: { patient: Patient; list: Session[] })
         </table>
       </div>
     </section>
+  );
+}
+
+/**
+ * Синтетический курс: 8 сеансов раз в неделю с сырым потоком — чтобы модели научения, двойник, стратегии движения
+ * и обсерватория работали сразу, у любого пациента, в демо и в клинике. Сеансы помечены «симуляция».
+ */
+function SyntheticCourseButton({ patient }: { patient: Patient }) {
+  const sessions = useAppStore((s) => s.sessions);
+  const saveSession = useAppStore((s) => s.saveSession);
+  const toast = useAppStore((s) => s.toast);
+  const locale = useAppStore((s) => s.settings.locale);
+  const [progress, setProgress] = useState<string | null>(null);
+  const run = async () => {
+    setProgress('0/8');
+    try {
+      const course = await generateSyntheticCourse({ patient, existing: sessions, clinician: currentClinician(), onProgress: (d, n) => setProgress(`${d}/${n}`) });
+      for (const c of course) saveSession(c.session, c.raw);
+      await useAppStore.getState().flush();
+      toast('good', locale === 'en' ? `Added ${course.length} simulated sessions` : `Добавлено симулированных сеансов: ${course.length}`);
+    } finally {
+      setProgress(null);
+    }
+  };
+  return (
+    <Button icon={<FlaskConical />} onClick={() => void run()} loading={progress !== null} disabled={progress !== null} title={locale === 'en' ? 'Generate 8 simulated weekly sessions with raw data' : 'Сгенерировать 8 симулированных сеансов раз в неделю с сырыми данными'}>
+      <span className="hide-sm">{progress !== null ? progress : locale === 'en' ? 'Simulated course' : 'Сгенерировать курс'}</span>
+    </Button>
   );
 }

@@ -29,7 +29,8 @@ export function useLabData() {
     if (!labLoaded) void loadLab();
   }, [rehabLoaded, loadRehab, labLoaded, loadLab]);
   const practice = useMemo(() => records.filter((r): r is PracticeRecord => r.kind === 'practice' && r.workspace === ws), [records, ws]);
-  const includeSimulated = ws === 'demo';
+  // Симулированные сеансы участвуют везде — и в демо, и в клинике; баннер «синтетические данные» показывается, если они есть
+  const includeSimulated = true;
   return { ws, patients, sessions, practice, includeSimulated, ready: rehabLoaded && labLoaded };
 }
 
@@ -50,7 +51,9 @@ export function Prov({ kind }: { kind: Provenance }) {
 
 export function SimulatedBanner({ show }: { show: boolean }) {
   const lt = useLT();
-  if (!show) return null;
+  const { ws, sessions } = useWorkspaceData();
+  const present = ws === 'demo' || sessions.some((s) => s.demo || s.device.simulated || s.device.kind === 'simulator');
+  if (!show || !present) return null;
   return (
     <div className="callout callout--demo" role="note">
       <FlaskConical aria-hidden />

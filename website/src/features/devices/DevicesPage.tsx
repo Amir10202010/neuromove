@@ -104,7 +104,7 @@ export function DevicesPage() {
   const serial = isWebSerialSupported();
   const ble = isWebBluetoothSupported();
   const sources: { k: DeviceKind; icon: ReactNode; title: string; text: string; disabled: boolean; badge: string }[] = [
-    { k: 'simulator', icon: <FlaskConical />, title: t('device.simulator'), text: ws === 'demo' ? t('device.kinds.simulatorText') : t('device.kinds.notInDemo'), disabled: ws !== 'demo', badge: ws === 'demo' ? '' : t('device.kinds.demoOnly') },
+    { k: 'simulator', icon: <FlaskConical />, title: t('device.simulator'), text: t('device.kinds.simulatorText'), disabled: false, badge: ws === 'demo' ? '' : t('device.kinds.simulated') },
     { k: 'usb', icon: <Usb />, title: t('device.usb'), text: t('device.kinds.usbText'), disabled: !serial, badge: serial ? t('device.supported') : t('device.kinds.notSupported') },
     { k: 'ble', icon: <Bluetooth />, title: t('device.ble'), text: t('device.kinds.bleText'), disabled: !ble, badge: ble ? t('device.supported') : t('device.kinds.notSupported') },
     { k: 'replay', icon: <FileUp />, title: t('device.replay'), text: t('device.kinds.replayText'), disabled: false, badge: 'imu-csv v1' },

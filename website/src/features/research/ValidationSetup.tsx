@@ -27,8 +27,8 @@ export function ValidationSetup({ protocolKey }: { protocolKey: string | null })
   const protocols = useMemo(() => latestVersions(all.filter((v) => v.workspace === ws)), [all, ws]);
   const [pKey, setPKey] = useState<string>(protocolKey ?? '');
   const [participant, setParticipant] = useState('');
-  // Clinic: only real devices. Demo: the simulator (labelled simulated everywhere).
-  const kinds: DeviceKind[] = ws === 'demo' ? ['simulator'] : ['usb', 'ble'];
+  // Real devices and the simulator everywhere; simulated sessions are labelled simulated
+  const kinds: DeviceKind[] = ws === 'demo' ? ['simulator', 'usb', 'ble'] : ['usb', 'ble', 'simulator'];
   const [kind, setKind] = useState<DeviceKind>(kinds[0] as DeviceKind);
   const [notes, setNotes] = useState('');
   const [busy, setBusy] = useState(false);

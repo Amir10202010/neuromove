@@ -21,9 +21,21 @@ export interface VirtualSessionOptions {
   maxSeconds?: number;
   /** Проверка одним датчиком: в поток идёт только этот датчик, остальных как будто не надели. */
   singleSensor?: Placement;
+  /** Хранить сырой поток в движке (runVirtualSessionRaw). */
+  recordRaw?: boolean;
 }
 
 export function runVirtualSession(o: VirtualSessionOptions): EngineResult {
+  return runVirtualEngine(o).result();
+}
+
+/** То же, но вместе с сырым потоком — для синтетических курсов, где нужны и модели, и стратегии движения. */
+export function runVirtualSessionRaw(o: VirtualSessionOptions): { result: EngineResult; raw: RawFrame[] } {
+  const engine = runVirtualEngine({ ...o, recordRaw: true });
+  return { result: engine.result(), raw: engine.rawFrames };
+}
+
+function runVirtualEngine(o: VirtualSessionOptions): SessionEngine {
   const rate = 100;
   const imu = new ImuSimulator(o.seed, rate);
   const patient = new VirtualPatient(o.profile, o.seed ^ 0x5bd1e995);
@@ -31,6 +43,7 @@ export function runVirtualSession(o: VirtualSessionOptions): EngineResult {
     steps: o.steps,
     rateHz: rate,
     autoAdvance: true,
+    ...(o.recordRaw ? { recordRaw: true } : {}),
     ...(o.expectedRom ? { expectedRom: o.expectedRom } : {}),
   });
   engine.onInstruction((ins, t) => patient.instruct(ins, t));
@@ -54,5 +67,5 @@ export function runVirtualSession(o: VirtualSessionOptions): EngineResult {
     engine.process([frame]);
   }
   if (!engine.isFinished) engine.stop();
-  return engine.result();
+  return engine;
 }

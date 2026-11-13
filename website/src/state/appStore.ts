@@ -177,9 +177,11 @@ export const useAppStore = create<State & Actions>((set, get) => {
   };
   // Clinic records go to the sync outbox in the same IndexedDB transaction as the record itself.
   // Demo records never leave the browser.
+  // Simulated sessions in the clinic stay local: the server refuses them (simulated_data_not_accepted).
   const put = (c: CollectionName, v: Patient | Session | Note | Alert) => {
-    persist((st) => st.put(c, v, v.workspace === 'clinic' ? makeOp(ENTITY_OF_COLLECTION[c], v.id, v) : undefined));
-    if (v.workspace === 'clinic') scheduleSync();
+    const sync = v.workspace === 'clinic' && !(c === 'sessions' && isSimulatedSession(v as Session));
+    persist((st) => st.put(c, v, sync ? makeOp(ENTITY_OF_COLLECTION[c], v.id, v) : undefined));
+    if (sync) scheduleSync();
   };
   const tombstone = (c: CollectionName, ws: string, id: string) => {
     if (ws !== 'clinic') return;
@@ -403,10 +405,8 @@ export const useAppStore = create<State & Actions>((set, get) => {
       const s = get();
       // Последняя линия защиты: экран выбора файла уже отказывает, но смоделированные данные
       // не должны попасть в историю настоящих пациентов никаким путём
-      if (session.workspace === 'clinic' && isSimulatedSession(session)) {
-        get().toast('critical', makeT(s.settings.locale)('errors.simulatedInClinic'));
-        return session;
-      }
+      // С 13 ноября 2026 (решение основателя): симуляция разрешена и в клинике — сеанс помечен «симуляция»
+      // (device.simulated, demo) и подписан на всех экранах и в выгрузках
       // Тот же сеанс второй раз (двойной клик, повтор эффекта, восстановление после перезагрузки) ничего
       // не меняет: иначе он задвоился бы в списке, оповещения — тоже, а следующий визит сдвинулся бы дважды
       const existing = s.sessions.find((x) => x.id === session.id);

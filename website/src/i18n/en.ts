@@ -368,7 +368,8 @@ export const en: typeof ru = {
       notSupported: 'Not supported in this browser',
       needsHardware: 'Needs the kit prototype',
       demoOnly: 'Demo only',
-      notInDemo: 'The simulator is not available in the clinic workspace: simulated data must never enter a patient’s history.',
+      simulated: 'Simulated',
+      notInDemo: 'The simulator also works in the clinic: such sessions are labelled “Simulated”, stay in this browser and are never synced.',
     },
     placement: {
       trunk: 'Trunk',

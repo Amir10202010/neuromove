@@ -92,7 +92,7 @@ export function SessionSetupPage({ patientId, protocol }: { patientId: string | 
   const minutes = Math.max(1, Math.round(estimateSeconds(steps) / 60));
 
   const sourceLabel = device === 'simulator' ? t('device.simulator') : device === 'usb' ? t('device.usb') : device === 'ble' ? t('device.ble') : t('device.replay');
-  const canStart = !!patient && steps.length > 0 && (device !== 'replay' || !!replay) && (device !== 'simulator' || ws === 'demo');
+  const canStart = !!patient && steps.length > 0 && (device !== 'replay' || !!replay);
 
   const start = () => {
     if (!patient || !canStart) return;
@@ -104,7 +104,7 @@ export function SessionSetupPage({ patientId, protocol }: { patientId: string | 
         protocolId,
         steps,
         deviceKind: device,
-        scenario: ws === 'demo' && device === 'simulator' ? scenario : 'normal',
+        scenario: device === 'simulator' ? scenario : 'normal',
         autoAdvance,
         ...(device === 'replay' && replay ? { replay: { name: replay.name, text: replay.text } } : {}),
         ...(single ? { single } : {}),
@@ -330,9 +330,8 @@ export function SessionSetupPage({ patientId, protocol }: { patientId: string | 
                   onSelect={() => setDevice('simulator')}
                   icon={<FlaskConical />}
                   title={t('device.simulator')}
-                  text={ws === 'demo' ? t('device.kinds.simulatorText') : t('device.kinds.notInDemo')}
-                  disabled={ws !== 'demo'}
-                  badge={ws === 'demo' ? undefined : <span className="badge badge--demo" style={{ marginLeft: 8 }}>{t('device.kinds.demoOnly')}</span>}
+                  text={t('device.kinds.simulatorText')}
+                  badge={ws === 'demo' ? undefined : <span className="badge badge--demo" style={{ marginLeft: 8 }}>{t('device.kinds.simulated')}</span>}
                 />
                 <Option
                   selected={device === 'usb'}
@@ -384,7 +383,7 @@ export function SessionSetupPage({ patientId, protocol }: { patientId: string | 
                   <span>{t('setup.hardwareMissing')}</span>
                 </div>
               )}
-              {ws === 'demo' && device === 'simulator' && (
+              {device === 'simulator' && (
                 <div className="stack" style={{ gap: 8 }}>
                   <span className="field__label">{t('setup.scenario')}</span>
                   <span className="field__hint" style={{ marginTop: -4 }}>
