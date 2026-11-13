@@ -104,6 +104,7 @@ export function ConnectPanel({ controller, state }: { controller: SessionControl
             <div style={{ flex: 1 }}>
               <div className="callout__title">{t('device.phase.error')}</div>
               <div>{t(`device.errors.${s.error.code}`)}</div>
+              {s.error.message && <div className="field__hint">{s.error.message}</div>}
             </div>
             <Button size="sm" icon={<RefreshCw />} onClick={() => void controller.reconnect()}>
               {t('common.retry')}

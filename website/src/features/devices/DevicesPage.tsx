@@ -162,7 +162,10 @@ export function DevicesPage() {
                 {status.error && (
                   <div className="callout callout--critical" role="alert">
                     <CircleAlert aria-hidden />
-                    <span>{t(`device.errors.${status.error.code}`)}</span>
+                    <span>
+                      {t(`device.errors.${status.error.code}`)}
+                      {status.error.message && <span className="field__hint" style={{ display: 'block' }}>{status.error.message}</span>}
+                    </span>
                   </div>
                 )}
                 {status.sensors.length > 0 && (
